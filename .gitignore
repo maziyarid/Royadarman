@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+wp-config.php
+*.zip
+*.sql.gz
+node_modules/
+dist/
+.DS_Store
+coverage/
