@@ -1,5 +1,13 @@
 # Iran-first implications
 
+> **PARTIALLY SUPERSEDED.** The non-payment items below (Jalali at
+> presentation only, UTC storage, Iranian SMS chain behind an adapter,
+> locale RTL) remain consistent with the current architecture. The
+> payment items (Iranian hosted IPG, split settlement, Sheba payouts, no
+> wallet/escrow) describe the earlier **marketplace/payment** design and
+> are **not** part of the current MVP. **Current canonical architecture:**
+> `backend/ARCHITECTURE.md`.
+
 Status: proposed until ADR-011 is locked.
 
 Evidence: Persian brand; Medical-CRM already implements Jalali, Iranian national-id checksum, and an Iranian SMS chain; adjacent clinic sites operate in that market.

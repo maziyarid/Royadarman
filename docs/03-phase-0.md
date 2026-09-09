@@ -1,5 +1,15 @@
 # Phase 0 — before marketplace code
 
+> **SUPERSEDED ARCHITECTURE**
+>
+> This phase-0 checklist was written for the earlier **marketplace/payment**
+> design (visit-fee collection, hosted IPG, ledger, slot holds, clinic
+> payout settlement). Those payment/marketplace items are **not** part of
+> the current canonical product. The non-financial items (operating
+> region, retention, taxonomy, red-flag copy, credentialing, SMS, data
+> residency) remain relevant. **Current canonical architecture:**
+> `backend/ARCHITECTURE.md`; current activation gates: `backend/CHECKLIST.md`.
+
 Duration: 2-4 weeks.
 
 Writing application code during Phase 0 freezes the wrong payment role, taxonomy, and booking mix into migrations.

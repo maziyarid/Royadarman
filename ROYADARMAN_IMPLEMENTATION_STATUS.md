@@ -1,0 +1,135 @@
+# Royadarman implementation status
+
+Resumable single-source implementation record. Updated as work progresses.
+Branch: `feat/royadarman-completion` (based on `main`, the canonical baseline).
+Overbuild branch `vibe/backend-comprehensive-5ec088` is preserved as a
+salvage/future-reference source only; it is **not** the development base.
+
+Status legend: `NOT_STARTED`, `PARTIAL`, `IMPLEMENTED_UNVERIFIED`, `VERIFIED`,
+`BLOCKED_EXTERNAL`, `FAILED`.
+
+## Source-of-truth audit (Phase 0)
+
+| Area | State | Evidence | Missing / Next action |
+| --- | --- | --- | --- |
+| Git base | VERIFIED | `main` @ `4d6e3ab` is the clean canonical baseline (14 models, 9 controllers, 8 migrations, intake gated). New branch `feat/royadarman-completion` created from `main`. | — |
+| Overbuild branch | VERIFIED (audited) | `vibe/backend-comprehensive-5ec088` = single commit `536f012`, the marketplace/payment/matching/scheduling overbuild. CMS, dashboards, SupportTicket, extra tests claimed in prior chat sessions are **not** in Git. | Preserve as future-reference. Do not merge. See salvage matrix below. |
+| Root README | VERIFIED (corrected) | Was "Managed dental marketplace … owns payment … settlement"; rewritten to current canonical scope + SUPERSEDED notice pointing to `backend/ARCHITECTURE.md`. | Commit. |
+| Old ADRs/docs | VERIFIED (marked) | `docs/01-adrs.md`, `02-architecture.md`, `03-phase-0.md`, `04-iran.md`, `05-data-model.md` carry SUPERSEDED/PARTIALLY SUPERSEDED headers. `docs/00-reuse-verdict.md` (ADR-001) still valid. | Commit. |
+| Sandbox PHP/Composer | FAILED (env) | `php` and `composer` binaries absent from sandbox. Not a Royadarman defect. | Install PHP 8.3 + Composer, then run `composer install`, `artisan about`, `route:list`, `test`, `composer audit`, Pint. |
+| Production MCP | NOT_STARTED | Not yet attempted read-only. | Attempt read-only; on runtime-level unsupported, record `RUNTIME_CONNECTOR_BLOCKED` and continue. |
+| ClickUp | NOT_STARTED | Legacy Monday-import + a public-site-unreachable task from an earlier outage. | Reconcile against current live evidence; update existing tasks, do not rewrite all legacy imports. |
+
+## Current canonical baseline (`main`) — what actually exists
+
+Verified by direct file inspection (not by chat claims).
+
+| Domain | State | Evidence | Missing | Next action |
+| --- | --- | --- | --- | --- |
+| Identity — OTP auth | IMPLEMENTED_UNVERIFIED | `OtpService`, `OtpChallenge`, `HttpOtpSender`, `AuthController` (challenge/verify/logout), throttle 20/60 & 30/60, `User` casts phone/totp encrypted. | No PHP runtime test yet. | Verify on PHP 8.3. |
+| Identity — Staff MFA | PARTIAL | `TotpVerifier` exists; `mfa_recovery_codes` cast on User. | Recovery-code flow, rapid revocation, idle/session-expiry controls not verified. | Complete + test. |
+| Identity — Roles | IMPLEMENTED_UNVERIFIED | `UserRole` enum: patient, coordinator, clinician, clinic_rep, owner, tech_admin. `isStaff()`. | Role-grant enforcement in policies not fully covered for every role. | Extend policy tests. |
+| Intake — Cases | IMPLEMENTED_UNVERIFIED | `PatientCase`, `CaseWorkflow`, `SubmitPatientCase`, `CaseStatus` enum with explicit `allowedTargets()` state machine, `StorePatientCaseRequest` (Tehran-area validation). | No PHP runtime test. | Verify on MariaDB. |
+| Intake — Kill switch | IMPLEMENTED_UNVERIFIED | `EnsurePatientIntakeEnabled` middleware wraps every intake route (draft/submit/documents/referrals/staff actions) in `api.php`. | Direct-while-disabled bypass test exists in `PatientCaseIntakeTest`; needs runtime run. | Verify on PHP 8.3. |
+| Consent | IMPLEMENTED_UNVERIFIED | `PolicyVersion`, `ConsentRecord`, `PolicyController`; fail-closed missing-translation design documented. | Runtime verification; legal text is an activation gate. | Verify; Gate A external. |
+| Documents — OPG pipeline | IMPLEMENTED_UNVERIFIED | `ClinicalDocument`, `ScanAttempt`, `QuarantineClinicalDocument`, `ClamAvDocumentScanner`, `ScanClinicalDocument` job, `DocumentScanner` contract, private storage design. | ClamAV live drill (Gate E external); runtime verify. | Verify on PHP 8.3 + ClamAV. |
+| Coordination — Assignments | IMPLEMENTED_UNVERIFIED | `CaseAssignment`, `coordination_tasks` table, `StaffCaseController` (assign/status/proposeReferral/createReview/publishReview). | Runtime verify. | Verify. |
+| Coordination — Referrals | IMPLEMENTED_UNVERIFIED | `ReferralProposal`, `ReferralGrant`, `ReferralController` (patient decision), `referral_grants.scope` JSON for minimum-data sharing. | Runtime verify. | Verify. |
+| Clinical review | PARTIAL | `review_revisions` table + `ReviewRevision` model (encrypted fields, signed_at). `publication_events` table exists but **no `Review` parent model**, no `PublicationEvent` model. | Add `Review` + `PublicationEvent` models; verify assigned-licensed-clinician-only publish. | Build models. |
+| Operations — Outbox | IMPLEMENTED_UNVERIFIED | `OutboxEvent`, `Outbox` service, `Idempotency`, `ProcessOutboxEvent` job, `DispatchOutbox` command. | Runtime verify; transaction-after-commit semantics. | Verify. |
+| Operations — Notifications | IMPLEMENTED_UNVERIFIED | `notification_deliveries` table, `HttpNotificationSender`, `NotificationCallbackController`. | SMS provider abstraction (no hard-coded provider); Gate B external. | Build SMS adapter. |
+| Operations — Retention | IMPLEMENTED_UNVERIFIED | `retention_jobs` table, `RunRetention` command. | Retention period is an activation gate (Gate C external). | Verify; Gate C external. |
+| Operations — Audit | IMPLEMENTED_UNVERIFIED | `AuditEvent` model, `audit_events` table. | Runtime verify; ensure no OTP/PII/secret storage. | Verify. |
+| Provider network — schema | IMPLEMENTED_UNVERIFIED | `clinics`, `practitioners` (licence_number/licence_hash/credential_status/expires_at), `clinic_memberships` tables exist on `main`. **No Eloquent models.** | Build `Clinic`, `Practitioner`, `ClinicMembership` models fresh against `main`'s schema (do NOT salvage overbuild's tangled `Clinic`/`Dentist`/`Credential`). | Build models. |
+| Home dentistry | PARTIAL | Exists only as `ServiceType::HomeDentistry` enum + intake Tehran-area question. No dedicated workflow table/lifecycle. | Build home-service lifecycle per §18. | Build. |
+| Support system | NOT_STARTED | No `support_cases`/`support_tickets` table, no `SupportCase`/`SupportTicket` model on `main`. (SupportCase models existed only on the overbuild branch.) | Build support system per §20. (The handoff instruction to "extend existing SupportCase" does not apply to `main`.) | Build. |
+| CMS / Marketing | NOT_STARTED | No CMS tables/models/controllers/routes/UI on `main`. Prior CMS claims were uncommitted. | Build vertically per §21–22. | Build. |
+| Role dashboards | NOT_STARTED | No dashboard controllers/services/views on `main`. Prior dashboard claims were uncommitted. | Build per-role UI per §13, clinical scope (no earnings/settlement/payment). | Build. |
+| Public frontend | PARTIAL | `Current Public_HTML/` + `Front-end v1/` static multilingual frontend; `public/home.blade.php` minimal; approved identity in `public/assets/`. | Reconcile static vs Blade; connect to Laravel routes; keep approved design. | Reconcile. |
+| Multilingual | PARTIAL | `lang/{fa,ar,en}/ui.php`; `SetLocale` middleware; `/fa/`,`/ar/`,`/en/` routes; `dir`/`lang`. | Audit full key coverage; legal-translation fail-closed. | Audit + complete. |
+| SEO | NOT_STARTED | No sitemap/robots/hreflang/canonical/structured-data implementation on `main`. | Build per §27. | Build. |
+| Tests | PARTIAL | 10 files / 24 test functions covering OTP, case workflow, clinical access, document pipeline, locale+owner-denial, operations, intake-disabled, error envelopes. | Need PHP runtime to run; coverage gaps for every new domain. | Run + expand. |
+
+## Activation gates (intentionally open — external)
+
+| Gate | State | Required input |
+| --- | --- | --- |
+| A — Legal/consent text (fa/ar/en) | BLOCKED_EXTERNAL | Approved exact legal wording in all three languages. |
+| B — SMS production | BLOCKED_EXTERNAL | Provider credentials, templates, delivery/callback/retry verification. |
+| C — Retention + encrypted backup/restore | BLOCKED_EXTERNAL | Approved retention period + encrypted backup + proven restore drill. |
+| D — Staffing | BLOCKED_EXTERNAL | Named coordinator coverage, licensed clinical lead, clinician credential records, accurate 24/7 wording. |
+| E — Scanner drills | BLOCKED_EXTERNAL | Operator-approved EICAR + forced-timeout fail-closed drills. |
+
+Intake stays `INTAKE_ENABLED=false` until A–E pass, end-to-end rehearsal
+succeeds, and explicit activation approval is given. All independent
+technical work continues regardless of these gates.
+
+## Overbuild salvage matrix
+
+Branch `vibe/backend-comprehensive-5ec088` (commit `536f012`). Classified per
+the handoff decision.
+
+| Component | Classification | Reason | Action |
+| --- | --- | --- | --- |
+| Finance — PaymentService, PaymentIntent, PaymentTransaction, PaymentWebhook | FUTURE_REFERENCE | Outside current MVP (no payments). | Leave on old branch; do not port. |
+| Finance — LedgerService, LedgerAccount/Entry/Transaction | FUTURE_REFERENCE | Outside current MVP (no ledger). | Leave on old branch. |
+| Finance — Refund, SettlementBatch/Item, PayoutAccount, ReconciliationResult | FUTURE_REFERENCE | Outside current MVP. | Leave on old branch. |
+| Finance — Order, OrderLine | FUTURE_REFERENCE | Outside current MVP. | Leave on old branch. |
+| config/payment.php (Zarinpal/IDPay) | REJECT | Hardcodes payment gateways; exposes payment config. | Do not port. |
+| Matching — MatchingService, MatchRun, MatchCandidate, MatchDecision | REJECT | Automatic marketplace matching is an explicit MVP exclusion. | Leave on old branch. |
+| Scheduling — SlotService, AppointmentSlot, SlotHold, CapacityWindow, BookingMode, HoldStatus | FUTURE_REFERENCE | Instant slot/hold booking excluded from MVP. | Leave on old branch. |
+| Scheduling — Appointment, AppointmentStatusHistory, CheckIn, VisitConfirmation, AvailabilityRule, OperatingHour, Holiday | FUTURE_REFERENCE | Appointment-booking flow outside current coordination scope. | Leave on old branch. |
+| Provider models — Clinic, ClinicBranch, ClinicUser, ClinicCredentialing, Dentist, Credential, Service, BranchService | REJECT | `main` already has a **better** provider schema (`clinics`, `practitioners`, `clinic_memberships`) with licence_hash + credential_status + expires_at. Overbuild models are tangled with marketplace relationships (payoutAccounts, settlementItems, ledgerEntries, appointmentSlots) and reference a non-existent `ClinicMembership` (it uses `ClinicUser`). | Build `Clinic`, `Practitioner`, `ClinicMembership` fresh against `main`'s schema. Do not salvage. |
+| Provider controllers — ClinicController, ClinicBranchController, DentistController, ServiceController | REJECT | CRUD over the marketplace-tangled models; no branch/service-area/credential workflow matching canonical scope. | Build fresh against `main`'s schema + canonical authorization. |
+| Marketplace operations — Complaint, FraudSignal, DocumentVerification, Notification, UrgencyAssessment, PatientPreference, IntakeAnswer, PriceSnapshot | FUTURE_REFERENCE / REJECT | Mixed marketplace semantics; `main` already covers the in-scope equivalents. | Inspect individually only if a canonical need appears; otherwise leave. |
+| `Review` model (parent of ReviewRevision) | INSPECT | `main` has `review_revisions` + `publication_events` tables but no `Review`/`PublicationEvent` models. Overbuild's `Review` is marketplace-tangled (requires "verified completed visit"). | Build `Review` + `PublicationEvent` fresh against `main`'s schema with assigned-licensed-clinician-only publish semantics. |
+| SupportCase, SupportCaseMessage | REJECT | Marketplace-tangled support; not on `main`. | Build support system fresh per §20. |
+| Policies — Appointment/Order/PaymentIntent/Refund/ClinicBranch/Dentist/Service | REJECT | Tied to overbuild models/marketplace. | Build fresh policies for canonical models. |
+| DomainServiceProvider | REJECT | Registers marketplace services. | Do not port; `main` registers services in `AppServiceProvider`. |
+| config/matching.php, config/scheduling.php | REJECT | Marketplace/scheduling config. | Do not port. |
+| Migration `2026_09_09_*_create_{clinic_network,matching,scheduling,finance,operations}_tables` | REJECT | Creates marketplace tables not on `main`. `main`'s own migrations are canonical. | Do not port; `main`'s schema is the source of truth. |
+
+Net salvage from overbuild: **none ported wholesale.** Any reusable *idea*
+(e.g. the shape of a credential record) is reimplemented against `main`'s
+already-superior schema. The branch is preserved as historical/future
+reference; no feature flags are needed because the overbuild code is not
+entering the production code path.
+
+## Roadmap (execution order)
+
+0. ~~Branch from `main` → `feat/royadarman-completion`.~~ ✅
+0. ~~Correct superseded docs (root README + ADRs).~~ ✅ (pending commit)
+0. ~~This status file.~~ ✅ (pending commit)
+1. Establish PHP 8.3 + Composer; run `composer install`, `artisan about`,
+   `route:list`, `test`, `composer audit`, Pint. Record results here.
+2. Read-only production comparison via Royadarman MCP (or
+   `RUNTIME_CONNECTOR_BLOCKED`).
+3. Fix any baseline defects found (e.g. missing `Review`/`PublicationEvent`/
+   `Clinic`/`Practitioner`/`ClinicMembership` models for tables that already
+   exist on `main`).
+4. Auth/authorization hardening: extend cross-record denial tests to every
+   role; audit list-query scope; verify kill-switch on every intake route.
+5. Data/workflow integrity: cases, transitions, consent, provider network
+   models, referral, home dentistry lifecycle, support system.
+6. OPG pipeline end-to-end verify against MariaDB + ClamAV; retention hooks.
+7. CMS (vertical): migrations → models → services → policies → requests →
+   resources → routes → admin UI → multilingual → SEO → media → revisions →
+   tests → browser.
+8. Role dashboards (real UI, clinical scope, no earnings/settlement/payment).
+9. Multilingual completeness (fa/ar/en, RTL/LTR, legal fail-closed).
+10. Public frontend + SEO (sitemap, robots, hreflang, canonical, structured
+    data, redirects) keeping approved design.
+11. SMS adapter (provider abstraction, no hard-coded provider) + ClamAV
+    adapter; do not activate payments.
+12. Quality hardening: tests (incl. MariaDB integration), security/IDOR,
+    browser QA, accessibility, performance, dependency audit, TODO/stub scan.
+13. Production drift reconciliation: backups, source comparison, deployment
+    plan, migrations, worker/scheduler, cache, health, rollback.
+14. Deploy technically-complete release with `INTAKE_ENABLED=false`; verify
+    every route for that state.
+15. ClickUp + docs + memory reconciliation.
+16. Activation gates: do everything possible automatically; mark external
+    items `BLOCKED_EXTERNAL` with exact required input.
+17. End-to-end rehearsal (only when gates permit).
+18. Controlled intake activation (only after explicit approval).
+19. Post-activation verification; rollback ready.
