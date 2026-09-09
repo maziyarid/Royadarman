@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CaseController;
+use App\Http\Controllers\Api\V1\CmsPostController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\NotificationCallbackController;
 use App\Http\Controllers\Api\V1\PolicyController;
@@ -32,6 +33,14 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
         Route::post('/support/{conversation}/internal-notes', [SupportController::class, 'internalNote']);
         Route::patch('/support/{conversation}/status', [SupportController::class, 'status']);
         Route::post('/support/{conversation}/assignee', [SupportController::class, 'assign']);
+
+        Route::get('/cms/posts', [CmsPostController::class, 'index']);
+        Route::post('/cms/posts', [CmsPostController::class, 'store']);
+        Route::get('/cms/posts/{post}', [CmsPostController::class, 'show']);
+        Route::patch('/cms/posts/{post}', [CmsPostController::class, 'update']);
+        Route::post('/cms/posts/{post}/publish', [CmsPostController::class, 'publish']);
+        Route::post('/cms/posts/{post}/unpublish', [CmsPostController::class, 'unpublish']);
+        Route::delete('/cms/posts/{post}', [CmsPostController::class, 'destroy']);
 
         Route::middleware(EnsurePatientIntakeEnabled::class)->group(function (): void {
             Route::post('/cases/draft', [CaseController::class, 'draft']);
