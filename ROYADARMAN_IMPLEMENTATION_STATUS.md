@@ -16,9 +16,63 @@ Status legend: `NOT_STARTED`, `PARTIAL`, `IMPLEMENTED_UNVERIFIED`, `VERIFIED`,
 | Overbuild branch | VERIFIED (audited) | `vibe/backend-comprehensive-5ec088` = single commit `536f012`, the marketplace/payment/matching/scheduling overbuild. CMS, dashboards, SupportTicket, extra tests claimed in prior chat sessions are **not** in Git. | Preserve as future-reference. Do not merge. See salvage matrix below. |
 | Root README | VERIFIED (corrected) | Was "Managed dental marketplace … owns payment … settlement"; rewritten to current canonical scope + SUPERSEDED notice pointing to `backend/ARCHITECTURE.md`. | Commit. |
 | Old ADRs/docs | VERIFIED (marked) | `docs/01-adrs.md`, `02-architecture.md`, `03-phase-0.md`, `04-iran.md`, `05-data-model.md` carry SUPERSEDED/PARTIALLY SUPERSEDED headers. `docs/00-reuse-verdict.md` (ADR-001) still valid. | Commit. |
-| Sandbox PHP/Composer | FAILED (env) | `php` and `composer` binaries absent from sandbox. Not a Royadarman defect. | Install PHP 8.3 + Composer, then run `composer install`, `artisan about`, `route:list`, `test`, `composer audit`, Pint. |
-| Production MCP | NOT_STARTED | Not yet attempted read-only. | Attempt read-only; on runtime-level unsupported, record `RUNTIME_CONNECTOR_BLOCKED` and continue. |
+| Sandbox PHP/Composer | VERIFIED (dev) | PHP 8.4.24 + Composer 2.8.8 installed in sandbox (dev/test only; production target stays PHP 8.3). `composer install` OK. | Runtime results recorded in the section below. |
+| Production MCP | VERIFIED (read-only) | `royadarman-admin` SSH profile -> `mcpadmin@64.21.191.116` (hostname `server.royadarman.com`), passwordless sudo. Read-only drift inspection complete (see Production state below). | Continue read-only; no production writes without explicit approval. |
 | ClickUp | NOT_STARTED | Legacy Monday-import + a public-site-unreachable task from an earlier outage. | Reconcile against current live evidence; update existing tasks, do not rewrite all legacy imports. |
+
+## Production state (read-only drift comparison, live)
+
+Server: `64.21.191.116`, hostname `server.royadarman.com`. App path:
+`/home/royadarman/apps/royadarman-backend` (matches DEPLOYMENT.md). Public
+root: `/home/royadarman/public_html` (Laravel front controller + approved
+assets + preserved `mcp/` only). Private uploads:
+`/home/royadarman/private_uploads/{quarantine,approved}` (root-owned,
+drwxr-x---, not web-reachable).
+
+| Check | Production value | Matches `main`? |
+| --- | --- | --- |
+| Live `/up` | `{"status":"ok"}` | Yes |
+| Live `/fa/`, `/ar/`, `/en/` | All render canonical content (no-diagnosis, Tehran-only, intake-disabled, licensed-dentist-only) | Yes |
+| `APP_ENV` / `APP_DEBUG` | production / false | Yes |
+| `INTAKE_ENABLED` | **false** (kill switch enforced) | Yes (matches open gates) |
+| `DB_CONNECTION` | mysql (MariaDB 10.11.19) | Yes |
+| `QUEUE_CONNECTION` / `CACHE_STORE` | database / database | Yes |
+| Web/FPM + worker + scheduler PHP | **ea-php83** (PHP 8.3) | Yes (CLI default is 8.2 but runtime uses 8.3) |
+| ClamAV | 1.4.6, fresh sigs (2026-09-09) | Installed & current |
+| Queue worker | `royadarman-queue.service` active/running/enabled, ea-php83, systemd-supervised | Yes |
+| Scheduler | cron `* * * * *` -> `ea-php83 artisan schedule:run` | Yes |
+| Failed jobs | none | Clean |
+| Deployed models | 14 (same set as `main`) | **Identical** |
+| Deployed controllers | 9 (same set as `main`) | **Identical** |
+| Deployed Domain dirs | Cases, Documents, Identity, Operations (4 canonical; NO Finance/Matching/Scheduling/CMS) | **Identical** |
+| Deployed migrations | 7 Royadarman + 3 base = same set as `main`; all Ran on MariaDB | **Identical** |
+| Overbuild on production | **None** | Overbuild never deployed |
+| Git in deploy dir | **Not a git repo** (code drop / release snapshot) | n/a |
+
+Drift verdict: **production source == `main` source.** The overbuild branch
+was never deployed; the marketplace/payment/matching/scheduling code is not
+live and never was. Production is healthy and matches the canonical
+architecture. No redeploy needed now; new work on
+`feat/royadarman-completion` will need a deliberate deploy later.
+
+## Runtime verification of `main` baseline (PHP 8.4 dev sandbox)
+
+Production target remains PHP 8.3; sandbox runs 8.4 for dev/test only.
+
+| Check | Command | Result |
+| --- | --- | --- |
+| App boots | `php artisan about` | OK (env local, cache database, queue database, storage public NOT LINKED) |
+| Migrations | `php artisan migrate --force` (sqlite) | 8/8 OK (users, cache, jobs, case tables, scan tracking, identity/provider/consent, coordination/clinical/operations) |
+| Routes | `php artisan route:list` | 22 routes, all canonical (auth/otp, cases, documents, referrals, staff, policies, me, notifications/callback, up, locale home). **No overbuild routes.** |
+| Tests | `php artisan test` | **25 passed / 81 assertions** (matches CHECKLIST baseline) |
+| Security | `composer audit --no-dev` | No advisories |
+| Formatting | `php vendor/bin/pint --test` | PASS (95 files) |
+
+Notes: `phpunit.xml` gained a stable test `APP_KEY` (tests previously
+threw `MissingAppKeyException`). `backend/.gitignore` added (vendor, .env,
+sqlite, storage runtime caches). Repo previously had no `.env.example`
+(gap to address). View-cache dir `storage/framework/views` must exist for
+the locale-render test.
 
 ## Current canonical baseline (`main`) — what actually exists
 
@@ -100,36 +154,40 @@ entering the production code path.
 0. ~~Branch from `main` → `feat/royadarman-completion`.~~ ✅
 0. ~~Correct superseded docs (root README + ADRs).~~ ✅ (pending commit)
 0. ~~This status file.~~ ✅ (pending commit)
-1. Establish PHP 8.3 + Composer; run `composer install`, `artisan about`,
-   `route:list`, `test`, `composer audit`, Pint. Record results here.
-2. Read-only production comparison via Royadarman MCP (or
-   `RUNTIME_CONNECTOR_BLOCKED`).
-3. Fix any baseline defects found (e.g. missing `Review`/`PublicationEvent`/
+0. ~~Branch from `main` → `feat/royadarman-completion`.~~ ✅
+0. ~~Correct superseded docs (root README + ADRs).~~ ✅ committed
+0. ~~This status file.~~ ✅ committed
+0. ~~Establish PHP 8.3 + Composer; run `composer install`, `artisan about`,
+   `route:list`, `test`, `composer audit`, Pint.~~ ✅ (PHP 8.4 dev sandbox;
+   25 tests/81 assertions pass; Pint PASS; composer audit clean)
+0. ~~Read-only production comparison via Royadarman MCP.~~ ✅ production ==
+   main; healthy; intake disabled; no overbuild deployed.
+1. Fix any baseline defects found (e.g. missing `Review`/`PublicationEvent`/
    `Clinic`/`Practitioner`/`ClinicMembership` models for tables that already
-   exist on `main`).
-4. Auth/authorization hardening: extend cross-record denial tests to every
+   exist on `main`; repo has no `.env.example`).
+2. Auth/authorization hardening: extend cross-record denial tests to every
    role; audit list-query scope; verify kill-switch on every intake route.
-5. Data/workflow integrity: cases, transitions, consent, provider network
+3. Data/workflow integrity: cases, transitions, consent, provider network
    models, referral, home dentistry lifecycle, support system.
-6. OPG pipeline end-to-end verify against MariaDB + ClamAV; retention hooks.
-7. CMS (vertical): migrations → models → services → policies → requests →
+4. OPG pipeline end-to-end verify against MariaDB + ClamAV; retention hooks.
+5. CMS (vertical): migrations → models → services → policies → requests →
    resources → routes → admin UI → multilingual → SEO → media → revisions →
    tests → browser.
-8. Role dashboards (real UI, clinical scope, no earnings/settlement/payment).
-9. Multilingual completeness (fa/ar/en, RTL/LTR, legal fail-closed).
-10. Public frontend + SEO (sitemap, robots, hreflang, canonical, structured
-    data, redirects) keeping approved design.
-11. SMS adapter (provider abstraction, no hard-coded provider) + ClamAV
-    adapter; do not activate payments.
-12. Quality hardening: tests (incl. MariaDB integration), security/IDOR,
+6. Role dashboards (real UI, clinical scope, no earnings/settlement/payment).
+7. Multilingual completeness (fa/ar/en, RTL/LTR, legal fail-closed).
+8. Public frontend + SEO (sitemap, robots, hreflang, canonical, structured
+   data, redirects) keeping approved design.
+9. SMS adapter (provider abstraction, no hard-coded provider) + ClamAV
+   adapter; do not activate payments.
+10. Quality hardening: tests (incl. MariaDB integration), security/IDOR,
     browser QA, accessibility, performance, dependency audit, TODO/stub scan.
-13. Production drift reconciliation: backups, source comparison, deployment
+11. Production drift reconciliation: backups, source comparison, deployment
     plan, migrations, worker/scheduler, cache, health, rollback.
-14. Deploy technically-complete release with `INTAKE_ENABLED=false`; verify
+12. Deploy technically-complete release with `INTAKE_ENABLED=false`; verify
     every route for that state.
-15. ClickUp + docs + memory reconciliation.
-16. Activation gates: do everything possible automatically; mark external
+13. ClickUp + docs + memory reconciliation.
+14. Activation gates: do everything possible automatically; mark external
     items `BLOCKED_EXTERNAL` with exact required input.
-17. End-to-end rehearsal (only when gates permit).
-18. Controlled intake activation (only after explicit approval).
-19. Post-activation verification; rollback ready.
+15. End-to-end rehearsal (only when gates permit).
+16. Controlled intake activation (only after explicit approval).
+17. Post-activation verification; rollback ready.
