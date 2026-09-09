@@ -16,4 +16,3 @@ class ReviewRevision extends Model
         return ['image_adequacy' => 'encrypted', 'observations' => 'encrypted', 'limitations' => 'encrypted', 'options' => 'encrypted', 'recommended_next_step' => 'encrypted', 'signed_at' => 'immutable_datetime'];
     }
 }
-

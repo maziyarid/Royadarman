@@ -55,4 +55,3 @@ class ClinicalDocument extends Model
         return $this->belongsTo(PatientCase::class, 'case_id');
     }
 }
-

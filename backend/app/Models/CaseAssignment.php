@@ -18,4 +18,3 @@ class CaseAssignment extends Model
         return ['assigned_at' => 'immutable_datetime', 'released_at' => 'immutable_datetime'];
     }
 }
-

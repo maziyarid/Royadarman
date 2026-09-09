@@ -21,4 +21,3 @@ class EnsurePatientIntakeEnabled
         return $next($request);
     }
 }
-

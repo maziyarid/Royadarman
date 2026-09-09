@@ -11,4 +11,3 @@ enum DocumentStatus: string
     case ScanFailed = 'scan_failed';
     case Deleted = 'deleted';
 }
-

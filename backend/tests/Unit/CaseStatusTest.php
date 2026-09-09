@@ -17,4 +17,3 @@ class CaseStatusTest extends TestCase
         $this->assertFalse(CaseStatus::Closed->canTransitionTo(CaseStatus::InCoordination));
     }
 }
-

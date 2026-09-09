@@ -118,4 +118,3 @@ class QuarantineClinicalDocument
         return [$extension, $detectedMime];
     }
 }
-

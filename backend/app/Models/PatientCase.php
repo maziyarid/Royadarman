@@ -83,4 +83,3 @@ class PatientCase extends Model
         return $this->hasMany(ClinicalDocument::class, 'case_id');
     }
 }
-

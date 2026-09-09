@@ -41,4 +41,3 @@ enum CaseStatus: string
         return in_array($target, $this->allowedTargets(), true);
     }
 }
-

@@ -24,4 +24,3 @@ final class HttpOtpSender implements OtpSender
         ])->throw();
     }
 }
-

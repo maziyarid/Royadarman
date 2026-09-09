@@ -28,4 +28,3 @@ class PatientCaseController extends Controller
         ], Response::HTTP_CREATED);
     }
 }
-

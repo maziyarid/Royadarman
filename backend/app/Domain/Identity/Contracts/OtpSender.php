@@ -6,4 +6,3 @@ interface OtpSender
 {
     public function send(string $mobile, string $code, string $locale): void;
 }
-

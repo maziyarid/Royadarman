@@ -8,4 +8,3 @@ interface DocumentScanner
 {
     public function scan(string $absolutePath): ScanResult;
 }
-

@@ -36,4 +36,3 @@ class LocaleAndAuthorizationTest extends TestCase
         $this->actingAs($other)->getJson('/api/v1/cases/'.$case->id)->assertNotFound();
     }
 }
-

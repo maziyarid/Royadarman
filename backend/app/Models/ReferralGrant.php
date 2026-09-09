@@ -16,4 +16,3 @@ class ReferralGrant extends Model
         return ['scope' => 'array', 'granted_at' => 'immutable_datetime', 'revoked_at' => 'immutable_datetime', 'expires_at' => 'immutable_datetime'];
     }
 }
-
