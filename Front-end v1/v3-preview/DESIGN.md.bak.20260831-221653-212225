@@ -1,0 +1,202 @@
+# Royadarman Design Context
+
+**Product truth:** Royadarman is a 24-hour dental guidance, coordination and support centre. It is not the personal clinic of the owner and it does not let non-clinicians diagnose patients.
+
+## Accepted visual baseline — 2026-08-31
+
+The client-approved blue screenshot supplied by the user is the canonical visual target for the public homepage. Do not reinterpret it into a green/teal health-tech theme or a generic clinic template. Match its observable composition: white 92px-class header, Royadarman logo lockup, centred Persian navigation, outlined login CTA, two-column hero with copy on the right and a rounded blue OPG panel on the left, pale-blue 24-hour support pill, dark headline with electric-blue second line, dual CTAs, and three compact trust/benefit items beneath. The OPG panel uses a blurred blue radiograph treatment, a white OPG chip, a shield trust cue, and natural Persian copy at the bottom.
+
+Canonical public palette for this accepted direction: `#1477F8` primary electric blue, `#0E5FD4` pressed/deep blue, `#EAF3FF` soft blue, `#0D1626` primary ink, `#65768B` supporting text, `#D9E5F4` structural border, and white page/surface backgrounds. The signature is the OPG decision panel, not decorative gradients or generic medical imagery.
+
+The visible screenshot is visual authority; clinical, privacy and consent safeguards remain product authority behind it. Demo copy must read naturally and plausibly. Do not expose placeholder language such as lorem ipsum or artificial marketing filler.
+
+## Experience direction
+
+The interface should feel like a calm, competent human coordination desk: reassuring enough for an anxious patient, precise enough for a clinical reviewer, and operational rather than promotional in staff areas.
+
+The visual concept is **“guided path”**. A restrained curved route motif connects request, human follow-up and licensed care. It is used once in the public hero and sparingly as a status/timeline cue—never as decorative noise.
+
+Avoid generic health-tech gradients, tooth stock photography, “AI diagnosis” imagery, excessive pills, inflated dashboard metrics and language that promises medical certainty.
+
+## Canonical UI decisions
+
+| Concern | Decision | Reason |
+| --- | --- | --- |
+| Public navigation | Authored compact header | The public site has only a few anchors and two high-priority actions |
+| Service selection | Native radio inputs inside authored cards | Preserves semantics while allowing clear touch targets |
+| Patient forms | Native labels/inputs/selects/textareas | Familiar, accessible and resilient in RTL |
+| Sensitive consent | Native checkbox plus linked full text | Explicit and not preselected |
+| OPG upload | Authored drop zone around native file input | Needs drag/drop, validation, processing and removal states |
+| Dialogs | Native `<dialog>` only if a blocking confirmation is introduced | Focus and escape behaviour should remain platform-correct |
+| Status | Text plus icon/tone, never colour alone | Accessibility and reduced ambiguity |
+| Staff tables | Authored responsive tables with card fallback | Dense operational data on desktop, safe use on mobile |
+| Notifications | Inline errors and an `aria-live` status region | Important failures must remain near their cause |
+| Icons | One consistent 24px outline SVG set | Crisp, language-neutral support for Persian labels |
+
+## Information architecture
+
+### Public
+
+1. Service promise and clinical boundary
+2. Three service paths
+3. How it works
+4. Secure OPG explanation
+5. Tehran home-service scope
+6. Partner-network selection principles
+7. Questions and limitations
+8. Contact/request entry point
+
+### Patient request
+
+1. Service choice
+2. Contact and Tehran area where relevant
+3. OPG upload where relevant
+4. Budget/preferences
+5. consent and review
+6. submission receipt/status
+
+### Staff
+
+- Coordinator: queue → case → contact/assignment → next action → resolution
+- Dentist: assigned review → secure image → structured opinion → signed version
+- Partner: assigned referral → accept/decline → proposed contact/visit → outcome
+- Admin: credentials → access → policies → audit → retention
+
+The existing 50-screen marketplace demo remains available at `/demo/` for reference but is explicitly labelled as an archived concept. It is not the source of truth for current product scope.
+
+## Visual system
+
+### Colour tokens
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `--ink` | `#0D1626` | Primary text |
+| `--ink-soft` | `#65768B` | Supporting text |
+| `--canvas` | `#FFFFFF` | Page background |
+| `--surface` | `#FFFFFF` | Cards and forms |
+| `--line` | `#D9E5F4` | Borders and separators |
+| `--brand` | `#1477F8` | Primary actions and active path |
+| `--brand-deep` | `#0E5FD4` | Hover/pressed and high-contrast brand |
+| `--brand-soft` | `#EAF3FF` | Calm emphasis and selected cards |
+| `--sun` | `#1477F8` | Legacy token mapped to approved blue; do not introduce gold accents |
+| `--danger` | `#B73545` | Urgent/error semantics only |
+| `--warning` | `#86570A` | Caution and pending review |
+| `--success` | `#1477F8` | Completed/verified states in the approved public blue system |
+
+No dark theme is planned for MVP. User-specific theme settings are not necessary for the current audience and would expand the accessibility test surface.
+
+### Typography
+
+- Primary: locally served Irancell, weights 400/500/700/800.
+- Fallback: Tahoma, Arial, sans-serif.
+- Body: 16px minimum on mobile; line-height 1.8 for Persian readability.
+- Labels and supporting text: never below 13px.
+- Hero display: responsive clamp, maximum approximately 64px.
+- Numbers/case references: maintain readable direction with `dir="ltr"` where needed.
+
+### Spacing and shape
+
+- Spacing scale: 4, 8, 12, 16, 24, 32, 48, 72.
+- Controls: minimum 44px touch height.
+- Input radius: 12px.
+- Card radius: 20px.
+- Hero/section container radius: up to 30px only for major authored surfaces.
+- Shadows: one low-elevation shadow; borders do most structural work.
+
+### Layout
+
+- Content width: 1180px maximum with 20px mobile gutters.
+- Public hero: asymmetric two-column layout, copy dominant, service route visual secondary.
+- Service cards: three columns ≥ 900px, single column on narrow screens.
+- Intake: one main form column plus a sticky trust/summary rail on desktop; one column on mobile.
+- Staff console: navigation rail + content; operational cards/tables, no public hero styling.
+
+## Component rules
+
+### Buttons
+
+- One primary action per surface.
+- Primary: solid brand background, white text.
+- Secondary: surface with line border.
+- Tertiary: text link with visible hover/focus.
+- Destructive actions use danger styling and a clear object label.
+- Disable only when action cannot run; preserve readable contrast and explain why where non-obvious.
+
+### Forms
+
+- Use `<form novalidate>` and provide controlled client-side messages while preserving server validation.
+- Labels always remain visible; placeholders show examples only.
+- Required state uses text or `aria-describedby`, not an asterisk alone.
+- Errors appear directly below the field, update `aria-invalid`, and are summarised/focused on submit when multiple fields fail.
+- Textareas are manually resizable vertically.
+- Persian mobile number input uses `inputmode="tel"`, accepts Persian/Arabic digits, and normalises on submission.
+- Budget is a range preference with “مایلم تلفنی مطرح کنم”; it never promises a treatment price.
+
+### OPG upload
+
+- Explain accepted formats and maximum size before selection.
+- Support click/keyboard and drag/drop; the native input remains operable.
+- Show selected name, human-readable size, validation/scan stage and explicit remove/retry actions.
+- Do not display a successful upload until the server has persisted it; do not display “safe” until scanning approves it.
+- Preview only safe, supported image types. PDF is represented by file metadata unless a safe renderer is available.
+- Consent is separate from selecting a file and never pre-checked.
+
+### Service cards
+
+Each card contains: icon, plain-language service name, one-line scope, availability label and action. Selected cards use border, background and checkmark—not colour alone.
+
+### Trust boundary
+
+The clinician limitation appears:
+
+- under the OPG service description;
+- next to consent/review before submission;
+- on the case receipt;
+- on every preliminary assessment.
+
+It should be calm and legible, not hidden in a footer or styled as alarming legal boilerplate.
+
+## Content principles
+
+- Use “راهنمایی و هماهنگی” for Royadarman actions.
+- Use “بررسی اولیه توسط دندانپزشک دارای مجوز” for OPG review.
+- Use “گزینه‌های متناسب با نیاز و بودجه اعلام‌شده” rather than “cheapest” or guaranteed “best.”
+- Say “درخواست” until a human confirms a visit; do not say “نوبت قطعی.”
+- Say “پوشش فعلی: شهر تهران” on every home-service entry point.
+- Do not prefix the owner's name with “دکتر” unless a verified professional credential later supports it.
+- Avoid urgency theatre. “24-hour support” means availability of intake/support, not continuous emergency dentistry.
+
+## Responsive and accessibility requirements
+
+- Test at 320, 375, 768, 1024 and 1440 CSS pixels.
+- All flows keyboard-operable in logical RTL order.
+- Skip link, landmarks and one H1 per page.
+- Focus indicator at least 3px and visible on all surfaces.
+- Minimum AA contrast for text and controls.
+- Honour `prefers-reduced-motion`; no critical information depends on animation.
+- Do not lock zoom or use horizontal scrolling for patient forms.
+- Tables gain labels/card layout on small screens rather than becoming unreadable.
+- Status and error copy is announced with appropriate live-region politeness.
+- Uploaded-file remove/retry controls have explicit accessible names.
+
+## Motion
+
+- 160–220ms ease-out for hover, disclosure and panel transitions.
+- A subtle one-time path draw may appear in the hero.
+- Upload progress may animate only while real work is occurring.
+- Reduced-motion mode removes path/progress motion and uses instant state changes.
+
+## Assets
+
+Use authored SVG shapes/icons and local fonts for MVP. No stock photo is required: an image of a dentist could incorrectly imply that the owner or a specific clinician provides all care. When real partner photography is introduced, obtain usage rights and caption it accurately.
+
+## Verification checklist
+
+- Copy reflects coordination, Tehran home service and licensed OPG review.
+- Owner is not described or visually represented as a doctor.
+- Native semantics remain intact under authored styling.
+- All form/upload success, error, empty, offline/retry and pending states exist.
+- Focus, keyboard and reduced-motion behaviour pass.
+- No placeholder `href="#"`, browser alert/confirm/prompt, remote hotlinked asset or public upload URL.
+- Strict premium UI audit passes with no critical issue.
+- Browser verification includes console, network, RTL layout and mobile viewport checks.

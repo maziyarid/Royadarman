@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="تصویر نمونه OPG">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b67df"/><stop offset=".56" stop-color="#176fdf"/><stop offset="1" stop-color="#0b4fb7"/></linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="10"/></filter>
+    <filter id="blur2"><feGaussianBlur stdDeviation="4"/></filter>
+    <radialGradient id="fog"><stop offset="0" stop-color="#d8ecff" stop-opacity=".28"/><stop offset="1" stop-color="#d8ecff" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="900" height="520" rx="30" fill="url(#bg)"/>
+  <g opacity=".74" filter="url(#blur)">
+    <ellipse cx="285" cy="175" rx="120" ry="82" fill="#052b68"/>
+    <ellipse cx="615" cy="175" rx="120" ry="82" fill="#052b68"/>
+    <ellipse cx="450" cy="130" rx="82" ry="60" fill="#073a83"/>
+    <path d="M155 205C250 115 650 115 745 205" fill="none" stroke="#9dcaff" stroke-width="22" opacity=".35"/>
+    <path d="M165 362C270 452 630 452 735 362" fill="none" stroke="#acd3ff" stroke-width="28" opacity=".44"/>
+  </g>
+  <g fill="#d5ebff" opacity=".58" filter="url(#blur2)">
+    <g transform="translate(0 6)">
+      <rect x="246" y="210" width="34" height="84" rx="17"/><rect x="286" y="205" width="35" height="90" rx="17"/><rect x="328" y="201" width="36" height="92" rx="18"/><rect x="371" y="198" width="37" height="95" rx="18"/><rect x="414" y="197" width="37" height="96" rx="18"/><rect x="457" y="197" width="37" height="96" rx="18"/><rect x="500" y="198" width="37" height="95" rx="18"/><rect x="543" y="201" width="36" height="92" rx="18"/><rect x="585" y="205" width="35" height="90" rx="17"/><rect x="625" y="210" width="34" height="84" rx="17"/>
+    </g>
+    <g transform="translate(0 42)">
+      <rect x="246" y="210" width="34" height="84" rx="17"/><rect x="286" y="205" width="35" height="90" rx="17"/><rect x="328" y="201" width="36" height="92" rx="18"/><rect x="371" y="198" width="37" height="95" rx="18"/><rect x="414" y="197" width="37" height="96" rx="18"/><rect x="457" y="197" width="37" height="96" rx="18"/><rect x="500" y="198" width="37" height="95" rx="18"/><rect x="543" y="201" width="36" height="92" rx="18"/><rect x="585" y="205" width="35" height="90" rx="17"/><rect x="625" y="210" width="34" height="84" rx="17"/>
+    </g>
+  </g>
+  <ellipse cx="460" cy="270" rx="390" ry="210" fill="url(#fog)"/>
+  <rect x="0" y="0" width="900" height="520" rx="30" fill="#0b4ca7" opacity=".15"/>
+</svg>

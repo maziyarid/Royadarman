@@ -1,0 +1,13 @@
+{
+  "profile": "public-sensitive-intake",
+  "sourceRoots": ["assets"],
+  "locale": "fa-IR",
+  "canonicalMap": "UX-CONTRACT.md",
+  "requiredCapabilities": ["Select/Listbox", "Form", "File Upload", "Toast"],
+  "ownership": {
+    "Select/Listbox": "native",
+    "Form": "native",
+    "File Upload": "authored",
+    "Toast": "authored"
+  }
+}

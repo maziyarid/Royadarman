@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1477f8">
+  <meta name="color-scheme" content="light">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="description" content="رویا درمان؛ مرکز شبانه‌روزی راهنمایی و پشتیبانی بیماران دندانپزشکی، هماهنگی خدمات دندانپزشکی در منزل در تهران و بررسی اولیه تصویر OPG توسط دندانپزشک دارای مجوز.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fa_IR">
+  <meta property="og:site_name" content="رویا درمان">
+  <meta property="og:title" content="رویا درمان | راهنمایی و پشتیبانی شبانه‌روزی دندانپزشکی">
+  <meta property="og:description" content="از ثبت درخواست و بررسی اولیه OPG تا معرفی دندانپزشک یا مرکز مناسب با توجه به نیاز، موقعیت و بودجه شما.">
+  <meta property="og:url" content="https://royadarman.com/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="رویا درمان | راهنمایی و پشتیبانی شبانه‌روزی دندانپزشکی">
+  <meta name="twitter:description" content="هماهنگی انسانی مسیر درمان، خدمات در منزل در تهران و بررسی اولیه OPG توسط دندانپزشک دارای مجوز.">
+  <title>رویا درمان | راهنمایی و پشتیبانی شبانه‌روزی دندانپزشکی</title>
+  <link rel="canonical" href="https://royadarman.com/">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="assets/accepted-blue.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">رفتن به محتوای اصلی</a>
+  <div id="app">
+    <div class="boot-screen" role="status" aria-live="polite">
+      <span class="brand-symbol" aria-hidden="true">ر</span>
+      <span>در حال آماده‌سازی رویا درمان…</span>
+    </div>
+  </div>
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <noscript>
+    <div class="noscript">برای استفاده از پیش‌نمایش تعاملی، جاوااسکریپت را فعال کنید. اطلاعات خدمات در همین صفحه در دسترس خواهد بود.</div>
+  </noscript>
+  <script type="module" src="assets/app.js"></script>
+</body>
+</html>

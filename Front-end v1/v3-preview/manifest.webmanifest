@@ -1,0 +1,20 @@
+{
+  "name": "رویا درمان؛ راهنمایی و پشتیبانی دندانپزشکی",
+  "short_name": "رویا درمان",
+  "description": "مرکز شبانه‌روزی راهنمایی و پشتیبانی بیماران دندانپزشکی",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./#/home",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1477f8",
+  "icons": [
+    {
+      "src": "assets/logo-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
