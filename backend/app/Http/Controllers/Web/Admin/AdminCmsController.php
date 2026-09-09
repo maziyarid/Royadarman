@@ -8,9 +8,13 @@ use App\Domain\Identity\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\Cms\Category;
 use App\Models\Cms\CategoryTranslation;
+use App\Models\Cms\Comment;
 use App\Models\Cms\Media;
+use App\Models\Cms\Menu;
+use App\Models\Cms\MenuItem;
 use App\Models\Cms\Post;
 use App\Models\Cms\PostTranslation;
+use App\Models\Cms\Redirect;
 use App\Models\Cms\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -379,5 +383,138 @@ final class AdminCmsController extends Controller
         $media->delete();
 
         return redirect()->route('admin.cms.media.index')->with('status', __('deleted'));
+    }
+
+    public function menusIndex(Request $request)
+    {
+        $this->guardManage($request);
+
+        $menus = Menu::query()->with(['translations', 'items.translations'])
+            ->orderByDesc('updated_at')->paginate(15, ['*'], 'page', $request->integer('page', 1))->withQueryString();
+
+        return view('admin.cms.menus-index', ['menus' => $menus]);
+    }
+
+    public function menusStore(Request $request)
+    {
+        $this->guardManage($request);
+        $data = $request->validate([
+            'slug' => ['required', 'string', 'max:60', 'unique:cms_menus,slug'],
+            'location' => ['required', 'string', 'max:40'],
+            'title_fa' => ['required', 'string', 'max:120'],
+        ]);
+
+        $menu = Menu::query()->create(['slug' => $data['slug'], 'location' => $data['location']]);
+        $menu->translations()->create(['locale' => 'fa', 'title' => $data['title_fa']]);
+
+        return redirect()->route('admin.cms.menus.index')->with('status', __('saved'));
+    }
+
+    public function menusDestroy(Request $request, Menu $menu)
+    {
+        $this->guardDelete($request);
+        $menu->delete();
+
+        return redirect()->route('admin.cms.menus.index')->with('status', __('deleted'));
+    }
+
+    public function menuItemsStore(Request $request, Menu $menu)
+    {
+        $this->guardManage($request);
+        $data = $request->validate([
+            'label_fa' => ['required', 'string', 'max:120'],
+            'url' => ['nullable', 'string', 'max:500'],
+            'parent_id' => ['nullable', 'integer', 'exists:cms_menu_items,id'],
+            'sort_order' => ['nullable', 'integer'],
+        ]);
+
+        $item = $menu->items()->create([
+            'parent_id' => $data['parent_id'] ?? null,
+            'url' => $data['url'] ?? null,
+            'sort_order' => $data['sort_order'] ?? 0,
+        ]);
+        $item->translations()->create(['locale' => 'fa', 'label' => $data['label_fa']]);
+
+        return redirect()->route('admin.cms.menus.index')->with('status', __('saved'));
+    }
+
+    public function menuItemsDestroy(Request $request, Menu $menu, MenuItem $item)
+    {
+        $this->guardDelete($request);
+        $item->delete();
+
+        return redirect()->route('admin.cms.menus.index')->with('status', __('deleted'));
+    }
+
+    public function redirectsIndex(Request $request)
+    {
+        $this->guardManage($request);
+
+        $redirects = Redirect::query()->orderByDesc('updated_at')
+            ->paginate(20, ['*'], 'page', $request->integer('page', 1))->withQueryString();
+
+        return view('admin.cms.redirects-index', ['redirects' => $redirects]);
+    }
+
+    public function redirectsStore(Request $request)
+    {
+        $this->guardManage($request);
+        $data = $request->validate([
+            'source_path' => ['required', 'string', 'max:500', 'unique:cms_redirects,source_path'],
+            'destination_url' => ['required', 'string', 'max:500'],
+            'status_code' => ['required', 'in:301,302'],
+        ]);
+
+        Redirect::query()->create($data);
+
+        return redirect()->route('admin.cms.redirects.index')->with('status', __('saved'));
+    }
+
+    public function redirectsDestroy(Request $request, Redirect $redirect)
+    {
+        $this->guardDelete($request);
+        $redirect->delete();
+
+        return redirect()->route('admin.cms.redirects.index')->with('status', __('deleted'));
+    }
+
+    public function commentsIndex(Request $request)
+    {
+        $this->guardManage($request);
+
+        $comments = Comment::query()->with(['post.translations', 'author:id,name'])
+            ->when($request->input('status'), fn ($q, $s) => $q->where('status', $s))
+            ->orderByDesc('created_at')
+            ->paginate(20, ['*'], 'page', $request->integer('page', 1))->withQueryString();
+
+        return view('admin.cms.comments-index', [
+            'comments' => $comments,
+            'filters' => $request->only(['status']),
+            'statuses' => ['pending', 'approved', 'spam', 'trash'],
+        ]);
+    }
+
+    public function commentsApprove(Request $request, Comment $comment)
+    {
+        $this->guardManage($request);
+        $comment->update(['status' => 'approved']);
+
+        return redirect()->route('admin.cms.comments.index')->with('status', __('saved'));
+    }
+
+    public function commentsMarkSpam(Request $request, Comment $comment)
+    {
+        $this->guardManage($request);
+        $comment->update(['status' => 'spam']);
+
+        return redirect()->route('admin.cms.comments.index')->with('status', __('saved'));
+    }
+
+    public function commentsDestroy(Request $request, Comment $comment)
+    {
+        $this->guardDelete($request);
+        $comment->delete();
+
+        return redirect()->route('admin.cms.comments.index')->with('status', __('deleted'));
     }
 }

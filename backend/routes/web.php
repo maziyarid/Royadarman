@@ -49,6 +49,21 @@ Route::middleware(['staff'])->prefix('/admin/cms')->name('admin.cms.')->group(fu
     Route::get('/media', [AdminCmsController::class, 'mediaIndex'])->name('media.index');
     Route::post('/media', [AdminCmsController::class, 'mediaStore'])->name('media.store');
     Route::delete('/media/{media}', [AdminCmsController::class, 'mediaDestroy'])->name('media.destroy');
+
+    Route::get('/menus', [AdminCmsController::class, 'menusIndex'])->name('menus.index');
+    Route::post('/menus', [AdminCmsController::class, 'menusStore'])->name('menus.store');
+    Route::delete('/menus/{menu}', [AdminCmsController::class, 'menusDestroy'])->name('menus.destroy');
+    Route::post('/menus/{menu}/items', [AdminCmsController::class, 'menuItemsStore'])->name('menus.items.store');
+    Route::delete('/menus/{menu}/items/{item}', [AdminCmsController::class, 'menuItemsDestroy'])->name('menus.items.destroy');
+
+    Route::get('/redirects', [AdminCmsController::class, 'redirectsIndex'])->name('redirects.index');
+    Route::post('/redirects', [AdminCmsController::class, 'redirectsStore'])->name('redirects.store');
+    Route::delete('/redirects/{redirect}', [AdminCmsController::class, 'redirectsDestroy'])->name('redirects.destroy');
+
+    Route::get('/comments', [AdminCmsController::class, 'commentsIndex'])->name('comments.index');
+    Route::post('/comments/{comment}/approve', [AdminCmsController::class, 'commentsApprove'])->name('comments.approve');
+    Route::post('/comments/{comment}/spam', [AdminCmsController::class, 'commentsMarkSpam'])->name('comments.spam');
+    Route::delete('/comments/{comment}', [AdminCmsController::class, 'commentsDestroy'])->name('comments.destroy');
 });
 
 Route::get('/dashboard', fn () => redirect('/fa/dashboard', 302));
