@@ -102,4 +102,9 @@ class PatientCase extends Model
     {
         return $this->hasMany(SupportConversation::class, 'case_id');
     }
+
+    public function homeServiceRequests(): HasMany
+    {
+        return $this->hasMany(HomeServiceRequest::class, 'case_id');
+    }
 }

@@ -82,4 +82,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(SupportMessage::class, 'author_user_id');
     }
+
+    public function homeServiceRequests(): HasMany
+    {
+        return $this->hasMany(HomeServiceRequest::class, 'patient_user_id');
+    }
+
+    public function providedHomeServiceRequests(): HasMany
+    {
+        return $this->hasMany(HomeServiceRequest::class, 'provider_user_id');
+    }
 }
