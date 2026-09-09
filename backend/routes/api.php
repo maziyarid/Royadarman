@@ -2,7 +2,11 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CaseController;
+use App\Http\Controllers\Api\V1\CmsCategoryController;
+use App\Http\Controllers\Api\V1\CmsMediaController;
 use App\Http\Controllers\Api\V1\CmsPostController;
+use App\Http\Controllers\Api\V1\CmsRedirectController;
+use App\Http\Controllers\Api\V1\CmsTagController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\NotificationCallbackController;
 use App\Http\Controllers\Api\V1\PolicyController;
@@ -41,6 +45,27 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
         Route::post('/cms/posts/{post}/publish', [CmsPostController::class, 'publish']);
         Route::post('/cms/posts/{post}/unpublish', [CmsPostController::class, 'unpublish']);
         Route::delete('/cms/posts/{post}', [CmsPostController::class, 'destroy']);
+
+        Route::get('/cms/categories', [CmsCategoryController::class, 'index']);
+        Route::post('/cms/categories', [CmsCategoryController::class, 'store']);
+        Route::get('/cms/categories/{category}', [CmsCategoryController::class, 'show']);
+        Route::patch('/cms/categories/{category}', [CmsCategoryController::class, 'update']);
+        Route::delete('/cms/categories/{category}', [CmsCategoryController::class, 'destroy']);
+
+        Route::get('/cms/tags', [CmsTagController::class, 'index']);
+        Route::post('/cms/tags', [CmsTagController::class, 'store']);
+        Route::post('/cms/tags/{tag}/merge', [CmsTagController::class, 'merge']);
+        Route::delete('/cms/tags/{tag}', [CmsTagController::class, 'destroy']);
+
+        Route::get('/cms/redirects', [CmsRedirectController::class, 'index']);
+        Route::post('/cms/redirects', [CmsRedirectController::class, 'store']);
+        Route::patch('/cms/redirects/{redirect}', [CmsRedirectController::class, 'update']);
+        Route::delete('/cms/redirects/{redirect}', [CmsRedirectController::class, 'destroy']);
+
+        Route::get('/cms/media', [CmsMediaController::class, 'index']);
+        Route::post('/cms/media', [CmsMediaController::class, 'store']);
+        Route::patch('/cms/media/{media}', [CmsMediaController::class, 'update']);
+        Route::delete('/cms/media/{media}', [CmsMediaController::class, 'destroy']);
 
         Route::middleware(EnsurePatientIntakeEnabled::class)->group(function (): void {
             Route::post('/cases/draft', [CaseController::class, 'draft']);
