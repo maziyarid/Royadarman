@@ -47,6 +47,9 @@
         <h1>{{ __('ui.admin.title') }}</h1>
         <nav>
             <a href="{{ route('admin.cms.posts.index') }}">{{ __('ui.admin.posts') }}</a>
+            <a href="{{ route('admin.cms.categories.index') }}">{{ __('ui.admin.categories') }}</a>
+            <a href="{{ route('admin.cms.tags.index') }}">{{ __('ui.admin.tags') }}</a>
+            <a href="{{ route('admin.cms.media.index') }}">{{ __('ui.admin.media') }}</a>
             <a href="/fa/" rel="noopener" target="_blank">{{ __('ui.admin.view_site') }}</a>
             <form method="POST" action="/api/v1/auth/logout" style="display:inline">@csrf<button class="btn ghost sm" type="submit">{{ __('ui.admin.logout') }}</button></form>
         </nav>

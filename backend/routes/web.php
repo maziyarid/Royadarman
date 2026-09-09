@@ -34,6 +34,21 @@ Route::middleware(['staff'])->prefix('/admin/cms')->name('admin.cms.')->group(fu
     Route::post('/posts/{post}/publish', [AdminCmsController::class, 'publish'])->name('posts.publish');
     Route::post('/posts/{post}/unpublish', [AdminCmsController::class, 'unpublish'])->name('posts.unpublish');
     Route::delete('/posts/{post}', [AdminCmsController::class, 'destroy'])->name('posts.destroy');
+
+    Route::get('/categories', [AdminCmsController::class, 'categoriesIndex'])->name('categories.index');
+    Route::get('/categories/create', [AdminCmsController::class, 'categoriesCreate'])->name('categories.create');
+    Route::post('/categories', [AdminCmsController::class, 'categoriesStore'])->name('categories.store');
+    Route::get('/categories/{category}/edit', [AdminCmsController::class, 'categoriesEdit'])->name('categories.edit');
+    Route::patch('/categories/{category}', [AdminCmsController::class, 'categoriesUpdate'])->name('categories.update');
+    Route::delete('/categories/{category}', [AdminCmsController::class, 'categoriesDestroy'])->name('categories.destroy');
+
+    Route::get('/tags', [AdminCmsController::class, 'tagsIndex'])->name('tags.index');
+    Route::post('/tags', [AdminCmsController::class, 'tagsStore'])->name('tags.store');
+    Route::delete('/tags/{tag}', [AdminCmsController::class, 'tagsDestroy'])->name('tags.destroy');
+
+    Route::get('/media', [AdminCmsController::class, 'mediaIndex'])->name('media.index');
+    Route::post('/media', [AdminCmsController::class, 'mediaStore'])->name('media.store');
+    Route::delete('/media/{media}', [AdminCmsController::class, 'mediaDestroy'])->name('media.destroy');
 });
 
 Route::get('/dashboard', fn () => redirect('/fa/dashboard', 302));
