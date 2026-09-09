@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title">
+  <title id="title">Royadarman support tooth</title>
+  <rect width="96" height="96" rx="28" fill="#2947A3"/>
+  <path d="M25 36c6-15 40-15 46 0" fill="none" stroke="#F2A566" stroke-width="7" stroke-linecap="round"/>
+  <path d="M31 34c1-9 33-9 34 0" fill="none" stroke="#F7F5EF" stroke-width="4" stroke-linecap="round"/>
+  <path d="M29 43c0-8 7-13 15-10l4 2 4-2c8-3 15 2 15 10 0 10-6 16-9 26-2 7-7 9-10 1-3 8-8 6-10-1-3-10-9-16-9-26Z" fill="#F7F5EF"/>
+  <path d="M38 49c7 5 13 5 20 0" fill="none" stroke="#2947A3" stroke-width="4" stroke-linecap="round"/>
+</svg>
