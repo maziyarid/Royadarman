@@ -36,4 +36,3 @@ return [
         'document_days' => env('ROYADARMAN_DOCUMENT_RETENTION_DAYS'),
     ],
 ];
-
