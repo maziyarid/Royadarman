@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Web\Admin\AdminCmsController;
 use App\Http\Controllers\Web\BlogController;
+use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\RobotsController;
 use App\Http\Controllers\Web\SitemapController;
 use App\Http\Middleware\SetLocale;
@@ -34,5 +35,12 @@ Route::middleware(['staff'])->prefix('/admin/cms')->name('admin.cms.')->group(fu
     Route::post('/posts/{post}/unpublish', [AdminCmsController::class, 'unpublish'])->name('posts.unpublish');
     Route::delete('/posts/{post}', [AdminCmsController::class, 'destroy'])->name('posts.destroy');
 });
+
+Route::get('/dashboard', fn () => redirect('/fa/dashboard', 302));
+
+Route::get('/{locale}/dashboard', [DashboardController::class, 'show'])
+    ->whereIn('locale', ['fa', 'ar', 'en'])
+    ->middleware(['web', SetLocale::class, 'auth'])
+    ->name('dashboard');
 
 Route::get('/admin', fn () => redirect()->route('admin.cms.posts.index'))->middleware(['staff']);
