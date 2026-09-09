@@ -10,8 +10,10 @@ use App\Infrastructure\Identity\HttpOtpSender;
 use App\Infrastructure\Operations\HttpNotificationSender;
 use App\Models\ClinicalDocument;
 use App\Models\PatientCase;
+use App\Models\SupportConversation;
 use App\Policies\ClinicalDocumentPolicy;
 use App\Policies\PatientCasePolicy;
+use App\Policies\SupportConversationPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -28,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(PatientCase::class, PatientCasePolicy::class);
         Gate::policy(ClinicalDocument::class, ClinicalDocumentPolicy::class);
+        Gate::policy(SupportConversation::class, SupportConversationPolicy::class);
         if (! $this->app->routesAreCached()) {
             $this->loadRoutesFrom(base_path('routes/api.php'));
         }

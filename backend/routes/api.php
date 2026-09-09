@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\PolicyController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\ReferralController;
 use App\Http\Controllers\Api\V1\StaffCaseController;
+use App\Http\Controllers\Api\V1\SupportController;
 use App\Http\Middleware\EnsurePatientIntakeEnabled;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,14 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [ProfileController::class, 'show']);
         Route::patch('/me/preferences', [ProfileController::class, 'update']);
+
+        Route::get('/support', [SupportController::class, 'index']);
+        Route::post('/support', [SupportController::class, 'store']);
+        Route::get('/support/{conversation}', [SupportController::class, 'show']);
+        Route::post('/support/{conversation}/messages', [SupportController::class, 'reply']);
+        Route::post('/support/{conversation}/internal-notes', [SupportController::class, 'internalNote']);
+        Route::patch('/support/{conversation}/status', [SupportController::class, 'status']);
+        Route::post('/support/{conversation}/assignee', [SupportController::class, 'assign']);
 
         Route::middleware(EnsurePatientIntakeEnabled::class)->group(function (): void {
             Route::post('/cases/draft', [CaseController::class, 'draft']);

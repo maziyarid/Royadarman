@@ -67,4 +67,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(ConsentRecord::class, 'subject_user_id');
     }
+
+    public function supportConversations(): HasMany
+    {
+        return $this->hasMany(SupportConversation::class, 'patient_user_id');
+    }
+
+    public function assignedSupportConversations(): HasMany
+    {
+        return $this->hasMany(SupportConversation::class, 'assignee_user_id');
+    }
+
+    public function supportMessages(): HasMany
+    {
+        return $this->hasMany(SupportMessage::class, 'author_user_id');
+    }
 }

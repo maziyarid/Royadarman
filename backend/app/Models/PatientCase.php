@@ -97,4 +97,9 @@ class PatientCase extends Model
     {
         return $this->hasMany(ReferralProposal::class, 'case_id');
     }
+
+    public function supportConversations(): HasMany
+    {
+        return $this->hasMany(SupportConversation::class, 'case_id');
+    }
 }
