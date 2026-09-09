@@ -32,3 +32,4 @@ phpstan.neon.local
 /public/storage
 /public/hot
 /public/build
+/storage/framework/testing/
