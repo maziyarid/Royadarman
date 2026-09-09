@@ -82,4 +82,19 @@ class PatientCase extends Model
     {
         return $this->hasMany(ClinicalDocument::class, 'case_id');
     }
+
+    public function reviewRevisions(): HasMany
+    {
+        return $this->hasMany(ReviewRevision::class, 'case_id');
+    }
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(CaseAssignment::class, 'case_id');
+    }
+
+    public function referralProposals(): HasMany
+    {
+        return $this->hasMany(ReferralProposal::class, 'case_id');
+    }
 }
