@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureStaffAccess;
 use App\Http\Middleware\RequestId;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -19,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(RequestId::class);
+        $middleware->alias([
+            'staff' => EnsureStaffAccess::class,
+        ]);
         $middleware->redirectGuestsTo(
             fn (Request $request) => $request->is('api/*') ? null : '/fa/',
         );
