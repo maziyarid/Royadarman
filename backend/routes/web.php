@@ -64,6 +64,10 @@ Route::middleware(['staff'])->prefix('/admin/cms')->name('admin.cms.')->group(fu
     Route::post('/comments/{comment}/approve', [AdminCmsController::class, 'commentsApprove'])->name('comments.approve');
     Route::post('/comments/{comment}/spam', [AdminCmsController::class, 'commentsMarkSpam'])->name('comments.spam');
     Route::delete('/comments/{comment}', [AdminCmsController::class, 'commentsDestroy'])->name('comments.destroy');
+
+    Route::get('/seo', [AdminCmsController::class, 'seoIndex'])->name('seo.index');
+    Route::get('/seo/{post}/edit', [AdminCmsController::class, 'seoEdit'])->name('seo.edit');
+    Route::patch('/seo/{post}', [AdminCmsController::class, 'seoUpdate'])->name('seo.update');
 });
 
 Route::get('/dashboard', fn () => redirect('/fa/dashboard', 302));

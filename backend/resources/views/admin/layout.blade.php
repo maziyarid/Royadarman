@@ -53,6 +53,7 @@
             <a href="{{ route('admin.cms.menus.index') }}">{{ __('ui.admin.menus') }}</a>
             <a href="{{ route('admin.cms.redirects.index') }}">{{ __('ui.admin.redirects') }}</a>
             <a href="{{ route('admin.cms.comments.index') }}">{{ __('ui.admin.comments') }}</a>
+            <a href="{{ route('admin.cms.seo.index') }}">{{ __('ui.admin.seo') }}</a>
             <a href="/fa/" rel="noopener" target="_blank">{{ __('ui.admin.view_site') }}</a>
             <form method="POST" action="/api/v1/auth/logout" style="display:inline">@csrf<button class="btn ghost sm" type="submit">{{ __('ui.admin.logout') }}</button></form>
         </nav>

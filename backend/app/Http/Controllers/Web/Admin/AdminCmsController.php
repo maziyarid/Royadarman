@@ -15,6 +15,7 @@ use App\Models\Cms\MenuItem;
 use App\Models\Cms\Post;
 use App\Models\Cms\PostTranslation;
 use App\Models\Cms\Redirect;
+use App\Models\Cms\SeoMetadata;
 use App\Models\Cms\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -516,5 +517,70 @@ final class AdminCmsController extends Controller
         $comment->delete();
 
         return redirect()->route('admin.cms.comments.index')->with('status', __('deleted'));
+    }
+
+    public function seoIndex(Request $request)
+    {
+        $this->guardManage($request);
+
+        $seo = SeoMetadata::query()
+            ->when($request->input('entity_type'), fn ($q, $t) => $q->where('entity_type', $t))
+            ->orderByDesc('updated_at')
+            ->paginate(20, ['*'], 'page', $request->integer('page', 1))->withQueryString();
+
+        return view('admin.cms.seo-index', [
+            'seo' => $seo,
+            'filters' => $request->only(['entity_type']),
+        ]);
+    }
+
+    public function seoEdit(Request $request, Post $post)
+    {
+        $this->guardManage($request);
+        $post->load('translations');
+
+        $seo = SeoMetadata::query()
+            ->where('entity_type', 'App\\Models\\Cms\\Post')
+            ->where('entity_id', $post->id)
+            ->get()->keyBy('locale');
+
+        return view('admin.cms.seo-editor', [
+            'post' => $post,
+            'seo' => $seo,
+            'locales' => ['fa', 'ar', 'en'],
+        ]);
+    }
+
+    public function seoUpdate(Request $request, Post $post)
+    {
+        $this->guardManage($request);
+        $data = $request->validate([
+            'seo' => ['required', 'array'],
+            'seo.*.locale' => ['required', 'in:fa,ar,en'],
+            'seo.*.seo_title' => ['nullable', 'string', 'max:200'],
+            'seo.*.meta_description' => ['nullable', 'string', 'max:320'],
+            'seo.*.canonical_url' => ['nullable', 'string', 'max:500'],
+            'seo.*.robots_directive' => ['nullable', 'string', 'max:60'],
+            'seo.*.og_title' => ['nullable', 'string', 'max:200'],
+            'seo.*.og_description' => ['nullable', 'string', 'max:320'],
+            'seo.*.focus_keyword' => ['nullable', 'string', 'max:120'],
+        ]);
+
+        foreach ($data['seo'] as $entry) {
+            SeoMetadata::query()->updateOrCreate(
+                ['entity_type' => 'App\\Models\\Cms\\Post', 'entity_id' => $post->id, 'locale' => $entry['locale']],
+                [
+                    'seo_title' => $entry['seo_title'] ?? null,
+                    'meta_description' => $entry['meta_description'] ?? null,
+                    'canonical_url' => $entry['canonical_url'] ?? null,
+                    'robots_directive' => $entry['robots_directive'] ?? 'index, follow',
+                    'og_title' => $entry['og_title'] ?? null,
+                    'og_description' => $entry['og_description'] ?? null,
+                    'focus_keyword' => $entry['focus_keyword'] ?? null,
+                ],
+            );
+        }
+
+        return redirect()->route('admin.cms.seo.index')->with('status', __('saved'));
     }
 }
