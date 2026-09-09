@@ -3,9 +3,12 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CaseController;
 use App\Http\Controllers\Api\V1\CmsCategoryController;
+use App\Http\Controllers\Api\V1\CmsCommentController;
 use App\Http\Controllers\Api\V1\CmsMediaController;
+use App\Http\Controllers\Api\V1\CmsMenuController;
 use App\Http\Controllers\Api\V1\CmsPostController;
 use App\Http\Controllers\Api\V1\CmsRedirectController;
+use App\Http\Controllers\Api\V1\CmsSeoMetadataController;
 use App\Http\Controllers\Api\V1\CmsTagController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\NotificationCallbackController;
@@ -66,6 +69,22 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
         Route::post('/cms/media', [CmsMediaController::class, 'store']);
         Route::patch('/cms/media/{media}', [CmsMediaController::class, 'update']);
         Route::delete('/cms/media/{media}', [CmsMediaController::class, 'destroy']);
+
+        Route::get('/cms/menus', [CmsMenuController::class, 'index']);
+        Route::post('/cms/menus', [CmsMenuController::class, 'store']);
+        Route::patch('/cms/menus/{menu}', [CmsMenuController::class, 'update']);
+        Route::delete('/cms/menus/{menu}', [CmsMenuController::class, 'destroy']);
+        Route::post('/cms/menus/{menu}/items', [CmsMenuController::class, 'storeItem']);
+        Route::patch('/cms/menus/{menu}/items/{item}', [CmsMenuController::class, 'updateItem']);
+        Route::delete('/cms/menus/{menu}/items/{item}', [CmsMenuController::class, 'destroyItem']);
+
+        Route::get('/cms/seo', [CmsSeoMetadataController::class, 'index']);
+        Route::post('/cms/seo', [CmsSeoMetadataController::class, 'upsert']);
+        Route::delete('/cms/seo/{seoMetadata}', [CmsSeoMetadataController::class, 'destroy']);
+
+        Route::get('/cms/comments', [CmsCommentController::class, 'index']);
+        Route::patch('/cms/comments/{comment}', [CmsCommentController::class, 'moderate']);
+        Route::delete('/cms/comments/{comment}', [CmsCommentController::class, 'destroy']);
 
         Route::middleware(EnsurePatientIntakeEnabled::class)->group(function (): void {
             Route::post('/cases/draft', [CaseController::class, 'draft']);
