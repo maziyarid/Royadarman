@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\CmsPostController;
 use App\Http\Controllers\Api\V1\CmsRedirectController;
 use App\Http\Controllers\Api\V1\CmsSeoMetadataController;
 use App\Http\Controllers\Api\V1\CmsTagController;
+use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\NotificationCallbackController;
 use App\Http\Controllers\Api\V1\PolicyController;
@@ -32,6 +33,8 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [ProfileController::class, 'show']);
         Route::patch('/me/preferences', [ProfileController::class, 'update']);
+
+        Route::get('/dashboard', [DashboardController::class, 'show']);
 
         Route::get('/support', [SupportController::class, 'index']);
         Route::post('/support', [SupportController::class, 'store']);
