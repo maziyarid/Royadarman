@@ -97,3 +97,41 @@ Safe post-deploy checks:
 ## Rollback
 
 If application code fails, restore the previous release/front controller and restart workers. Keep additive schema in place; old code must tolerate it. If a migration fails, stop at the failed migration, preserve the database snapshot and inspect the exact partial state. Never run a blind rollback that drops a column or table already used by live records. Repair forward with a new expand/contract migration. Destructive contraction happens only in a later release after old code and data use have been verified absent and a fresh restore-tested backup exists.
+
+## Release traceability
+
+The deployed directory is not required to be a Git working tree. There must be a
+trustworthy way to answer "what exact source revision is running?".
+
+For every release, after deploying the artefact and before opening intake:
+
+```bash
+PHP=/usr/local/bin/ea-php83
+
+# If deploying from a Git checkout, the command reads the working-tree HEAD.
+# If deploying from an artefact (no .git), export ROYADARMAN_RELEASE_COMMIT
+# in the production .env to the exact deployed commit SHA first.
+"$PHP" artisan royadarman:release-identity --write
+```
+
+This writes `storage/app/release-identity.json` containing:
+
+- `commit` — the deployed Git SHA (from `ROYADARMAN_RELEASE_COMMIT`, or the
+  working-tree HEAD when that env var is unset);
+- `built_at` — the release build timestamp;
+- `composer_lock_sha256` — the SHA-256 of the committed `composer.lock`, so a
+  dependency drift between the artefact and the locked dependencies is detectable;
+- `composer_lock_modified_at` — the lockfile modification time.
+
+The manifest is the operator-facing release provenance record. Do **not** expose
+it publicly; it is intended for incident response and audit only. To confirm the
+running release during an incident:
+
+```bash
+cat /home/royadarman/apps/royadarman-backend/storage/app/release-identity.json
+```
+
+Rollback provenance: when restoring a previous release, overwrite the manifest
+for that release so the file always describes the code actually serving traffic.
+Keep release manifests alongside backups so each restore-tested backup is
+linked to the exact revision it was taken from.
