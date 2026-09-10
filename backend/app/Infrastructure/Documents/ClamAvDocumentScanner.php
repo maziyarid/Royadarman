@@ -36,4 +36,3 @@ class ClamAvDocumentScanner implements DocumentScanner
         throw new RuntimeException('The OPG scanner failed without a verdict; document remains quarantined.');
     }
 }
-

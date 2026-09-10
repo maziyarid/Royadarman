@@ -24,6 +24,7 @@ final class NotificationCallbackController extends Controller
 
         $data = $request->validate(['reference' => ['required', 'string', 'max:120'], 'status' => ['required', 'in:queued,sent,delivered,failed'], 'failure_code' => ['nullable', 'string', 'max:80']]);
         DB::table('notification_deliveries')->where('provider_reference', $data['reference'])->update(['status' => $data['status'], 'failure_code' => $data['failure_code'] ?? null, 'updated_at' => now()]);
+
         return response()->json(['data' => ['accepted' => true]]);
     }
 }

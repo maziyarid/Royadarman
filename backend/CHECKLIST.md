@@ -54,6 +54,20 @@ Updated: 2026-09-08
 - [x] Browser verified all locales, direction, language switching, FAQ behavior, keyboard skip-link focus, loaded SVG assets, and no desktop horizontal overflow.
 - [x] Queue and signature updater active; no failed jobs.
 
+## Re-verification 2026-09-10 (clean checkout, PHP 8.4.24, SQLite in-memory)
+
+- [x] `php artisan test` — 25 tests / 81 assertions pass.
+- [x] `vendor/bin/pint --test` — 95 files clean (Pint auto-fixed 78 files with trailing-newline/brace drift).
+- [x] `php artisan migrate --force` — 7 migrations apply cleanly.
+- [x] `php artisan route:list` — 22 routes.
+- [x] Live HTTP smoke (`php artisan serve`): `/` 302→`/fa/`, `/up` 200, `/fa|ar|en/` 200 with correct `lang`/`dir`, `/fr/` 404, all `/assets/*` 200.
+- [x] API error envelopes carry stable codes + `request_id`; `/api/v1/policies/consent` returns `error.consent.translation_unavailable` (fail-closed).
+- [x] `lang/{fa,ar,en}/ui.php` — 32 keys each, zero missing cross-locale.
+- [x] `Front-end v1/v3-preview` — all assets 200, `node --check app.js` OK, jsdom execution 0 runtime errors.
+- [x] Added `.env.example` (repo previously shipped without one).
+- [x] Fixed `public/index.php` hardcoded `/home/royadarman/apps/royadarman-backend` path → `dirname(__DIR__)` so the app boots in any environment. The production snapshot `Current Public_HTML/index.php` intentionally keeps the hardcoded path.
+- [x] Removed 15 timestamped `.bak.*` editor backup files and one unreferenced empty `opg-hero.jpg` from `Front-end v1/v3-preview/`.
+
 ## Activation gates still intentionally open
 
 - [ ] Approve the exact legal consent/privacy text in all three languages.

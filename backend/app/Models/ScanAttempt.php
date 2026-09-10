@@ -18,4 +18,3 @@ class ScanAttempt extends Model
         return ['started_at' => 'immutable_datetime', 'finished_at' => 'immutable_datetime'];
     }
 }
-

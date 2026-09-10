@@ -18,4 +18,3 @@ class OtpChallenge extends Model
         return ['phone' => 'encrypted', 'expires_at' => 'immutable_datetime', 'used_at' => 'immutable_datetime', 'last_sent_at' => 'immutable_datetime'];
     }
 }
-

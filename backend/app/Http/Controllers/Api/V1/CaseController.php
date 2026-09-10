@@ -83,4 +83,3 @@ final class CaseController extends Controller
         return ['id' => $case->id, 'reference' => $case->public_reference, 'service_type' => $case->service_type->value, 'status' => $case->status->value, 'version' => $case->version, 'source_language' => $case->source_language, 'submitted_at' => $case->submitted_at?->toIso8601String()];
     }
 }
-

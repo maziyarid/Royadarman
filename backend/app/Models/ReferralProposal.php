@@ -16,4 +16,3 @@ class ReferralProposal extends Model
         return ['reasoning' => 'encrypted', 'proposed_at' => 'immutable_datetime', 'withdrawn_at' => 'immutable_datetime', 'decided_at' => 'immutable_datetime'];
     }
 }
-

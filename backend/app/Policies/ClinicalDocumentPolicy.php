@@ -31,4 +31,3 @@ final class ClinicalDocumentPolicy
             && DB::table('practitioners')->where('user_id', $user->id)->where('credential_status', 'verified')->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))->exists();
     }
 }
-

@@ -16,4 +16,3 @@ class PolicyVersion extends Model
         return ['published_at' => 'immutable_datetime'];
     }
 }
-

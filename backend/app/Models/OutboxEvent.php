@@ -16,4 +16,3 @@ class OutboxEvent extends Model
         return ['payload' => 'array', 'available_at' => 'immutable_datetime', 'processed_at' => 'immutable_datetime'];
     }
 }
-

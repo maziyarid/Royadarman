@@ -10,4 +10,3 @@ final readonly class ScanResult
         public string $reference,
     ) {}
 }
-

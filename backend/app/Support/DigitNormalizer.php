@@ -20,4 +20,3 @@ final class DigitNormalizer
         return (string) preg_replace('/^(?:0098|98)/', '0', $digits);
     }
 }
-

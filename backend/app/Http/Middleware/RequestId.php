@@ -19,4 +19,3 @@ final class RequestId
         return $response;
     }
 }
-

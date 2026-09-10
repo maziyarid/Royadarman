@@ -136,4 +136,3 @@ return new class extends Migration
         Schema::dropIfExists('scan_attempts');
     }
 };
-

@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-$applicationRoot = '/home/royadarman/apps/royadarman-backend';
+$applicationRoot = dirname(__DIR__);
 
 if (file_exists($maintenance = $applicationRoot.'/storage/framework/maintenance.php')) {
     require $maintenance;

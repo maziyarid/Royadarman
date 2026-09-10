@@ -21,6 +21,7 @@ final class ProcessOutboxEvent implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 5;
+
     public array $backoff = [30, 120, 600, 1800];
 
     public function __construct(public readonly string $outboxEventId)
@@ -43,6 +44,7 @@ final class ProcessOutboxEvent implements ShouldQueue
         $delivery = DB::table('notification_deliveries')->where('outbox_event_id', $event->id)->where('channel', 'sms')->first();
         if ($delivery?->status === 'sent') {
             $event->update(['processed_at' => now()]);
+
             return;
         }
 
