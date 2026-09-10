@@ -49,7 +49,7 @@
         <p class="lede">{{ $translation->excerpt }}</p>
         @endif
         <div class="article-body">
-            {!! $translation->sanitized_body ?: $translation->body !!}
+            {!! $translation->sanitized_body !!}
         </div>
     </article>
 </main>

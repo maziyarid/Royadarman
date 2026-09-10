@@ -53,7 +53,7 @@
         <h1>{{ $translation->title }}</h1>
         @if($post->author)<p class="byline"><small>{{ $post->published_at?->format('Y-m-d') }}</small></p>@endif
         <div class="article-body">
-            {!! $translation->sanitized_body ?: $translation->body !!}
+            {!! $translation->sanitized_body !!}
         </div>
     </article>
 </main>

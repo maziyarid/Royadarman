@@ -27,7 +27,10 @@ final class SupportController extends Controller
         if ($user->role === UserRole::Patient) {
             $query->where('patient_user_id', $user->id);
         } elseif ($user->role === UserRole::Coordinator) {
-            $query->where('assignee_user_id', $user->id);
+            $query->where(function ($q) use ($user) {
+                $q->where('assignee_user_id', $user->id)
+                    ->orWhereNull('assignee_user_id');
+            });
         } elseif ($user->role === UserRole::Owner || $user->role === UserRole::TechnicalAdministrator) {
             // Owners and technical administrators may browse all support conversations.
         } else {
@@ -202,7 +205,9 @@ final class SupportController extends Controller
 
     public function assign(Request $request, SupportConversation $conversation): JsonResponse
     {
-        abort_unless(in_array($request->user()->role, [UserRole::Coordinator, UserRole::Owner], true), 403);
+        $user = $request->user();
+        abort_unless(in_array($user->role, [UserRole::Coordinator, UserRole::Owner], true), 403);
+        abort_unless($user->can('changeStatus', $conversation), 403);
 
         $data = $request->validate([
             'assignee_user_id' => ['required', 'exists:users,id'],

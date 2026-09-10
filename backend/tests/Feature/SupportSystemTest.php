@@ -285,6 +285,67 @@ final class SupportSystemTest extends TestCase
             ->assertJsonMissing(['subject' => 'patient conversation']);
     }
 
+    public function test_support_index_includes_unassigned_conversations_for_coordinator(): void
+    {
+        $patient = User::factory()->create(['role' => 'patient']);
+        $coordinator = User::factory()->create(['role' => 'coordinator']);
+        // Conversation assigned to the coordinator.
+        SupportConversation::query()->create([
+            'patient_user_id' => $patient->id,
+            'assignee_user_id' => $coordinator->id,
+            'category' => SupportCategory::General->value,
+            'status' => ConversationStatus::Open->value,
+            'priority' => 'normal',
+            'opened_at' => now(),
+            'source_language' => 'fa',
+            'subject' => 'assigned to me',
+        ]);
+        // Unassigned conversation awaiting coordinator intake.
+        SupportConversation::query()->create([
+            'patient_user_id' => $patient->id,
+            'category' => SupportCategory::General->value,
+            'status' => ConversationStatus::Open->value,
+            'priority' => 'normal',
+            'opened_at' => now(),
+            'source_language' => 'fa',
+            'subject' => 'awaiting intake',
+        ]);
+
+        $response = $this->actingAs($coordinator)->getJson('/api/v1/support')->assertOk();
+        $subjects = collect($response->json('data'))->pluck('subject')->all();
+        $this->assertContains('assigned to me', $subjects);
+        $this->assertContains('awaiting intake', $subjects);
+    }
+
+    public function test_support_assign_requires_coordinator_access_to_conversation(): void
+    {
+        $patient = User::factory()->create(['role' => 'patient']);
+        $other = User::factory()->create(['role' => 'coordinator']);
+        // Conversation assigned to a different coordinator.
+        $conversation = SupportConversation::query()->create([
+            'patient_user_id' => $patient->id,
+            'assignee_user_id' => $other->id,
+            'category' => SupportCategory::General->value,
+            'status' => ConversationStatus::Open->value,
+            'priority' => 'normal',
+            'opened_at' => now(),
+            'source_language' => 'fa',
+            'subject' => 'owned by other',
+        ]);
+
+        $coordinator = User::factory()->create(['role' => 'coordinator']);
+        $this->actingAs($coordinator)
+            ->postJson("/api/v1/support/{$conversation->id}/assignee", [
+                'assignee_user_id' => $coordinator->id,
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('support_conversations', [
+            'id' => $conversation->id,
+            'assignee_user_id' => $other->id,
+        ]);
+    }
+
     public function test_support_index_allows_owner_to_browse_all_conversations(): void
     {
         $patient = User::factory()->create(['role' => 'patient']);
