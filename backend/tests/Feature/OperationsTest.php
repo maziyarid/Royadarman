@@ -26,6 +26,18 @@ final class CapturingNotificationSender implements NotificationSender
     }
 }
 
+final class CountingNotificationSender implements NotificationSender
+{
+    public int $calls = 0;
+
+    public function send(string $mobile, string $template, string $locale, array $parameters, string $idempotencyKey): string
+    {
+        $this->calls++;
+
+        return 'provider-retry-'.$this->calls;
+    }
+}
+
 class OperationsTest extends TestCase
 {
     use RefreshDatabase;
@@ -59,6 +71,38 @@ class OperationsTest extends TestCase
         $this->call('POST', '/api/v1/notifications/callback', [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_X_CALLBACK_TIMESTAMP' => $timestamp, 'HTTP_X_CALLBACK_SIGNATURE' => $signature], $body)->assertOk();
         $this->assertDatabaseHas('notification_deliveries', ['provider_reference' => 'provider-9', 'status' => 'delivered']);
         $this->call('POST', '/api/v1/notifications/callback', [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_X_CALLBACK_TIMESTAMP' => $timestamp, 'HTTP_X_CALLBACK_SIGNATURE' => 'wrong'], $body)->assertUnauthorized();
+    }
+
+    public function test_provider_accepts_sms_but_worker_dies_before_recording_sent_is_safe_on_retry(): void
+    {
+        $sender = new CountingNotificationSender;
+        $this->app->instance(NotificationSender::class, $sender);
+        $patient = User::factory()->create(['role' => 'patient', 'locale' => 'fa', 'phone' => '09121234567', 'phone_hash' => hash('sha256', 'retry')]);
+        $case = $this->patientCase($patient);
+        $event = OutboxEvent::query()->create(['event_type' => 'case.submitted', 'aggregate_type' => PatientCase::class, 'aggregate_id' => $case->id, 'recipient_locale' => 'fa', 'payload' => ['template_key' => 'case_submitted', 'reference' => $case->public_reference], 'deduplication_key' => 'retry-1', 'available_at' => now()]);
+
+        $job = new ProcessOutboxEvent($event->id);
+        $job->handle($sender);
+        $this->assertSame(1, $sender->calls);
+        $this->assertDatabaseHas('notification_deliveries', ['outbox_event_id' => $event->id, 'status' => 'sent']);
+
+        $job->handle($sender);
+        $this->assertSame(1, $sender->calls);
+        $this->assertDatabaseHas('notification_deliveries', ['outbox_event_id' => $event->id, 'status' => 'sent']);
+    }
+
+    public function test_callback_promotes_delivery_status_with_row_lock(): void
+    {
+        config()->set('royadarman.sms.callback_secret', 'test-secret');
+        $patient = User::factory()->create(['role' => 'patient']);
+        $case = $this->patientCase($patient);
+        $event = OutboxEvent::query()->create(['event_type' => 'case.submitted', 'aggregate_type' => PatientCase::class, 'aggregate_id' => $case->id, 'recipient_locale' => 'fa', 'payload' => ['template_key' => 'case_submitted'], 'deduplication_key' => 'cb-2', 'available_at' => now()]);
+        DB::table('notification_deliveries')->insert(['id' => (string) Str::ulid(), 'outbox_event_id' => $event->id, 'channel' => 'sms', 'provider_reference' => 'provider-cb', 'status' => 'sent', 'recipient_locale' => 'fa', 'template_key' => 'case_submitted', 'created_at' => now(), 'updated_at' => now()]);
+        $body = json_encode(['reference' => 'provider-cb', 'status' => 'delivered'], JSON_THROW_ON_ERROR);
+        $timestamp = (string) time();
+        $signature = hash_hmac('sha256', $timestamp.'.'.$body, 'test-secret');
+        $this->call('POST', '/api/v1/notifications/callback', [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_X_CALLBACK_TIMESTAMP' => $timestamp, 'HTTP_X_CALLBACK_SIGNATURE' => $signature], $body)->assertOk();
+        $this->assertDatabaseHas('notification_deliveries', ['provider_reference' => 'provider-cb', 'status' => 'delivered']);
     }
 
     public function test_due_retention_deletes_private_object_and_marks_record_without_a_default_duration(): void
