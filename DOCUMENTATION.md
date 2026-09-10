@@ -283,7 +283,13 @@ in production).
 
 **Downloads** are server-streamed after authorization (`ClinicalDocumentPolicy`),
 never via public or signed object URLs, and every access is audited in
-`document_access_events`.
+`document_access_events`. The stream uses `Content-Disposition: inline` so an
+authorised browser can render the OPG preview directly, with a restrictive
+`Content-Security-Policy: default-src 'none'; sandbox`, `Cache-Control: no-store,
+private`, `X-Content-Type-Options: nosniff`, and the verified detected MIME.
+Rejected and scan-failed documents are not streamable; only `approved` documents
+are, and only for the owning patient or an assigned clinician with a verified,
+non-expired practitioner record.
 
 **Document endpoints:**
 
