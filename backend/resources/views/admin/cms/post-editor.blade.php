@@ -63,7 +63,22 @@
                 </div>
                 <div class="field" style="margin-top:12px">
                     <label>{{ __('ui.admin.body') }} ({{ $locale }})</label>
-                    <textarea name="translations[{{ $locale }}][body]" required>{{ $tr?->body }}</textarea>
+                    <div class="rte-toolbar" data-rte-toolbar="{{ $locale }}" role="toolbar" aria-label="{{ __('ui.admin.body') }}">
+                        <button type="button" data-cmd="bold" title="Bold" aria-label="Bold" style="font-weight:700">B</button>
+                        <button type="button" data-cmd="italic" title="Italic" aria-label="Italic" style="font-style:italic">I</button>
+                        <button type="button" data-cmd="underline" title="Underline" aria-label="Underline" style="text-decoration:underline">U</button>
+                        <span class="rte-sep"></span>
+                        <button type="button" data-cmd-block="h2" title="Heading 2" aria-label="Heading 2">H2</button>
+                        <button type="button" data-cmd-block="h3" title="Heading 3" aria-label="Heading 3">H3</button>
+                        <button type="button" data-cmd="formatBlock" data-value="p" title="Paragraph" aria-label="Paragraph">P</button>
+                        <span class="rte-sep"></span>
+                        <button type="button" data-cmd="insertUnorderedList" title="Bullet list" aria-label="Bullet list">•</button>
+                        <button type="button" data-cmd="insertOrderedList" title="Numbered list" aria-label="Numbered list">1.</button>
+                        <button type="button" data-cmd="formatBlock" data-value="blockquote" title="Quote" aria-label="Quote">❝</button>
+                        <button type="button" data-rte-link="{{ $locale }}" title="Insert link" aria-label="Insert link">🔗</button>
+                    </div>
+                    <div class="rte-editor" contenteditable="true" data-rte-editor="{{ $locale }}" role="textbox" aria-multiline="true" style="min-height:280px"></div>
+                    <textarea name="translations[{{ $locale }}][body]" required data-rte-source="{{ $locale }}" style="display:none">{{ $tr?->body }}</textarea>
                 </div>
                 <input type="hidden" name="translations[{{ $locale }}][locale]" value="{{ $locale }}">
             </div>
@@ -132,13 +147,49 @@
 @endif
 
 <script>
-document.querySelectorAll('.tabs button').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelector('.tab-panel[data-panel="' + btn.dataset.tab + '"]').classList.add('active');
+const rteInit = () => {
+    document.querySelectorAll('[data-rte-editor]').forEach(ed => {
+        const locale = ed.dataset.rteEditor;
+        const source = document.querySelector('[data-rte-source="' + locale + '"]');
+        if (!source) return;
+        ed.innerHTML = source.value || '<p><br></p>';
+
+        const toolbar = document.querySelector('[data-rte-toolbar="' + locale + '"]');
+        if (toolbar) {
+            toolbar.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('mousedown', e => e.preventDefault());
+                btn.addEventListener('click', () => {
+                    ed.focus();
+                    if (btn.dataset.rteLink !== undefined) {
+                        const url = prompt('URL:', 'https://');
+                        if (url) document.execCommand('createLink', false, url);
+                        return;
+                    }
+                    if (btn.dataset.cmdBlock) {
+                        document.execCommand('formatBlock', false, btn.dataset.cmdBlock);
+                        return;
+                    }
+                    const cmd = btn.dataset.cmd;
+                    if (cmd === 'formatBlock' && btn.dataset.value) {
+                        document.execCommand('formatBlock', false, btn.dataset.value);
+                        return;
+                    }
+                    if (cmd) document.execCommand(cmd, false, null);
+                    source.value = ed.innerHTML;
+                });
+            });
+        }
+
+        ed.addEventListener('input', () => source.value = ed.innerHTML);
+        ed.addEventListener('blur', () => source.value = ed.innerHTML);
     });
-});
+};
+rteInit();
+document.querySelector('form')?.addEventListener('submit', () => {
+    document.querySelectorAll('[data-rte-editor]').forEach(ed => {
+        const source = document.querySelector('[data-rte-source="' + ed.dataset.rteEditor + '"]');
+        if (source) source.value = ed.innerHTML;
+    });
+}, {capture:true});
 </script>
 @endsection

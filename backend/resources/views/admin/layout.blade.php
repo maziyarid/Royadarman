@@ -38,6 +38,16 @@
         .empty{text-align:center;color:var(--muted);padding:40px 20px} .pagination{display:flex;gap:8px;justify-content:center;margin-top:18px}
         .pagination a{padding:6px 12px;border:1px solid var(--line);border-radius:6px;color:var(--muted);text-decoration:none} .pagination a.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
         .muted{color:var(--muted)} .row-actions{display:flex;gap:8px;flex-wrap:wrap}
+        .rte-toolbar{display:flex;gap:4px;flex-wrap:wrap;padding:6px 8px;background:var(--bg);border:1px solid var(--line);border-radius:8px 8px 0 0;border-bottom:none;margin-top:4px}
+        .rte-toolbar button{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font-size:13px;cursor:pointer}
+        .rte-toolbar button:hover{border-color:var(--accent);color:var(--accent)}
+        .rte-toolbar .rte-sep{width:1px;background:var(--line);margin:4px 2px}
+        .rte-editor{min-height:280px;padding:14px 16px;background:var(--bg);border:1px solid var(--line);border-radius:0 0 8px 8px;color:var(--ink);font-size:14px;line-height:1.7;outline:none;overflow-y:auto}
+        .rte-editor:focus{border-color:var(--accent)}
+        .rte-editor :where(h2,h3){margin:.6em 0 .3em} .rte-editor h2{font-size:1.3em} .rte-editor h3{font-size:1.1em}
+        .rte-editor p{margin:0 0 .8em} .rte-editor ul,.rte-editor ol{margin:0 0 .8em;padding-inline-start:1.6em}
+        .rte-editor blockquote{margin:.6em 0;padding:8px 14px;border-inline-start:3px solid var(--accent);background:var(--panel);border-radius:0 6px 6px 0}
+        .rte-editor a{color:var(--accent);text-decoration:underline} .rte-editor img{max-width:100%;border-radius:6px}
     </style>
 </head>
 <body>
