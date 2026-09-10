@@ -59,6 +59,10 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (AuthorizationException $exception, Request $request) {
+            if (! $request->is('api/*') && ! $request->expectsJson()) {
+                return null;
+            }
+
             return response()->json([
                 'error' => ['code' => 'error.forbidden', 'message' => __('This action is unauthorized.')],
                 'request_id' => $request->attributes->get('request_id'),
@@ -66,6 +70,10 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (ModelNotFoundException $exception, Request $request) {
+            if (! $request->is('api/*') && ! $request->expectsJson()) {
+                return null;
+            }
+
             return response()->json([
                 'error' => ['code' => 'error.not_found', 'message' => __('Not Found')],
                 'request_id' => $request->attributes->get('request_id'),
@@ -73,6 +81,10 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (HttpExceptionInterface $exception, Request $request) {
+            if (! $request->is('api/*') && ! $request->expectsJson()) {
+                return null;
+            }
+
             $status = $exception->getStatusCode();
             $code = match ($status) {
                 404 => 'error.not_found',

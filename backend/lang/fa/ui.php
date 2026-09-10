@@ -174,4 +174,13 @@ return [
         'service' => ['opg_review' => 'بازبینی OPG', 'home_service' => 'خدمات در منزل', 'clinic_referral' => 'ارجاع به کلینیک'],
         'home_status' => ['requested' => 'درخواست‌شده', 'area_verified' => 'منطقه تأییدشده', 'coordinator_review' => 'بازبینی هماهنگ‌کننده'],
     ],
+    'blog_index_title' => 'مقالات | رویادرمان',
+    'blog_index_heading' => 'مقالات',
+    'blog_index_description' => 'مقالات راهنمایی و هماهنگی دندانپزشکی از تیم رویادرمان.',
+    'blog_index_empty' => 'هنوز مقاله‌ای منتشر نشده است.',
+    'blog_read_more' => 'ادامه مطلب',
+    'pagination' => 'صفحه‌بندی',
+    'error_404_title' => 'صفحه پیدا نشد',
+    'error_404_text' => 'صفحه‌ای که به دنبال آن هستید وجود ندارد یا جابه‌جا شده است.',
+    'error_404_home' => 'بازگشت به خانه',
 ];

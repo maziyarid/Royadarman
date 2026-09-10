@@ -24,6 +24,11 @@ Route::get('/{locale}/', fn () => response()->view('public.home')->header('Cache
     ->middleware(SetLocale::class)
     ->name('public.home');
 
+Route::get('/{locale}/blog/', [BlogController::class, 'index'])
+    ->whereIn('locale', ['fa', 'ar', 'en'])
+    ->middleware(SetLocale::class)
+    ->name('public.blog.index');
+
 Route::get('/{locale}/blog/{slug}', [BlogController::class, 'show'])
     ->whereIn('locale', ['fa', 'ar', 'en'])
     ->middleware(SetLocale::class)

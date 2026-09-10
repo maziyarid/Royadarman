@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domain\CMS\Enums\PostStatus;
+use App\Domain\CMS\Enums\PostType;
 use App\Domain\CMS\Services\StructuredDataService;
 use App\Models\Cms\Post;
 use App\Models\Cms\PostTranslation;
@@ -11,6 +12,26 @@ use Illuminate\Http\Response;
 final class BlogController
 {
     public function __construct(private readonly StructuredDataService $structuredData) {}
+
+    public function index(string $locale): Response
+    {
+        $translations = PostTranslation::query()
+            ->where('locale', $locale)
+            ->whereHas('post', fn ($q) => $q
+                ->where('type', PostType::Post)
+                ->where('status', PostStatus::Published)
+                ->where('published_at', '<=', now()))
+            ->with(['post.author'])
+            ->orderByDesc('post_id')
+            ->paginate(12);
+
+        return response()->view('public.blog.index', [
+            'locale' => $locale,
+            'translations' => $translations,
+            'canonical' => url('/'.$locale.'/blog/'),
+        ], 200)
+            ->header('Cache-Control', 'public, max-age=300');
+    }
 
     public function show(string $locale, string $slug): Response
     {

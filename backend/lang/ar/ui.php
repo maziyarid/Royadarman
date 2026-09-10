@@ -173,4 +173,13 @@ return [
         'service' => ['opg_review' => 'مراجعة OPG', 'home_service' => 'خدمة منزلية', 'clinic_referral' => 'إحالة للعيادة'],
         'home_status' => ['requested' => 'مطلوب', 'area_verified' => 'المنطقة موثقة', 'coordinator_review' => 'مراجعة المنسق'],
     ],
+    'blog_index_title' => 'مقالات | رویادرمان',
+    'blog_index_heading' => 'مقالات',
+    'blog_index_description' => 'مقالات الإرشاد والتنسيق لطب الأسنان من فريق رویادرمان.',
+    'blog_index_empty' => 'لم يتم نشر أي مقالات بعد.',
+    'blog_read_more' => 'اقرأ المزيد',
+    'pagination' => 'ترقيم الصفحات',
+    'error_404_title' => 'الصفحة غير موجودة',
+    'error_404_text' => 'الصفحة التي تبحث عنها غير موجودة أو تم نقلها.',
+    'error_404_home' => 'العودة إلى الرئيسية',
 ];

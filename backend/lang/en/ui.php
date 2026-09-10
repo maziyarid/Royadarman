@@ -173,4 +173,13 @@ return [
         'service' => ['opg_review' => 'OPG review', 'home_service' => 'Home service', 'clinic_referral' => 'Clinic referral'],
         'home_status' => ['requested' => 'Requested', 'area_verified' => 'Area verified', 'coordinator_review' => 'Coordinator review'],
     ],
+    'blog_index_title' => 'Articles | Royadarman',
+    'blog_index_heading' => 'Articles',
+    'blog_index_description' => 'Dental guidance and coordination articles from the Royadarman team.',
+    'blog_index_empty' => 'No articles have been published yet.',
+    'blog_read_more' => 'Read more',
+    'pagination' => 'Pagination',
+    'error_404_title' => 'Page not found',
+    'error_404_text' => 'The page you are looking for does not exist or has been moved.',
+    'error_404_home' => 'Return to home',
 ];

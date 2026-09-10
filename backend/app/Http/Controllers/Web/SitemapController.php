@@ -40,6 +40,13 @@ final class SitemapController
 
         $urls = [$home];
 
+        $urls[] = [
+            'url' => url('/'.$locale.'/blog/'),
+            'lastmod' => now()->toDateString(),
+            'changefreq' => 'weekly',
+            'priority' => '0.9',
+        ];
+
         foreach ($posts as $post) {
             $translation = $post->translations->firstWhere('locale', $locale);
             if (! $translation || empty($translation->slug)) {

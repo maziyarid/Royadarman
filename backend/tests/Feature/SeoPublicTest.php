@@ -328,4 +328,55 @@ final class SeoPublicTest extends TestCase
             ->assertSee('رویا درمان', false)
             ->assertDontSee('رویاد', false);
     }
+
+    public function test_blog_index_lists_published_posts_with_canonical_and_hreflang(): void
+    {
+        $author = User::factory()->create();
+        $published = Post::query()->create([
+            'author_user_id' => $author->id,
+            'type' => PostType::Post->value,
+            'status' => PostStatus::Published->value,
+            'published_at' => now(),
+        ]);
+        $published->translations()->create(['locale' => 'fa', 'title' => 'راهنمای ایمپلنت', 'slug' => 'implant-guide', 'body' => '<p>متن</p>', 'sanitized_body' => '<p>متن</p>', 'excerpt' => 'خلاصه مقاله']);
+
+        $draft = Post::query()->create([
+            'author_user_id' => $author->id,
+            'type' => PostType::Post->value,
+            'status' => PostStatus::Draft->value,
+            'published_at' => null,
+        ]);
+        $draft->translations()->create(['locale' => 'fa', 'title' => 'پیش‌نویس', 'slug' => 'draft-slug', 'body' => '<p>متن</p>', 'sanitized_body' => '<p>متن</p>']);
+
+        $this->get('/fa/blog/')
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="'.url('/fa/blog/').'">', false)
+            ->assertSee('<link rel="alternate" hreflang="x-default" href="'.url('/fa/blog/').'">', false)
+            ->assertSee('راهنمای ایمپلنت', false)
+            ->assertSee('/fa/blog/implant-guide', false)
+            ->assertDontSee('/fa/blog/draft-slug', false);
+    }
+
+    public function test_blog_index_shows_empty_state_when_no_posts(): void
+    {
+        $this->get('/en/blog/')
+            ->assertOk()
+            ->assertSee('No articles have been published yet.', false);
+    }
+
+    public function test_locale_sitemap_includes_blog_index_page(): void
+    {
+        $this->get('/sitemap-fa.xml')
+            ->assertOk()
+            ->assertSee(url('/fa/blog/'), false);
+    }
+
+    public function test_404_renders_localized_custom_view(): void
+    {
+        $this->withHeaders(['Accept' => 'text/html'])
+            ->get('/fa/this/path/has/slashes')
+            ->assertNotFound()
+            ->assertSee('صفحه پیدا نشد', false)
+            ->assertSee('<meta name="robots" content="noindex, follow">', false);
+    }
 }
