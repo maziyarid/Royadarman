@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web\Admin;
 
 use App\Domain\CMS\Enums\PostStatus;
 use App\Domain\CMS\Enums\PostType;
+use App\Domain\CMS\Services\HtmlSanitizer;
 use App\Domain\Identity\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\Cms\Category;
@@ -22,6 +23,8 @@ use Illuminate\Validation\Rule;
 
 final class AdminCmsController extends Controller
 {
+    public function __construct(private readonly HtmlSanitizer $sanitizer) {}
+
     public function index(Request $request)
     {
         abort_unless($request->user()->can('viewAny', Post::class), 403);
@@ -78,7 +81,7 @@ final class AdminCmsController extends Controller
                 'slug' => $tr['slug'],
                 'excerpt' => $tr['excerpt'] ?? null,
                 'body' => $tr['body'],
-                'sanitized_body' => $tr['body'],
+                'sanitized_body' => $this->sanitizer->sanitize($tr['body']),
             ]);
         }
 
@@ -129,7 +132,7 @@ final class AdminCmsController extends Controller
                     'slug' => $tr['slug'],
                     'excerpt' => $tr['excerpt'] ?? null,
                     'body' => $tr['body'],
-                    'sanitized_body' => $tr['body'],
+                    'sanitized_body' => $this->sanitizer->sanitize($tr['body']),
                 ],
             );
         }

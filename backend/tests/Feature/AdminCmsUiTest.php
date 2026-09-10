@@ -53,6 +53,28 @@ final class AdminCmsUiTest extends TestCase
         $this->assertSame(2, $post->translations()->count());
     }
 
+    public function test_post_body_is_sanitized_against_stored_xss(): void
+    {
+        $owner = User::factory()->create(['role' => 'owner']);
+        $payload = '<p>ok</p><script>alert(1)</script><img src="javascript:alert(1)" onerror="alert(2)"><a href="javascript:alert(3)">x</a><!--[if IE]><script>alert(4)</script><![endif]-->';
+
+        $this->actingAs($owner)->post('/admin/cms/posts', [
+            'type' => PostType::Post->value,
+            'status' => PostStatus::Draft->value,
+            'is_featured' => false,
+            'translations' => [
+                ['locale' => 'fa', 'title' => 'XSS test', 'slug' => 'xss-test', 'body' => $payload],
+            ],
+        ])->assertRedirect();
+
+        $body = Post::first()->translations()->first()->sanitized_body;
+        $this->assertStringNotContainsString('<script', $body);
+        $this->assertStringNotContainsString('javascript:', $body);
+        $this->assertStringNotContainsString('onerror', $body);
+        $this->assertStringNotContainsString('<!--[if', $body);
+        $this->assertStringContainsString('<p>ok</p>', $body);
+    }
+
     public function test_owner_can_publish_a_post_from_admin(): void
     {
         $owner = User::factory()->create(['role' => 'owner']);

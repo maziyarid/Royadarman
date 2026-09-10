@@ -28,6 +28,11 @@ Route::get('/{locale}/blog/{slug}', [BlogController::class, 'show'])
     ->middleware(SetLocale::class)
     ->name('public.blog.show');
 
+Route::get('/{locale}/blog/{slug}/preview', [BlogController::class, 'preview'])
+    ->whereIn('locale', ['fa', 'ar', 'en'])
+    ->middleware(['signed', 'auth', SetLocale::class])
+    ->name('public.blog.preview');
+
 Route::middleware(['staff'])->prefix('/admin/cms')->name('admin.cms.')->group(function (): void {
     Route::get('/posts', [AdminCmsController::class, 'index'])->name('posts.index');
     Route::get('/posts/create', [AdminCmsController::class, 'create'])->name('posts.create');

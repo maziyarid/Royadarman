@@ -96,6 +96,7 @@ return [
         'col_updated' => 'به‌روزرسانی',
         'actions' => 'عملیات',
         'save' => 'ذخیره',
+        'preview' => 'پیش‌نمایش',
         'publish' => 'انتشار',
         'unpublish' => 'لغو انتشار',
         'delete' => 'حذف',

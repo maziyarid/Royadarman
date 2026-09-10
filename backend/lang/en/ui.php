@@ -95,6 +95,7 @@ return [
         'col_updated' => 'Updated',
         'actions' => 'Actions',
         'save' => 'Save',
+        'preview' => 'Preview',
         'publish' => 'Publish',
         'unpublish' => 'Unpublish',
         'delete' => 'Delete',

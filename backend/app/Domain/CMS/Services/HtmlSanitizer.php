@@ -16,6 +16,9 @@ final class HtmlSanitizer
 
     public function sanitize(string $html): string
     {
+        // Strip HTML comments (incl. IE conditional-comment XSS vectors) before parsing.
+        $html = preg_replace('/<!--.*?-->/s', '', $html) ?? $html;
+
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $html = '<?xml encoding="UTF-8">'.$html;
         libxml_use_internal_errors(true);
@@ -90,7 +93,7 @@ final class HtmlSanitizer
                 continue;
             }
             $src = $node->getAttribute('src');
-            if (preg_match('/^\s*(javascript|vbscript):/i', $src)) {
+            if (preg_match('/^\s*(javascript|vbscript|data):/i', $src)) {
                 $node->removeAttribute('src');
             }
         }

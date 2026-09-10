@@ -95,6 +95,7 @@ return [
         'col_updated' => 'آخر تحديث',
         'actions' => 'إجراءات',
         'save' => 'حفظ',
+        'preview' => 'معاينة',
         'publish' => 'نشر',
         'unpublish' => 'إلغاء النشر',
         'delete' => 'حذف',

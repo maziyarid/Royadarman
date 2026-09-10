@@ -10,6 +10,7 @@ use App\Models\Cms\Redirect;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Testing\File;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 final class SeoPublicTest extends TestCase
@@ -110,6 +111,46 @@ final class SeoPublicTest extends TestCase
         $post->translations()->create(['locale' => 'fa', 'title' => 'پیش‌نویس', 'slug' => 'not-published', 'body' => '<p>متن</p>', 'sanitized_body' => '<p>متن</p>']);
 
         $this->get('/fa/blog/not-published')->assertNotFound();
+    }
+
+    public function test_preview_requires_valid_signed_url_and_auth(): void
+    {
+        $author = User::factory()->create(['role' => 'owner']);
+        $post = Post::query()->create([
+            'author_user_id' => $author->id,
+            'type' => PostType::Post->value,
+            'status' => PostStatus::Draft->value,
+            'published_at' => null,
+        ]);
+        $post->translations()->create(['locale' => 'fa', 'title' => 'پیش‌نویس', 'slug' => 'draft-preview', 'body' => '<p>متن</p>', 'sanitized_body' => '<p>متن</p>']);
+
+        // Unsigned URL → 403 (signed middleware)
+        $this->actingAs($author)->get('/fa/blog/draft-preview/preview')->assertForbidden();
+
+        // Signed URL as staff → 200 with noindex and preview banner
+        $signed = URL::signedRoute('public.blog.preview', ['locale' => 'fa', 'slug' => 'draft-preview'], now()->addMinutes(15));
+        $this->actingAs($author)->get($signed)
+            ->assertOk()
+            ->assertHeader('X-Robots-Tag', 'noindex, nofollow')
+            ->assertSee('preview-banner', false)
+            ->assertSee('noindex, nofollow', false)
+            ->assertSee('پیش‌نویس', false);
+    }
+
+    public function test_preview_signed_url_rejects_patient(): void
+    {
+        $author = User::factory()->create(['role' => 'owner']);
+        $patient = User::factory()->create(['role' => 'patient']);
+        $post = Post::query()->create([
+            'author_user_id' => $author->id,
+            'type' => PostType::Post->value,
+            'status' => PostStatus::Draft->value,
+            'published_at' => null,
+        ]);
+        $post->translations()->create(['locale' => 'fa', 'title' => 'پیش‌نویس', 'slug' => 'draft-preview-2', 'body' => '<p>متن</p>', 'sanitized_body' => '<p>متن</p>']);
+
+        $signed = URL::signedRoute('public.blog.preview', ['locale' => 'fa', 'slug' => 'draft-preview-2'], now()->addMinutes(15));
+        $this->actingAs($patient)->get($signed)->assertForbidden();
     }
 
     public function test_redirect_manager_issues_301_for_known_source_path(): void

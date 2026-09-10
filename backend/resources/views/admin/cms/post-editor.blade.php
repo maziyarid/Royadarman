@@ -102,8 +102,17 @@
 
     <div style="display:flex;gap:10px;margin:20px 0">
         <button type="submit" class="btn primary">{{ __('ui.admin.save') }}</button>
-        @if($post->exists && $post->status->value !== 'published')
-            <a href="{{ route('admin.cms.posts.index') }}" class="btn">{{ __('ui.admin.posts') }}</a>
+        @if($post->exists)
+            @php
+                $previewLocale = $post->translations->first()?->locale ?? 'fa';
+                $previewSlug = $post->translations->firstWhere('locale', $previewLocale)?->slug;
+            @endphp
+            @if($previewSlug)
+                <a href="{{ URL::signedRoute('public.blog.preview', ['locale' => $previewLocale, 'slug' => $previewSlug], now()->addMinutes(15)) }}" target="_blank" rel="noopener" class="btn">{{ __('ui.admin.preview') }}</a>
+            @endif
+            @if($post->status->value !== 'published')
+                <a href="{{ route('admin.cms.posts.index') }}" class="btn">{{ __('ui.admin.posts') }}</a>
+            @endif
         @endif
     </div>
 </form>

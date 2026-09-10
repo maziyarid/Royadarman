@@ -29,6 +29,11 @@
     @endif
 </head>
 <body>
+@if(! empty($isPreview))
+    <div class="preview-banner" role="status" style="background:#b45309;color:#fff;padding:8px 16px;text-align:center;font-weight:600">
+        {{ __('ui.admin.preview') }}
+    </div>
+@endif
 <a class="skip-link" href="#main">{{ __('ui.skip') }}</a>
 <header class="site-header">
     <div class="shell header-row">
