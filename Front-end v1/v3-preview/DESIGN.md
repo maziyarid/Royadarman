@@ -1,5 +1,23 @@
 # Royadarman Design Context
 
+> **SUPERSEDED DESIGN EXPLORATION — DO NOT IMPLEMENT FROM THIS DOCUMENT.**
+>
+> This `v3-preview/` directory is an earlier static-prototype exploration that
+> proposed a teal/green base (`styles.css`) with an `accepted-blue.css` override
+> layer (`#1477F8`). That direction was **not** adopted for production.
+>
+> The deployed production frontend and the canonical `backend/DESIGN.md` settled
+> on the lapis + apricot palette (`--lapis:#2947A3`, `--apricot:#F2A566`) backed by
+> `backend/public/assets/site.css`. The Blade views in
+> `backend/resources/views/public/` are the live source of truth and match the
+> deployed `Current Public_HTML/`.
+>
+> Current canonical design system: `backend/DESIGN.md`
+> Runtime source of truth: `backend/public/assets/site.css`
+>
+> This file and the v3-preview assets are preserved for historical reference
+> only. Do not reintroduce the teal/blue-override palette into the codebase.
+
 **Product truth:** Royadarman is a 24-hour dental guidance, coordination and support centre. It is not the personal clinic of the owner and it does not let non-clinicians diagnose patients.
 
 ## Accepted visual baseline — 2026-08-31

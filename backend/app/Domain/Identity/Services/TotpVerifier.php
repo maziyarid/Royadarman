@@ -30,7 +30,7 @@ final class TotpVerifier
 
     private function decodeBase32(string $value): string
     {
-        $alphabet = '[REDACTED:entropy:32]';
+        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
         $bits = '';
         foreach (str_split(strtoupper(preg_replace('/\s+/', '', $value) ?? '')) as $char) {
             $position = strpos($alphabet, $char);
@@ -49,4 +49,3 @@ final class TotpVerifier
         return $decoded;
     }
 }
-

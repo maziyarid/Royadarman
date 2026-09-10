@@ -8,4 +8,3 @@ enum ServiceType: string
     case HomeDentistry = 'home_dentistry';
     case OpgReview = 'opg_review';
 }
-

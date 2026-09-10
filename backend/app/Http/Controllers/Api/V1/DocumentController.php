@@ -64,4 +64,3 @@ final class DocumentController extends Controller
         ]);
     }
 }
-

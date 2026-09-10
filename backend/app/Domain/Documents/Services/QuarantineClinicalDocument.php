@@ -99,7 +99,7 @@ class QuarantineClinicalDocument
         $extension = strtolower($file->getClientOriginalExtension());
 
         if (! array_key_exists($extension, self::MIME_BY_EXTENSION)) {
-            throw ValidationException::withMessages(['opg' => 'فقط JPEG، PNG یا PDF پذیرفته می‌شود.']);
+            throw ValidationException::withMessages(['opg' => 'فقط JPEG یا PNG پذیرفته می‌شود.']);
         }
 
         $detectedMime = (new \finfo(FILEINFO_MIME_TYPE))->file($file->getRealPath());
@@ -118,4 +118,3 @@ class QuarantineClinicalDocument
         return [$extension, $detectedMime];
     }
 }
-

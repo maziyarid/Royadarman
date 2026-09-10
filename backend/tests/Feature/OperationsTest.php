@@ -21,6 +21,7 @@ final class CapturingNotificationSender implements NotificationSender
     public function send(string $mobile, string $template, string $locale, array $parameters, string $idempotencyKey): string
     {
         $this->calls++;
+
         return 'provider-1';
     }
 }

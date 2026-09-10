@@ -16,4 +16,3 @@ enum UserRole: string
         return $this !== self::Patient;
     }
 }
-

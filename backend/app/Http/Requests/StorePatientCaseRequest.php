@@ -55,4 +55,3 @@ class StorePatientCaseRequest extends FormRequest
         });
     }
 }
-

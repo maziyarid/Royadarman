@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 final class RunRetention extends Command
 {
     protected $signature = 'retention:run {--limit=50}';
+
     protected $description = 'Execute approved, due retention jobs without inventing retention periods.';
 
     public function handle(): int
@@ -23,6 +24,7 @@ final class RunRetention extends Command
                 }
                 if ($job->resource_type !== ClinicalDocument::class) {
                     DB::table('retention_jobs')->where('id', $id)->update(['status' => 'unsupported', 'updated_at' => now()]);
+
                     return;
                 }
                 $document = ClinicalDocument::query()->find($job->resource_id);
@@ -33,6 +35,7 @@ final class RunRetention extends Command
                 DB::table('retention_jobs')->where('id', $id)->update(['status' => 'completed', 'updated_at' => now()]);
             });
         });
+
         return self::SUCCESS;
     }
 }

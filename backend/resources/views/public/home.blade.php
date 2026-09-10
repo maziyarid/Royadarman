@@ -11,8 +11,17 @@
     @foreach(['fa','ar','en'] as $language)<link rel="alternate" hreflang="{{ $language }}" href="{{ url('/'.$language.'/') }}">@endforeach
     <link rel="alternate" hreflang="x-default" href="{{ url('/fa/') }}">
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/assets/site.css?v=20260908">
-    <script src="/assets/site.js?v=20260908" defer></script>
+    <link rel="stylesheet" href="/assets/site.css?v=20260910">
+    <script src="/assets/site.js?v=20260910" defer></script>
+    @php
+        $orgSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Organization',
+            'name' => 'Royadarman',
+            'url' => url('/fa/'),
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($orgSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 </head>
 <body>
 <a class="skip-link" href="#main">{{ __('ui.skip') }}</a>

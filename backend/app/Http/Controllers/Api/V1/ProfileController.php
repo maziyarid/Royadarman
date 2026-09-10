@@ -23,4 +23,3 @@ final class ProfileController extends Controller
         return $this->show($request);
     }
 }
-

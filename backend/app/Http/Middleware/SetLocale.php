@@ -19,4 +19,3 @@ final class SetLocale
         return $next($request);
     }
 }
-

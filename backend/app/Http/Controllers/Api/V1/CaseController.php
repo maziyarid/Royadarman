@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Cases\Enums\CaseStatus;
+use App\Domain\Cases\Enums\HomeServiceStatus;
 use App\Domain\Cases\Enums\ServiceType;
 use App\Domain\Operations\Services\Idempotency;
 use App\Domain\Operations\Services\Outbox;
 use App\Http\Controllers\Controller;
+use App\Models\HomeServiceRequest;
 use App\Models\PatientCase;
 use App\Models\PolicyVersion;
 use Illuminate\Http\JsonResponse;
@@ -62,6 +64,14 @@ final class CaseController extends Controller
                 }
                 DB::table('consent_events')->insert(['id' => (string) Str::ulid(), 'subject_user_id' => $request->user()->id, 'case_id' => $locked->id, 'policy_version_id' => $policy->id, 'purpose' => 'case_coordination', 'decision' => 'accepted', 'locale' => $locked->source_language, 'channel' => 'web', 'ip_hash' => hash_hmac('sha256', (string) $request->ip(), (string) config('app.key')), 'user_agent_hash' => hash('sha256', (string) $request->userAgent()), 'created_at' => now()]);
                 $locked->update(['status' => CaseStatus::Submitted, 'version' => $locked->version + 1, 'submitted_at' => now()]);
+                if ($locked->service_type === ServiceType::HomeDentistry && $locked->tehran_area) {
+                    HomeServiceRequest::query()->create([
+                        'case_id' => $locked->id,
+                        'patient_user_id' => $locked->patient_user_id,
+                        'tehran_area' => $locked->tehran_area,
+                        'status' => HomeServiceStatus::Requested,
+                    ]);
+                }
                 $outbox->record('case.submitted', PatientCase::class, $locked->id, ['template_key' => 'case_submitted', 'reference' => $locked->public_reference], 'case.submitted.'.$locked->id, $request->user()->locale);
 
                 return ['status' => 200, 'body' => ['data' => $this->resource($locked->refresh())]];
@@ -83,4 +93,3 @@ final class CaseController extends Controller
         return ['id' => $case->id, 'reference' => $case->public_reference, 'service_type' => $case->service_type->value, 'status' => $case->status->value, 'version' => $case->version, 'source_language' => $case->source_language, 'submitted_at' => $case->submitted_at?->toIso8601String()];
     }
 }
-

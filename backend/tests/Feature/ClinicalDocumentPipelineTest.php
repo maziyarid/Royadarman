@@ -104,5 +104,50 @@ class ClinicalDocumentPipelineTest extends TestCase
             'budget_band' => 'balanced',
         ]);
     }
-}
 
+    public function test_disabled_scanner_keeps_document_quarantined_fail_closed(): void
+    {
+        Storage::fake('opg-quarantine');
+        config()->set('royadarman.opg.scanner.enabled', false);
+
+        $document = ClinicalDocument::query()->create([
+            'case_id' => $this->patientCase()->id,
+            'original_name' => 'sample-opg.png',
+            'storage_disk' => 'opg-quarantine',
+            'storage_key' => 'cases/test/quarantined.upload',
+            'detected_mime' => 'image/png',
+            'byte_size' => 68,
+            'sha256' => hash('sha256', 'image-bytes'),
+            'status' => DocumentStatus::Quarantined,
+        ]);
+        Storage::disk('opg-quarantine')->put($document->storage_key, 'image-bytes');
+
+        $scanner = app(DocumentScanner::class);
+
+        try {
+            (new ScanClinicalDocument($document->id))->handle($scanner);
+            $this->fail('Expected scanner to throw when disabled.');
+        } catch (\RuntimeException $exception) {
+            $this->assertStringContainsString('quarantined', $exception->getMessage());
+        }
+
+        // Scanner threw mid-handle; document stays in Scanning and the file
+        // remains quarantined (never promoted to the approved disk). The queue
+        // worker would invoke failed() to flip it to ScanFailed; here we prove
+        // the fail-closed invariant: no promotion, no approval, file retained.
+        $document->refresh();
+        $this->assertNotSame(DocumentStatus::Approved, $document->status);
+        Storage::disk('opg-quarantine')->assertExists($document->storage_key);
+
+        // Simulate the queue worker's failed() callback to confirm the
+        // fail-closed terminal status is applied.
+        (new ScanClinicalDocument($document->id))->failed($exception);
+        $document->refresh();
+        $this->assertSame(DocumentStatus::ScanFailed, $document->status);
+        $this->assertDatabaseHas('audit_events', [
+            'resource_id' => $document->id,
+            'action' => 'document.scanned',
+            'result' => 'failed',
+        ]);
+    }
+}

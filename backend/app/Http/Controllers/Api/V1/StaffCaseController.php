@@ -86,4 +86,3 @@ final class StaffCaseController extends Controller
         return response()->json(['data' => ['id' => $review->id, 'published' => true]]);
     }
 }
-

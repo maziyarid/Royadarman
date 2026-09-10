@@ -21,6 +21,7 @@ final class Outbox
         if (! $event->processed_at) {
             ProcessOutboxEvent::dispatch($event->id)->afterCommit();
         }
+
         return $event;
     }
 }

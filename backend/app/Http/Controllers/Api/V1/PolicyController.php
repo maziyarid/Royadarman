@@ -20,4 +20,3 @@ final class PolicyController extends Controller
         return response()->json(['data' => ['key' => $key, 'version' => $policy->version, 'locale' => $locale, 'content' => $policy->content, 'content_hash' => $policy->content_hash]])->header('Cache-Control', 'private, no-store');
     }
 }
-

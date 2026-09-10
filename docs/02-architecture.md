@@ -1,5 +1,19 @@
 # Royadarman architecture
 
+> **SUPERSEDED ARCHITECTURE**
+>
+> This document describes the earlier **marketplace/payment** design:
+> patient PWA + clinic portal + ops console, PostgreSQL/PostGIS source of
+> truth, hosted checkout payment, immutable ledger, slot/hold booking,
+> and PostGIS matching. **This is superseded.** It must not be used as the
+> current implementation specification, and no code should restore
+> payments, the ledger, slot holds, or marketplace matching.
+>
+> **Current canonical architecture:** `backend/ARCHITECTURE.md`
+> (Laravel 13, PHP 8.3, MariaDB 10.11, server-rendered Blade, no live
+> payments, no marketplace, Tehran-only home dentistry, licensed-clinician
+> OPG review, consent-driven referral).
+
 Working specification for Phase 1.
 
 ## Business loop

@@ -56,4 +56,3 @@ class CaseWorkflowTest extends TestCase
         }
     }
 }
-

@@ -35,5 +35,24 @@ class LocaleAndAuthorizationTest extends TestCase
         $case = PatientCase::query()->create(['public_reference' => 'RD-PRIVATE2', 'patient_user_id' => $patient->id, 'service_type' => 'guidance_referral', 'status' => 'submitted', 'patient_mobile' => '09121234567', 'patient_mobile_hash' => hash('sha256', 'other'), 'budget_band' => 'call']);
         $this->actingAs($other)->getJson('/api/v1/cases/'.$case->id)->assertNotFound();
     }
-}
 
+    public function test_validation_messages_are_localised_per_locale(): void
+    {
+        $payload = ['locale' => 'fa'];
+
+        $fa = $this->postJson('/api/v1/auth/otp/challenge', $payload, ['X-Locale' => 'fa'])
+            ->assertStatus(422)
+            ->json('error.details.mobile.0');
+        $this->assertStringContainsString('شماره همراه', $fa);
+
+        $ar = $this->postJson('/api/v1/auth/otp/challenge', $payload, ['X-Locale' => 'ar'])
+            ->assertStatus(422)
+            ->json('error.details.mobile.0');
+        $this->assertStringContainsString('رقم الهاتف', $ar);
+
+        $en = $this->postJson('/api/v1/auth/otp/challenge', $payload, ['X-Locale' => 'en'])
+            ->assertStatus(422)
+            ->json('error.details.mobile.0');
+        $this->assertStringContainsString('mobile number', $en);
+    }
+}

@@ -7,3 +7,58 @@
 @media(max-width:600px){.shell{width:min(var(--shell),calc(100% - 28px))}.header-row{min-height:72px}.brand small,.desktop-cta{display:none}.brand img{width:44px;height:44px}.hero{padding:46px 0}.hero-grid{grid-template-columns:minmax(0,1fr)}h1{font-size:clamp(36px,12vw,52px)}.lede{font-size:17px}.hero-actions{flex-direction:column}.hero-actions .button{width:100%}.thread-card{padding:18px}.thread-card::before{inset-inline-start:42px}.thread-card li{gap:12px}.thread-card li>span{width:38px;height:38px}.section{padding:60px 0}.service-card{padding:24px}.start-card{padding:24px}.footer-row{align-items:flex-start;flex-direction:column}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
 @media(forced-colors:active){*{scrollbar-color:auto}.button,.language summary{border:1px solid ButtonText}:focus-visible{outline-color:Highlight}}
+
+
+/* === CMS article / page content (§23) === */
+.preview-banner{position:sticky;z-index:10;top:0}
+.blog-article{max-width:780px;margin:0 auto;padding:64px 0 88px}
+.blog-article .back-link{display:inline-flex;align-items:center;gap:8px;margin-bottom:28px;color:var(--lapis);font-weight:700;font-size:14px}
+.blog-article .back-link:hover{color:var(--lapis-deep)}
+.blog-article h1{margin-bottom:18px}
+.blog-article .lede{margin-bottom:40px}
+.article-body{color:var(--ink);font-size:17px;line-height:1.85}
+html[dir=ltr] .article-body{line-height:1.7}
+.article-body h2{margin-top:48px;margin-bottom:16px;font-size:clamp(26px,3vw,34px)}
+.article-body h3{margin-top:36px;margin-bottom:12px;font-size:22px}
+.article-body p{margin:0 0 22px}
+.article-body ul,.article-body ol{margin:0 0 22px;padding-inline-start:26px}
+.article-body li{margin-bottom:10px}
+.article-body img{width:100%;border-radius:16px;margin:28px 0;box-shadow:var(--shadow)}
+.article-body blockquote{margin:28px 0;padding:20px 24px;background:var(--lapis-soft);border-inline-start:4px solid var(--lapis);border-radius:0 14px 14px 0;color:var(--lapis-deep);font-style:italic}
+html[dir=ltr] .article-body blockquote{border-radius:14px 0 0 14px}
+.article-body a{color:var(--lapis);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.article-body a:hover{color:var(--lapis-deep)}
+.article-body pre{margin:24px 0;padding:20px;background:var(--ink);color:#e8ecfa;border-radius:14px;overflow-x:auto;font-size:14px;line-height:1.6}
+.article-body code{padding:2px 6px;background:var(--lapis-soft);color:var(--lapis-deep);border-radius:6px;font-size:.92em}
+.article-body pre code{background:none;color:inherit;padding:0}
+.article-body table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}
+.article-body th,.article-body td{padding:12px 14px;border:1px solid var(--line);text-align:start}
+.article-body th{background:var(--lapis-soft);color:var(--lapis-deep);font-weight:800}
+.article-body figure{margin:28px 0}
+.article-body figcaption{margin-top:10px;color:var(--muted);font-size:13px;text-align:center}
+.article-body hr{margin:36px 0;border:none;border-top:1px solid var(--line)}
+@media(max-width:600px){.blog-article{padding:36px 0 56px}.article-body{font-size:16px}}
+
+/* === Blog index list (§23) === */
+.blog-index-head{padding:48px 0 24px}
+.blog-index-head .back-link{display:inline-flex;align-items:center;gap:8px;margin-bottom:28px;color:var(--lapis);font-weight:700;font-size:14px}
+.blog-index-head h1{margin-bottom:14px}
+.blog-list{padding-bottom:80px}
+.blog-list-item{padding:28px 0;border-top:1px solid var(--line)}
+.blog-list-item h2{font-size:26px;line-height:1.3;margin-bottom:10px}
+.blog-list-item h2 a{color:var(--ink)}
+.blog-list-item h2 a:hover{color:var(--lapis)}
+.blog-list-item .byline{margin:0 0 12px;color:var(--muted);font-size:13px}
+.blog-list-item p{color:var(--muted);max-width:680px}
+.blog-list-item .read-more{display:inline-block;margin-top:14px;color:var(--lapis);font-weight:700;font-size:14px}
+.blog-list-item .read-more:hover{color:var(--lapis-deep)}
+.empty-state{padding:48px 0;color:var(--muted);text-align:center}
+.pagination{display:flex;align-items:center;justify-content:center;gap:18px;padding:24px 0 80px;color:var(--muted);font-weight:700}
+.pagination a{padding:8px 14px;border:1px solid var(--line);border-radius:10px;color:var(--lapis);background:var(--paper)}
+.pagination a:hover{background:var(--lapis-soft)}
+.pagination .disabled{opacity:.4;padding:8px 14px;border:1px solid var(--line);border-radius:10px}
+/* === 404 error page === */
+.error-section{padding:80px 0;text-align:center}
+.error-section .kicker{color:var(--lapis);font-size:18px;margin-bottom:14px}
+.error-section h1{margin-bottom:18px}
+.error-section .lede{max-width:560px;margin:0 auto 28px;color:var(--muted)}

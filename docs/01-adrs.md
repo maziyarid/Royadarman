@@ -1,5 +1,22 @@
 # Architecture decision records
 
+> **SUPERSEDED ARCHITECTURE**
+>
+> This document describes an earlier **marketplace/payment** architecture
+> (PostgreSQL/PostGIS source of truth, hosted IPG checkout, immutable
+> double-entry ledger, slot holds, marketplace matching, clinic payouts).
+> It **must not be used as the current implementation specification.**
+> ADR-002 (marketplace), ADR-004 (PostgreSQL/PostGIS), ADR-005 (instant
+> slots), ADR-006 (no money without a viable hold), ADR-007 (ledger), and
+> ADR-015 (legal settlement) in particular describe the superseded design.
+>
+> **Current canonical architecture:** `backend/ARCHITECTURE.md`
+> (Laravel 13, PHP 8.3, MariaDB 10.11, no live payments, no marketplace,
+> Tehran-only home dentistry, licensed-clinician OPG review,
+> consent-driven referral). Only ADR-001 (do not fork Medical-CRM) and
+> ADR-003 (modular monolith) remain consistent with the current
+> architecture.
+
 Convention: accepted ADRs do not change in place. A reversal is a new ADR that names the cost.
 
 ## Accepted (2026-08-27)

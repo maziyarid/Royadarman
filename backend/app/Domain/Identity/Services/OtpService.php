@@ -96,9 +96,11 @@ final class OtpService
                 $codes = $user->mfa_recovery_codes;
                 unset($codes[$index]);
                 $user->update(['mfa_recovery_codes' => array_values($codes)]);
+
                 return true;
             }
         }
+
         return false;
     }
 }

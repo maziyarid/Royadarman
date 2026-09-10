@@ -1,5 +1,16 @@
 # Principal data model
 
+> **SUPERSEDED ARCHITECTURE**
+>
+> This data model reflects the earlier **marketplace/payment** design
+> (PostgreSQL/PostGIS, MatchRun/MatchCandidate, SlotHold, Order,
+> PaymentIntent, LedgerEntry, SettlementBatch, PayoutAccount, etc.).
+> **This is superseded.** Do not rebuild this schema. The current canonical
+> data model is defined by the migrations in `backend/database/migrations`
+> against MariaDB, under the scope in `backend/ARCHITECTURE.md`. Payments,
+> ledger, settlement, marketplace matching, and slot/hold scheduling are
+> **not** part of the current MVP.
+
 Rule: Royadarman stores referral and transactional information. It does not become a dental EMR by accident.
 
 Identity and privacy: User, PatientProfile, GuardianRelationship, Address, ConsentRecord, CommunicationPreference, Session, RoleAssignment.
