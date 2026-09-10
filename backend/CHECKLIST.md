@@ -1,6 +1,6 @@
 # Royadarman delivery checklist
 
-Updated: 2026-09-08
+Updated: 2026-09-10
 
 ## Architecture and product
 

@@ -17,7 +17,7 @@ This repository is the source of truth for product, architecture, and the produc
 | Architecture | Laravel 13 modular monolith + MariaDB + database queue/workers |
 | Medical-CRM reuse | Rejected (ADR-001) |
 | Intake | Server-side disabled (`INTAKE_ENABLED=false`) until activation gates close |
-| Tests | 25 tests / 81 assertions pass; Pint clean on 95 files |
+| Tests | 120 tests / 291 assertions pass; Pint clean on 107 files |
 
 ## Read in this order
 

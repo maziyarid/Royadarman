@@ -595,27 +595,51 @@ path because that is the real production application root. The development sourc
 
 | Gate | Command | Expected |
 |---|---|---|
-| Tests | `php artisan test` | 25 tests, 81 assertions, 0 failures |
-| Lint | `vendor/bin/pint --test` | 95 files, 0 issues |
-| Migrations | `php artisan migrate --force` | 7 migrations apply cleanly |
-| Strict design audit | `premium-audit.json` | 0 findings |
+| Tests | `php artisan test` | 120 tests, 291 assertions, 0 failures |
+| Lint | `vendor/bin/pint --test` | 107 files, 0 issues |
+| Migrations | `php artisan migrate --force` | 10 migrations apply cleanly |
+| Preflight | `php artisan royadarman:preflight` | refuses empty APP_KEY/phone-hash key, debug true, unsafe intake/disk/queue |
+| CI | `.github/workflows/ci.yml` | PHP 8.3/8.4 matrix, frontend smoke, locale parity |
 
 **Test coverage** (`backend/tests/`):
 
 - `Feature/OtpAuthenticationTest` — patient OTP normalise/hash/single-use, expiry,
   staff recovery codes.
+- `Feature/OtpInvariantTest` — Persian/Arabic digit normalisation, invalid
+  mobile rejection, expiry, single-use, 5-attempt lock, resend cooldown, phone/IP
+  hourly limits, inactive user rejection, concurrent verification safety.
+- `Feature/PhoneHashKeyTest` — fail-fast on missing/empty phone-hash key, valid
+  key consistency.
 - `Feature/PatientCaseIntakeTest` — intake server-side disabled, idempotent
   create/submit with localized consent, missing-translation blocks submission.
-- `Feature/CaseWorkflowTest` — state-machine transitions.
+- `Feature/CaseWorkflowTest` — state-machine transitions with audit.
+- `Feature/StaffWorkflowTest` — referral proposal (coordinator-only), patient
+  accept/decline, grant linked to versioned consent, assignment role/credential
+  enforcement, review creation (assigned clinician only, document traceability),
+  review publishing (author-only, idempotent, credential/assignment rechecked),
+  revision sequencing, version conflicts.
 - `Feature/ClinicalDocumentPipelineTest` — OPG validation, quarantine, scan,
   promotion, audited streaming.
-- `Feature/ClinicalAccessTest` — policy isolation, owner has no clinical access.
-- `Feature/ReferralController`/`StaffCaseController` — proposals, decisions,
-  assignments, reviews.
-- `Feature/OperationsTest` — outbox, idempotency, retention (fail-closed without
-  a configured duration).
-- `Feature/LocaleAndAuthorizationTest` — each locale renders correct lang/dir.
-- `Feature/ApiErrorEnvelopeTest` — stable codes + `request_id`.
+- `Feature/DocumentConsentTest` — upload without/revoked/wrong-patient/wrong-
+  policy consent, executable/oversized/zero-byte/PDF rejection, document limit.
+- `Feature/DocumentStreamingHeadersTest` — inline disposition, no-store, nosniff,
+  restrictive CSP, rejected/scan-failed not streamable, IDOR/nested mismatch.
+- `Feature/ClinicalAccessTest` — owner/tech-admin/clinic-rep/unverified-clinician
+  default-deny, credential revocation.
+- `Feature/IdempotencyTest` — replay caching, key reuse conflict, unique-
+  constraint race resolved deterministically, actor isolation.
+- `Feature/NotificationCallbackTest` — signed callback, status-regression
+  prevention, replay idempotency, stale timestamp, missing secret, validation,
+  CSRF exclusion.
+- `Feature/OperationsTest` — outbox localisation/idempotency, provider-accepts-
+  then-worker-dies retry safety, retention fail-closed without a configured
+  duration.
+- `Feature/LocaleAndAuthorizationTest` — each locale renders correct lang/dir,
+  skip link, hreflang alternates, intake-disabled state, FAQ progressive
+  enhancement, local assets.
+- `Feature/ApiErrorEnvelopeTest` — stable codes + `request_id` for 401/403/422.
+- `Feature/ReleaseIdentityTest` — commit/lock-hash/build-time provenance, env
+  override.
 - `Unit/CaseStatusTest` — enum transition logic.
 
 ---
@@ -623,20 +647,26 @@ path because that is the real production application root. The development sourc
 ## 19. Verification evidence
 
 All checks re-run on a clean checkout during this session (PHP 8.4.24, Laravel
-13.29, SQLite in-memory for tests).
+13, SQLite in-memory for tests).
 
 ```text
 $ cd backend && php artisan test
-Tests: 25 passed (81 assertions)   Duration: 0.44s
+Tests: 120 passed (291 assertions)   Duration: ~1.3s
 
 $ vendor/bin/pint --test
-Laravel  PASS  .......................................... 95 files
+Laravel  PASS  .......................................... 107 files
 
 $ php artisan migrate --force
-# 7 migrations applied (0001_* x3, 2026_08_31_* x2, 2026_09_08_* x2)
+# 10 migrations applied (0001_* x3, 2026_08_31_* x2, 2026_09_08_* x2, 2026_09_10_* x3)
 
 $ php artisan route:list
 # 22 routes listed
+
+$ php artisan royadarman:preflight
+Preflight OK: configuration passes the safety gates.
+
+$ php artisan route:cache && php artisan route:clear
+# Routes cached successfully / Route cache cleared successfully
 ```
 
 **Live HTTP smoke test** (`php artisan serve`, probed via Node http):
