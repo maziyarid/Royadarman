@@ -167,6 +167,13 @@ entering the production code path.
    exist on `main`; repo has no `.env.example`).
 2. Auth/authorization hardening: extend cross-record denial tests to every
    role; audit list-query scope; verify kill-switch on every intake route.
+   **Progress:** 14-case AuthorizationMatrixTest (cross-record GET denial for
+   owner/tech_admin/clinic_rep/clinician[unverified]/coordinator/patient);
+   SupportConversationPolicy list-scope allowlist (Greptile P1 fix); 15-case
+   ListEndpointScopeTest (§12 — every CMS list endpoint denies patient/
+   clinician/clinic_rep; CMS roles allowed). **Remaining:** list-scope tests
+   for case/document lists if/when added; role-grant enforcement audit for
+   every policy branch.
 3. Data/workflow integrity: cases, transitions, consent, provider network
    models, referral, home dentistry lifecycle, support system.
 4. OPG pipeline end-to-end verify against MariaDB + ClamAV; retention hooks.
