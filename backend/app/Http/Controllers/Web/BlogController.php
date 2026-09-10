@@ -30,7 +30,7 @@ final class BlogController
 
         $canonical = $seo?->canonical_url ?: url('/'.$locale.'/blog/'.$slug);
         $robots = $seo?->robots_directive ?: 'index, follow';
-        $ogImage = $seo?->ogImage?->path ? url('/storage/'.$seo->ogImage->path) : null;
+        $ogImage = $seo?->ogImage ? route('cms.media.serve', $seo->ogImage) : null;
 
         return response()->view('public.blog.show', [
             'post' => $post,

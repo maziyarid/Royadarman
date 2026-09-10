@@ -4,9 +4,12 @@ namespace Tests\Feature;
 
 use App\Domain\CMS\Enums\PostStatus;
 use App\Domain\CMS\Enums\PostType;
+use App\Models\Cms\Media;
 use App\Models\Cms\Post;
+use App\Models\Cms\Redirect;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Testing\File;
 use Tests\TestCase;
 
 final class SeoPublicTest extends TestCase
@@ -95,5 +98,84 @@ final class SeoPublicTest extends TestCase
         $post->translations()->create(['locale' => 'fa', 'title' => 'پیش‌نویس', 'slug' => 'not-published', 'body' => '<p>متن</p>', 'sanitized_body' => '<p>متن</p>']);
 
         $this->get('/fa/blog/not-published')->assertNotFound();
+    }
+
+    public function test_redirect_manager_issues_301_for_known_source_path(): void
+    {
+        Redirect::create([
+            'source_path' => '/old-page',
+            'destination_url' => '/fa/',
+            'status_code' => 301,
+            'is_active' => true,
+        ]);
+
+        $this->get('/old-page')->assertRedirect('/fa/')->assertStatus(301);
+        $this->assertSame(1, Redirect::where('source_path', '/old-page')->first()->hit_count);
+    }
+
+    public function test_redirect_manager_issues_302_when_configured(): void
+    {
+        Redirect::create([
+            'source_path' => '/temp-page',
+            'destination_url' => '/fa/services',
+            'status_code' => 302,
+            'is_active' => true,
+        ]);
+
+        $this->get('/temp-page')->assertRedirect('/fa/services')->assertStatus(302);
+    }
+
+    public function test_inactive_redirect_returns_404(): void
+    {
+        Redirect::create([
+            'source_path' => '/disabled',
+            'destination_url' => '/fa/',
+            'status_code' => 301,
+            'is_active' => false,
+        ]);
+
+        $this->get('/disabled')->assertNotFound();
+    }
+
+    public function test_unknown_path_returns_404_not_redirect(): void
+    {
+        $this->get('/this-does-not-exist-anywhere')->assertNotFound();
+    }
+
+    public function test_cms_media_is_served_publicly(): void
+    {
+        \Storage::fake('public-cms');
+        $file = File::image('og.png', 200, 200);
+        $storageKey = $file->store('media', 'public-cms');
+
+        $media = Media::create([
+            'uploaded_by_user_id' => User::factory()->create()->id,
+            'disk' => 'public-cms',
+            'storage_key' => $storageKey,
+            'original_filename' => 'og.png',
+            'mime_type' => 'image/png',
+            'byte_size' => $file->getSize(),
+            'sha256' => hash_file('sha256', $file->getRealPath()),
+            'width' => 200,
+            'height' => 200,
+        ]);
+
+        $this->get(route('cms.media.serve', $media))->assertOk()->assertHeader('Content-Type', 'image/png');
+    }
+
+    public function test_non_image_cms_media_returns_404(): void
+    {
+        \Storage::fake('public-cms');
+        $media = Media::create([
+            'uploaded_by_user_id' => User::factory()->create()->id,
+            'disk' => 'public-cms',
+            'storage_key' => 'media/doc.txt',
+            'original_filename' => 'doc.txt',
+            'mime_type' => 'text/plain',
+            'byte_size' => 10,
+            'sha256' => 'abc',
+        ]);
+
+        $this->get(route('cms.media.serve', $media))->assertNotFound();
     }
 }

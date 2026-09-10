@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Web\Admin\AdminCmsController;
 use App\Http\Controllers\Web\BlogController;
+use App\Http\Controllers\Web\CmsMediaServeController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\PublicRedirectController;
 use App\Http\Controllers\Web\RobotsController;
 use App\Http\Controllers\Web\SitemapController;
 use App\Http\Middleware\SetLocale;
@@ -14,6 +16,7 @@ Route::get('/up', fn () => response()->json(['status' => 'ok']));
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
 Route::get('/sitemap-{locale}.xml', [SitemapController::class, 'locale'])->whereIn('locale', ['fa', 'ar', 'en'])->name('sitemap.locale');
 Route::get('/robots.txt', RobotsController::class)->name('robots');
+Route::get('/cms-media/{media}', [CmsMediaServeController::class, 'show'])->name('cms.media.serve');
 
 Route::get('/{locale}/', fn () => response()->view('public.home')->header('Cache-Control', 'public, max-age=300'))
     ->whereIn('locale', ['fa', 'ar', 'en'])
@@ -78,3 +81,5 @@ Route::get('/{locale}/dashboard', [DashboardController::class, 'show'])
     ->name('dashboard');
 
 Route::get('/admin', fn () => redirect()->route('admin.cms.posts.index'))->middleware(['staff']);
+
+Route::fallback([PublicRedirectController::class, 'resolve']);
