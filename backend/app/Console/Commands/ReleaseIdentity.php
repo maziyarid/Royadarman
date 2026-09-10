@@ -40,6 +40,10 @@ final class ReleaseIdentity extends Command
     private function resolveCommit(): ?string
     {
         $envCommit = env('ROYADARMAN_RELEASE_COMMIT');
+        if (! is_string($envCommit) || $envCommit === '') {
+            $process = getenv('ROYADARMAN_RELEASE_COMMIT');
+            $envCommit = is_string($process) ? $process : null;
+        }
         if (is_string($envCommit) && $envCommit !== '') {
             return $envCommit;
         }
