@@ -300,4 +300,32 @@ final class SeoPublicTest extends TestCase
 
         $this->get(route('cms.media.serve', $media))->assertNotFound();
     }
+
+    public function test_home_and_page_render_correct_brand_name(): void
+    {
+        $this->get('/fa/')
+            ->assertOk()
+            ->assertSee('رویا درمان', false)
+            ->assertDontSee('رویاد', false);
+
+        $author = User::factory()->create();
+        $post = Post::query()->create([
+            'author_user_id' => $author->id,
+            'type' => PostType::Page->value,
+            'status' => PostStatus::Published->value,
+            'published_at' => now(),
+        ]);
+        $post->translations()->create([
+            'locale' => 'fa',
+            'title' => 'درباره ما',
+            'slug' => 'about-us',
+            'body' => '<p>محتوای صفحه</p>',
+            'sanitized_body' => '<p>محتوای صفحه</p>',
+        ]);
+
+        $this->get('/fa/about-us')
+            ->assertOk()
+            ->assertSee('رویا درمان', false)
+            ->assertDontSee('رویاد', false);
+    }
 }

@@ -23,7 +23,7 @@
     <meta name="twitter:image" content="{{ $ogImage }}">
     @endif
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/assets/site.css?v=20260908">
+    <link rel="stylesheet" href="/assets/site.css?v=20260910">
     @if($schema)
     <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     @endif
@@ -34,7 +34,7 @@
     <div class="shell header-row">
         <a class="brand" href="/{{ $locale }}/" aria-label="{{ __('ui.meta_title') }}">
             <img src="/assets/brand-mark.svg" alt="" width="54" height="54">
-            <span><strong>{{ $locale === 'en' ? 'Royadarman' : 'رویاد ارمان' }}</strong><small>{{ __('ui.brand_subtitle') }}</small></span>
+            <span><strong>{{ $locale === 'en' ? 'Royadarman' : 'رویا درمان' }}</strong><small>{{ __('ui.brand_subtitle') }}</small></span>
         </a>
         <div class="header-actions">
             <details class="language"><summary>{{ strtoupper($locale) }}<span aria-hidden="true">⇄</span></summary><div>@foreach(['fa' => 'فارسی','ar' => 'العربية','en' => 'English'] as $code => $label)<a lang="{{ $code }}" dir="{{ $code === 'en' ? 'ltr' : 'rtl' }}" hreflang="{{ $code }}" href="/{{ $code }}/" @if($code === $locale) aria-current="page" @endif>{{ $label }}</a>@endforeach</div></details>
@@ -53,6 +53,6 @@
         </div>
     </article>
 </main>
-<footer><div class="shell footer-row"><div class="brand"><img src="/assets/brand-mark.svg" alt="" width="46" height="46"><span><strong>{{ $locale === 'en' ? 'Royadarman' : 'رویاد ارمان' }}</strong><small>{{ __('ui.footer') }}</small></span></div><p>© {{ now()->setTimezone('Asia/Tehran')->format('Y') }}</p></div></footer>
+<footer><div class="shell footer-row"><div class="brand"><img src="/assets/brand-mark.svg" alt="" width="46" height="46"><span><strong>{{ $locale === 'en' ? 'Royadarman' : 'رویا درمان' }}</strong><small>{{ __('ui.footer') }}</small></span></div><p>© {{ now()->setTimezone('Asia/Tehran')->format('Y') }}</p></div></footer>
 </body>
 </html>
