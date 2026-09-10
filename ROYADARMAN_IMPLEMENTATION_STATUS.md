@@ -18,7 +18,7 @@ Status legend: `NOT_STARTED`, `PARTIAL`, `IMPLEMENTED_UNVERIFIED`, `VERIFIED`,
 | Old ADRs/docs | VERIFIED (marked) | `docs/01-adrs.md`, `02-architecture.md`, `03-phase-0.md`, `04-iran.md`, `05-data-model.md` carry SUPERSEDED/PARTIALLY SUPERSEDED headers. `docs/00-reuse-verdict.md` (ADR-001) still valid. | Commit. |
 | Sandbox PHP/Composer | VERIFIED (dev) | PHP 8.4.24 + Composer 2.8.8 installed in sandbox (dev/test only; production target stays PHP 8.3). `composer install` OK. | Runtime results recorded in the section below. |
 | Production MCP | VERIFIED (read-only) | `royadarman-admin` SSH profile -> `mcpadmin@64.21.191.116` (hostname `server.royadarman.com`), passwordless sudo. Read-only drift inspection complete (see Production state below). | Continue read-only; no production writes without explicit approval. |
-| ClickUp | NOT_STARTED | Legacy Monday-import + a public-site-unreachable task from an earlier outage. | Reconcile against current live evidence; update existing tasks, do not rewrite all legacy imports. |
+| ClickUp | VERIFIED (reconciled) | Stale "Investigate Royadarman public-site availability before publishing" task (`86cbehdrx`, Web delivery list, was "in progress" from a 2026-09-05 TinyFish `target_unreachable` alert) reconciled against live evidence: Royadarman is live + healthy. Task updated with verified production drift audit evidence and **closed**. Other legacy Monday-import tasks (Teznevise, Kanoon, Dr Bastaninejad, personal finance, Royadarman scope-verify in `archive candidates`) left as-is per policy — do not rewrite all legacy imports. | — |
 
 ## Production state (read-only drift comparison, live)
 
@@ -201,6 +201,8 @@ entering the production code path.
 12. Deploy technically-complete release with `INTAKE_ENABLED=false`; verify
     every route for that state.
 13. ClickUp + docs + memory reconciliation.
+    **Progress:** stale public-site-unreachable task closed with verified
+    evidence (production drift audit). Legacy Monday-import tasks left as-is.
 14. Activation gates: do everything possible automatically; mark external
     items `BLOCKED_EXTERNAL` with exact required input.
 15. End-to-end rehearsal (only when gates permit).
