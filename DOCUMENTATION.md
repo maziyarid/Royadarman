@@ -205,8 +205,11 @@ correlate any client report to a single request across logs.
 verified by `App\Domain\Identity\Services\TotpVerifier`. Recovery codes are
 single-use and consumed on use.
 
-**Throttling.** Challenge is throttled at `20,60`; verify at `30,60` (20/30
-attempts per 60 seconds).
+**Throttling.** Challenge is throttled by the named limiter `otp-challenge`
+(20 attempts per 60 minutes, keyed by IP); verify by `otp-verify` (30 attempts
+per 60 minutes). The in-application `OtpService` additionally enforces
+10 phone challenges/hour, 20 IP challenges/hour, a 1-minute resend cooldown,
+5 verification attempts per challenge, and a 5-minute challenge expiry.
 
 ---
 

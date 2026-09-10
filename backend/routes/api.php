@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Route;
 Route::post('api/v1/notifications/callback', NotificationCallbackController::class);
 
 Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (): void {
-    Route::post('/auth/otp/challenge', [AuthController::class, 'challenge'])->middleware('throttle:20,60');
-    Route::post('/auth/otp/verify', [AuthController::class, 'verify'])->middleware('throttle:30,60');
+    Route::post('/auth/otp/challenge', [AuthController::class, 'challenge'])->middleware('throttle:otp-challenge');
+    Route::post('/auth/otp/verify', [AuthController::class, 'verify'])->middleware('throttle:otp-verify');
     Route::get('/policies/{key}', [PolicyController::class, 'show']);
 
     Route::middleware('auth')->group(function (): void {
