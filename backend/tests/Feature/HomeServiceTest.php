@@ -2,12 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Cases\Enums\CaseStatus;
 use App\Domain\Cases\Enums\HomeServiceStatus;
+use App\Jobs\ProcessOutboxEvent;
 use App\Models\HomeServiceRequest;
 use App\Models\PatientCase;
+use App\Models\PolicyVersion;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -157,5 +161,54 @@ final class HomeServiceTest extends TestCase
         ]);
 
         return [$patient, $coordinator, $provider, $case, $home];
+    }
+
+    public function test_intake_submission_creates_home_service_request_for_home_dentistry(): void
+    {
+        Queue::fake([ProcessOutboxEvent::class]);
+        config()->set('royadarman.intake_enabled', true);
+        $user = User::factory()->create(['role' => 'patient', 'locale' => 'fa', 'phone' => '09121234567', 'phone_hash' => hash('sha256', 'home-intake')]);
+        PolicyVersion::query()->create(['policy_key' => 'case_coordination', 'version' => 'home-approved-1', 'locale' => 'fa', 'content' => 'متن رضایت', 'content_hash' => hash('sha256', 'متن رضایت'), 'published_at' => now()]);
+
+        $draft = $this->actingAs($user)->postJson('/api/v1/cases/draft', [
+            'service_type' => 'home_dentistry',
+            'tehran_area' => 'east',
+            'budget_band' => 'balanced',
+            'budget_input_unit' => 'toman',
+            'source_language' => 'fa',
+        ], ['Idempotency-Key' => 'home-draft-'.Str::uuid()])->assertCreated();
+
+        $caseId = $draft->json('data.id');
+        $this->actingAs($user)->postJson("/api/v1/cases/{$caseId}/submit", ['version' => 1, 'policy_version' => 'home-approved-1'], ['Idempotency-Key' => 'home-submit-'.Str::uuid()])
+            ->assertOk()
+            ->assertJsonPath('data.status', CaseStatus::Submitted->value);
+
+        $this->assertDatabaseHas('home_service_requests', [
+            'case_id' => $caseId,
+            'patient_user_id' => $user->id,
+            'tehran_area' => 'east',
+            'status' => HomeServiceStatus::Requested->value,
+        ]);
+    }
+
+    public function test_intake_submission_does_not_create_home_service_for_non_home_dentistry(): void
+    {
+        Queue::fake([ProcessOutboxEvent::class]);
+        config()->set('royadarman.intake_enabled', true);
+        $user = User::factory()->create(['role' => 'patient', 'locale' => 'fa', 'phone' => '09121234567', 'phone_hash' => hash('sha256', 'opg-intake')]);
+        PolicyVersion::query()->create(['policy_key' => 'case_coordination', 'version' => 'opg-approved-1', 'locale' => 'fa', 'content' => 'متن رضایت', 'content_hash' => hash('sha256', 'متن رضایت'), 'published_at' => now()]);
+
+        $draft = $this->actingAs($user)->postJson('/api/v1/cases/draft', [
+            'service_type' => 'opg_review',
+            'budget_band' => 'balanced',
+            'budget_input_unit' => 'toman',
+            'source_language' => 'fa',
+        ], ['Idempotency-Key' => 'opg-draft-'.Str::uuid()])->assertCreated();
+
+        $caseId = $draft->json('data.id');
+        $this->actingAs($user)->postJson("/api/v1/cases/{$caseId}/submit", ['version' => 1, 'policy_version' => 'opg-approved-1'], ['Idempotency-Key' => 'opg-submit-'.Str::uuid()])
+            ->assertOk();
+
+        $this->assertDatabaseMissing('home_service_requests', ['case_id' => $caseId]);
     }
 }
