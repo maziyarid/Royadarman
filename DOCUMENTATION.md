@@ -268,7 +268,11 @@ in production).
 2. **Scanning** — `ScanClinicalDocument` job runs the `DocumentScanner`
    (ClamAV). `scan_attempts` rows track each attempt.
 3. **Approved / Rejected / ScanFailed** — clean files promote to a separate
-   private approved disk; infected or failed files are quarantined and never
+   private approved disk; infected files are marked `rejected`, their hash,
+   verdict and audit metadata are recorded, and the malicious bytes are then
+   **deleted** from quarantine (retaining malware is worse than retaining the
+   evidence of the verdict). Files that fail scanning (engine unavailable,
+   timeout, hash mismatch) remain in quarantine as `scan_failed` and are never
    clinical-accessible.
 4. **Deleted** — `retention:run` deletes the private object and marks the record
    once an operator-approved retention duration has elapsed. No duration is ever
