@@ -10,3 +10,11 @@ node_modules/
 dist/
 .DS_Store
 coverage/
+# Editor/merge backup files — keep these out of version control.
+*.bak
+*.bak.*
+*.orig
+*.rej
+*.swp
+*~
+.*.swp
