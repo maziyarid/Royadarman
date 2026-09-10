@@ -24,8 +24,8 @@
     @endif
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/assets/site.css?v=20260908">
-    @if($seo?->schema_data)
-    <script type="application/ld+json">{!! json_encode($seo->schema_data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    @if($schema)
+    <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     @endif
 </head>
 <body>

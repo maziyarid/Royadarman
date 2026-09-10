@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domain\CMS\Enums\PostStatus;
+use App\Domain\CMS\Services\StructuredDataService;
 use App\Models\Cms\PostTranslation;
 use Illuminate\Http\Response;
 
 final class BlogController
 {
+    public function __construct(private readonly StructuredDataService $structuredData) {}
+
     public function show(string $locale, string $slug): Response
     {
         $translation = PostTranslation::query()
@@ -15,7 +18,7 @@ final class BlogController
             ->where('slug', $slug)
             ->firstOrFail();
 
-        $post = $translation->post()->with('translations')->firstOrFail();
+        $post = $translation->post()->with(['translations', 'author'])->firstOrFail();
         abort_unless($post->status === PostStatus::Published && $post->published_at?->isPast(), 404);
 
         $seo = $post->seoMetadata()->where('locale', $locale)->first();
@@ -32,6 +35,8 @@ final class BlogController
         $robots = $seo?->robots_directive ?: 'index, follow';
         $ogImage = $seo?->ogImage ? route('cms.media.serve', $seo->ogImage) : null;
 
+        $schema = $seo?->schema_data ?: $this->structuredData->article($post, $translation, $locale, $canonical);
+
         return response()->view('public.blog.show', [
             'post' => $post,
             'translation' => $translation,
@@ -41,6 +46,7 @@ final class BlogController
             'robots' => $robots,
             'alternates' => $alternates,
             'ogImage' => $ogImage,
+            'schema' => $schema,
         ], 200)
             ->header('Cache-Control', 'public, max-age=300');
     }

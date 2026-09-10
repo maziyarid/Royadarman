@@ -13,6 +13,15 @@
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/assets/site.css?v=20260908">
     <script src="/assets/site.js?v=20260908" defer></script>
+    @php
+        $orgSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Organization',
+            'name' => 'Royadarman',
+            'url' => url('/fa/'),
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($orgSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 </head>
 <body>
 <a class="skip-link" href="#main">{{ __('ui.skip') }}</a>

@@ -16,6 +16,15 @@ final class SeoPublicTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_home_renders_organization_structured_data(): void
+    {
+        $this->get('/fa/')
+            ->assertOk()
+            ->assertSee('application/ld+json', false)
+            ->assertSee('"@type":"Organization"', false)
+            ->assertSee('"name":"Royadarman"', false);
+    }
+
     public function test_robots_txt_is_served_with_sitemap_reference(): void
     {
         $this->get('/robots.txt')
@@ -83,6 +92,9 @@ final class SeoPublicTest extends TestCase
             ->assertSee('<link rel="canonical" href="'.url('/fa/blog/implant-guide').'">', false)
             ->assertSee('<link rel="alternate" hreflang="fa" href="'.url('/fa/blog/implant-guide').'">', false)
             ->assertSee('<link rel="alternate" hreflang="en" href="'.url('/en/blog/implant-guide-en').'">', false)
+            ->assertSee('راهنمای ایمپلنت', false)
+            ->assertSee('application/ld+json', false)
+            ->assertSee('"@type":"Article"', false)
             ->assertSee('راهنمای ایمپلنت', false);
     }
 
