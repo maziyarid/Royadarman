@@ -1,5 +1,13 @@
 # Royadarman architecture
 
+> **SUPERSEDED — historical Phase-0 design spec.** This document described the
+> originally-proposed marketplace/payment architecture (PostgreSQL/PostGIS, hosted
+> checkout, double-entry ledger, booking modes). That architecture was **not**
+> implemented. The implemented product is a guidance/coordination service on
+> Laravel 13 / MariaDB with no payments, no marketplace, and no booking holds.
+> The current authoritative architecture is `backend/ARCHITECTURE.md` and
+> `DOCUMENTATION.md`. This file is retained for historical provenance only.
+
 Working specification for Phase 1.
 
 ## Business loop

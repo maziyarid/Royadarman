@@ -1,5 +1,10 @@
 # Phase 0 — before marketplace code
 
+> **SUPERSEDED — historical Phase-0 plan.** This document planned work for the
+> originally-proposed marketplace. The implemented product is a guidance and
+> coordination service, not a marketplace. See `backend/ARCHITECTURE.md` and
+> `DOCUMENTATION.md` for the current system. Retained for historical provenance.
+
 Duration: 2-4 weeks.
 
 Writing application code during Phase 0 freezes the wrong payment role, taxonomy, and booking mix into migrations.

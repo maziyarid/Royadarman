@@ -73,9 +73,9 @@ class PatientCase extends Model
         return $this->hasMany(CaseStatusEvent::class, 'case_id');
     }
 
-    public function consents(): HasMany
+    public function consentEvents(): HasMany
     {
-        return $this->hasMany(ConsentRecord::class, 'case_id');
+        return $this->hasMany(ConsentEvent::class, 'case_id');
     }
 
     public function documents(): HasMany

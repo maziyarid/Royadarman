@@ -7,13 +7,14 @@ use App\Domain\Identity\Enums\UserRole;
 use App\Models\OtpChallenge;
 use App\Models\User;
 use App\Support\DigitNormalizer;
+use App\Support\PhoneHasher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 final class OtpService
 {
-    public function __construct(private readonly OtpSender $sender, private readonly TotpVerifier $totp) {}
+    public function __construct(private readonly OtpSender $sender, private readonly TotpVerifier $totp, private readonly PhoneHasher $phoneHasher) {}
 
     public function challenge(string $mobile, string $locale, string $ip): OtpChallenge
     {
@@ -22,7 +23,7 @@ final class OtpService
             throw ValidationException::withMessages(['mobile' => __('ui.errors.mobile')]);
         }
 
-        $phoneHash = hash_hmac('sha256', $mobile, (string) config('royadarman.phone_hash_key'));
+        $phoneHash = $this->phoneHasher->hash($mobile);
         $ipHash = hash_hmac('sha256', $ip, (string) config('app.key'));
         if (OtpChallenge::query()->where('phone_hash', $phoneHash)->where('created_at', '>=', now()->subHour())->count() >= 10) {
             abort(429);

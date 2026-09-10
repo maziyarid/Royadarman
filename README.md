@@ -43,17 +43,6 @@ The production backend lives in `backend/` (see `backend/ARCHITECTURE.md`, `back
 8. Maps, SMS, and clinic calendars sit behind adapters.
 9. WordPress is not in the transactional path.
 
-## Non-negotiables
-
-1. Marketplace, not a clinic directory and not an EMR.
-2. PostgreSQL/PostGIS is the booking and money source of truth.
-3. No payment without a viable clinic hold.
-4. Hosted checkout. Signed webhooks only. Immutable double-entry ledger.
-5. Instant slots and manual clinic acceptance in MVP.
-6. Operations console is a first-class application.
-7. Maps, PSP, SMS, and clinic calendars sit behind adapters.
-8. WordPress is not in the transactional path.
-
 ## License
 
 Proprietary. All rights reserved.

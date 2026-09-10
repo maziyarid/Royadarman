@@ -2,7 +2,7 @@
 
 return [
     'intake_enabled' => filter_var(env('INTAKE_ENABLED', env('ROYADARMAN_ACCEPT_INTAKE', false)), FILTER_VALIDATE_BOOL),
-    'phone_hash_key' => env('ROYADARMAN_PHONE_HASH_KEY', env('APP_KEY')),
+    'phone_hash_key' => env('ROYADARMAN_PHONE_HASH_KEY'),
     'supported_locales' => ['fa', 'ar', 'en'],
     'display_timezone' => 'Asia/Tehran',
 

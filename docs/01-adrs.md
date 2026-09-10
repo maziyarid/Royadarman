@@ -2,6 +2,14 @@
 
 Convention: accepted ADRs do not change in place. A reversal is a new ADR that names the cost.
 
+> **Note on superseded ADRs.** ADR-004 (PostgreSQL/PostGIS), ADR-006 (payment
+> capture), ADR-007 (double-entry ledger), ADR-014 (booking modes), and ADR-015
+> (settlement) describe the originally-proposed marketplace/payment architecture.
+> The implemented system is a guidance/coordination service on Laravel 13 /
+> MariaDB with no payments, no marketplace, and no booking holds. These ADRs are
+> retained as historical record; the implemented system superseded them. See
+> `backend/ARCHITECTURE.md` for the current architecture.
+
 ## Accepted (2026-08-27)
 
 ### ADR-001 — Do not fork Medical-CRM
