@@ -23,7 +23,9 @@ final class DocumentController extends Controller
         $request->validate(['document' => ['required', 'file', 'max:'.config('royadarman.opg.max_kilobytes')]]);
 
         $consentEvent = $consent->latestActiveFor($request->user(), 'opg_document_sharing', $case->id, 'opg_document_sharing');
-        abort_unless($consentEvent !== null, 403, 'document.consent_required');
+        if ($consentEvent === null) {
+            return response()->json(['error' => ['code' => 'document.consent_required'], 'request_id' => $request->attributes->get('request_id')], 403);
+        }
 
         $document = $quarantine->handle($case, $request->user(), $request->file('document'), $consentEvent);
 
