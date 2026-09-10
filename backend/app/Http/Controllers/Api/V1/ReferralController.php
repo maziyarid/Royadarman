@@ -22,7 +22,7 @@ final class ReferralController extends Controller
         return DB::transaction(function () use ($request, $case, $proposal, $data, $outbox, $consent): JsonResponse {
             $locked = ReferralProposal::query()->lockForUpdate()->findOrFail($proposal->id);
             if ($locked->status !== 'proposed' || $locked->withdrawn_at) {
-                return response()->json(['error' => ['code' => 'referral.not_available']], 422);
+                return response()->json(['error' => ['code' => 'referral.not_available'], 'request_id' => $request->attributes->get('request_id')], 422);
             }
             $locked->update(['status' => $data['decision'], 'decided_at' => now()]);
             if ($data['decision'] === 'accepted') {

@@ -85,7 +85,7 @@ final class CaseController extends Controller
 
                 $policy = $consent->resolvePolicy('case_coordination', $data['policy_version'], $locked->source_language);
                 if (! $policy) {
-                    return ['status' => 503, 'body' => ['error' => ['code' => 'error.consent.translation_unavailable']]];
+                    return ['status' => 503, 'body' => ['error' => ['code' => 'error.consent.translation_unavailable'], 'request_id' => $request->attributes->get('request_id')]];
                 }
 
                 $consent->record($request->user(), 'case_coordination', $policy->id, $locked->source_language, $request, $locked->id);

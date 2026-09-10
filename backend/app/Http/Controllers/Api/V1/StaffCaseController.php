@@ -33,7 +33,7 @@ final class StaffCaseController extends Controller
             $locked = PatientCase::query()->lockForUpdate()->findOrFail($case->id);
 
             if ($locked->version !== (int) $data['version']) {
-                return response()->json(['error' => ['code' => 'case.version_conflict']], 409);
+                return response()->json(['error' => ['code' => 'case.version_conflict'], 'request_id' => $request->attributes->get('request_id')], 409);
             }
 
             if ($data['purpose'] === 'clinical_review') {
@@ -79,9 +79,9 @@ final class StaffCaseController extends Controller
                 (int) $data['version']
             );
         } catch (HttpException $e) {
-            return response()->json(['error' => ['code' => 'case.version_conflict']], 409);
+            return response()->json(['error' => ['code' => 'case.version_conflict'], 'request_id' => $request->attributes->get('request_id')], 409);
         } catch (\DomainException) {
-            return response()->json(['error' => ['code' => 'case.invalid_transition']], 409);
+            return response()->json(['error' => ['code' => 'case.invalid_transition'], 'request_id' => $request->attributes->get('request_id')], 409);
         }
 
         return response()->json(['data' => ['id' => $updated->id, 'status' => $updated->status->value, 'version' => $updated->version]])
@@ -171,7 +171,7 @@ final class StaffCaseController extends Controller
             abort_unless($locked->case_id === $case->id, 404);
 
             if ($locked->signed_at !== null) {
-                return response()->json(['error' => ['code' => 'review.already_published']], 409);
+                return response()->json(['error' => ['code' => 'review.already_published'], 'request_id' => $request->attributes->get('request_id')], 409);
             }
 
             // Revalidate credential authority at publication time.

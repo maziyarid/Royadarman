@@ -42,10 +42,10 @@ final class DocumentController extends Controller
     {
         abort_unless($document->case_id === $case->id, 404);
         if ($document->status === DocumentStatus::Rejected) {
-            return response()->json(['error' => ['code' => 'document.rejected']], 403);
+            return response()->json(['error' => ['code' => 'document.rejected'], 'request_id' => $request->attributes->get('request_id')], 403);
         }
         if ($document->status === DocumentStatus::ScanFailed) {
-            return response()->json(['error' => ['code' => 'document.scan_failed']], 503);
+            return response()->json(['error' => ['code' => 'document.scan_failed'], 'request_id' => $request->attributes->get('request_id')], 503);
         }
         abort_unless($request->user()->can('view', $document), 404);
 
