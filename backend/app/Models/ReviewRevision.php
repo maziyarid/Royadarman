@@ -55,6 +55,10 @@ class ReviewRevision extends Model
 
     public function isPublished(): bool
     {
+        if ($this->relationLoaded('publicationEvents')) {
+            return $this->publicationEvents->contains('event', 'published');
+        }
+
         return $this->publicationEvents()
             ->where('event', 'published')
             ->exists();

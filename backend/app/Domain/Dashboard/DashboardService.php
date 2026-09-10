@@ -5,6 +5,7 @@ namespace App\Domain\Dashboard;
 use App\Domain\Cases\Enums\CaseStatus;
 use App\Domain\Cases\Enums\HomeServiceStatus;
 use App\Domain\Cases\Enums\ServiceType;
+use App\Domain\CMS\Enums\PostStatus;
 use App\Domain\Identity\Enums\CredentialStatus;
 use App\Domain\Identity\Enums\UserRole;
 use App\Domain\Support\Enums\ConversationStatus;
@@ -38,7 +39,9 @@ final class DashboardService
 
     private function patient(User $user): array
     {
-        $cases = $user->cases()->with(['documents', 'reviewRevisions'])->latest()->limit(20)->get();
+        $cases = $user->cases()
+            ->with(['documents', 'reviewRevisions.publicationEvents'])
+            ->latest()->limit(20)->get();
         $openReferrals = ReferralProposal::query()
             ->whereHas('case', fn ($q) => $q->where('patient_user_id', $user->id))
             ->where('status', 'proposed')
@@ -84,7 +87,7 @@ final class DashboardService
         $assignedReviews = ReviewRevision::query()
             ->where('clinician_user_id', $user->id)
             ->whereDoesntHave('supersededBy')
-            ->with('case:id,status')
+            ->with(['case:id,status', 'publicationEvents'])
             ->latest()->limit(20)->get();
 
         $openDrafts = ReviewRevision::query()
@@ -149,7 +152,7 @@ final class DashboardService
     private function coordinator(User $user): array
     {
         $myQueue = $user->coordinatedCases()
-            ->with(['documents', 'reviewRevisions'])
+            ->with(['documents', 'reviewRevisions.publicationEvents'])
             ->latest()->limit(20)->get();
 
         $awaitingPatient = $user->coordinatedCases()
@@ -192,19 +195,31 @@ final class DashboardService
             ->groupBy('status')
             ->pluck('total', 'status');
 
+        $clinicCounts = Clinic::query()
+            ->toBase()
+            ->selectRaw(
+                'count(*) as total, sum(case when is_active = 1 then 1 else 0 end) as active'
+            )->first();
+
+        $postCounts = Post::query()
+            ->toBase()
+            ->selectRaw(
+                'sum(case when status = ? then 1 else 0 end) as published,'
+                .' sum(case when status = ? then 1 else 0 end) as review',
+                [PostStatus::Published->value, PostStatus::InReview->value]
+            )->first();
+
         return [
             'role' => UserRole::Owner->value,
             'case_status_counts' => $caseStatusCounts,
-            'total_cases' => PatientCase::query()->count(),
-            'total_clinics' => Clinic::query()->count(),
-            'active_clinics' => Clinic::query()->where('is_active', true)->count(),
+            'total_cases' => $caseStatusCounts->sum(),
+            'total_clinics' => (int) $clinicCounts->total,
+            'active_clinics' => (int) $clinicCounts->active,
             'verified_practitioners' => Practitioner::query()
                 ->where('credential_status', 'verified')->count(),
             'open_support' => SupportConversation::query()->where('status', 'open')->count(),
-            'published_posts' => Post::query()
-                ->where('status', 'published')->count(),
-            'pending_review_posts' => Post::query()
-                ->where('status', 'review')->count(),
+            'published_posts' => (int) $postCounts->published,
+            'pending_review_posts' => (int) $postCounts->review,
         ];
     }
 
