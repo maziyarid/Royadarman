@@ -28,6 +28,10 @@ final class SupportController extends Controller
             $query->where('patient_user_id', $user->id);
         } elseif ($user->role === UserRole::Coordinator) {
             $query->where('assignee_user_id', $user->id);
+        } elseif ($user->role === UserRole::Owner || $user->role === UserRole::TechnicalAdministrator) {
+            // Owners and technical administrators may browse all support conversations.
+        } else {
+            abort(403);
         }
 
         $conversations = $query->paginate(20);

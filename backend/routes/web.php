@@ -4,6 +4,7 @@ use App\Http\Controllers\Web\Admin\AdminCmsController;
 use App\Http\Controllers\Web\BlogController;
 use App\Http\Controllers\Web\CmsMediaServeController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\PageController;
 use App\Http\Controllers\Web\PublicRedirectController;
 use App\Http\Controllers\Web\RobotsController;
 use App\Http\Controllers\Web\SitemapController;
@@ -32,6 +33,13 @@ Route::get('/{locale}/blog/{slug}/preview', [BlogController::class, 'preview'])
     ->whereIn('locale', ['fa', 'ar', 'en'])
     ->middleware(['signed', 'auth', SetLocale::class])
     ->name('public.blog.preview');
+
+Route::get('/dashboard', fn () => redirect('/fa/dashboard', 302));
+
+Route::get('/{locale}/dashboard', [DashboardController::class, 'show'])
+    ->whereIn('locale', ['fa', 'ar', 'en'])
+    ->middleware(['web', SetLocale::class, 'auth'])
+    ->name('dashboard');
 
 Route::middleware(['staff'])->prefix('/admin/cms')->name('admin.cms.')->group(function (): void {
     Route::get('/posts', [AdminCmsController::class, 'index'])->name('posts.index');
@@ -78,13 +86,18 @@ Route::middleware(['staff'])->prefix('/admin/cms')->name('admin.cms.')->group(fu
     Route::patch('/seo/{post}', [AdminCmsController::class, 'seoUpdate'])->name('seo.update');
 });
 
-Route::get('/dashboard', fn () => redirect('/fa/dashboard', 302));
-
-Route::get('/{locale}/dashboard', [DashboardController::class, 'show'])
-    ->whereIn('locale', ['fa', 'ar', 'en'])
-    ->middleware(['web', SetLocale::class, 'auth'])
-    ->name('dashboard');
-
 Route::get('/admin', fn () => redirect()->route('admin.cms.posts.index'))->middleware(['staff']);
+
+Route::get('/{locale}/services/{slug}', [PageController::class, 'show'])
+    ->whereIn('locale', ['fa', 'ar', 'en'])
+    ->where('slug', '[a-z0-9\-]+')
+    ->middleware(SetLocale::class)
+    ->name('public.service.show');
+
+Route::get('/{locale}/{slug}', [PageController::class, 'show'])
+    ->whereIn('locale', ['fa', 'ar', 'en'])
+    ->where('slug', '[a-z0-9\-]+')
+    ->middleware(SetLocale::class)
+    ->name('public.page.show');
 
 Route::fallback([PublicRedirectController::class, 'resolve']);

@@ -258,4 +258,50 @@ final class SupportSystemTest extends TestCase
             ->assertJsonPath('data.0.subject', 'mine')
             ->assertJsonMissing(['subject' => 'theirs']);
     }
+
+    public function test_support_index_denies_clinician_and_clinic_rep_visibility_bypass(): void
+    {
+        $patient = User::factory()->create(['role' => 'patient']);
+        SupportConversation::query()->create([
+            'patient_user_id' => $patient->id,
+            'category' => SupportCategory::General->value,
+            'status' => ConversationStatus::Open->value,
+            'priority' => 'normal',
+            'opened_at' => now(),
+            'source_language' => 'fa',
+            'subject' => 'patient conversation',
+        ]);
+
+        $clinician = User::factory()->create(['role' => 'clinician']);
+        $this->actingAs($clinician)
+            ->getJson('/api/v1/support')
+            ->assertForbidden()
+            ->assertJsonMissing(['subject' => 'patient conversation']);
+
+        $clinicRep = User::factory()->create(['role' => 'clinic_rep']);
+        $this->actingAs($clinicRep)
+            ->getJson('/api/v1/support')
+            ->assertForbidden()
+            ->assertJsonMissing(['subject' => 'patient conversation']);
+    }
+
+    public function test_support_index_allows_owner_to_browse_all_conversations(): void
+    {
+        $patient = User::factory()->create(['role' => 'patient']);
+        SupportConversation::query()->create([
+            'patient_user_id' => $patient->id,
+            'category' => SupportCategory::General->value,
+            'status' => ConversationStatus::Open->value,
+            'priority' => 'normal',
+            'opened_at' => now(),
+            'source_language' => 'fa',
+            'subject' => 'owner visible',
+        ]);
+
+        $owner = User::factory()->create(['role' => 'owner']);
+        $this->actingAs($owner)
+            ->getJson('/api/v1/support')
+            ->assertOk()
+            ->assertJsonPath('data.0.subject', 'owner visible');
+    }
 }

@@ -59,4 +59,54 @@ final class StructuredDataService
             'url' => url('/fa/'),
         ];
     }
+
+    /**
+     * Build a WebPage schema for a published CMS page.
+     * Does NOT fabricate medical/provider claims (§27).
+     *
+     * @return array<string, mixed>
+     */
+    public function webPage(Post $post, PostTranslation $translation, string $locale, string $canonical): array
+    {
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'WebPage',
+            'name' => $translation->title,
+            'url' => $canonical,
+            'inLanguage' => $locale,
+            'dateModified' => $post->updated_at?->toIso8601String(),
+        ];
+        if ($translation->excerpt) {
+            $schema['description'] = $translation->excerpt;
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Build a Service schema for a published CMS service page.
+     * Describes coordination only — no fabricated provider/pricing/availability (§27).
+     *
+     * @return array<string, mixed>
+     */
+    public function service(Post $post, PostTranslation $translation, string $locale, string $canonical): array
+    {
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Service',
+            'name' => $translation->title,
+            'url' => $canonical,
+            'inLanguage' => $locale,
+            'provider' => [
+                '@type' => 'Organization',
+                'name' => 'Royadarman',
+                'url' => url('/fa/'),
+            ],
+        ];
+        if ($translation->excerpt) {
+            $schema['description'] = $translation->excerpt;
+        }
+
+        return $schema;
+    }
 }

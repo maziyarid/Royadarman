@@ -195,6 +195,75 @@ final class SeoPublicTest extends TestCase
         $this->get('/this-does-not-exist-anywhere')->assertNotFound();
     }
 
+    public function test_published_cms_page_renders_with_canonical_and_schema(): void
+    {
+        $author = User::factory()->create();
+        $post = Post::query()->create([
+            'author_user_id' => $author->id,
+            'type' => PostType::Page->value,
+            'status' => PostStatus::Published->value,
+            'published_at' => now(),
+        ]);
+        $post->translations()->create(['locale' => 'fa', 'title' => 'درباره ما', 'slug' => 'about-us', 'body' => '<p>صفحه درباره ما</p>', 'sanitized_body' => '<p>صفحه درباره ما</p>']);
+        $post->translations()->create(['locale' => 'en', 'title' => 'About Us', 'slug' => 'about-us-en', 'body' => '<p>About page</p>', 'sanitized_body' => '<p>About page</p>']);
+
+        $this->get('/fa/about-us')
+            ->assertOk()
+            ->assertSee('<html lang="fa" dir="rtl">', false)
+            ->assertSee('<link rel="canonical" href="'.url('/fa/about-us').'">', false)
+            ->assertSee('<link rel="alternate" hreflang="en" href="'.url('/en/about-us-en').'">', false)
+            ->assertSee('درباره ما', false)
+            ->assertSee('application/ld+json', false)
+            ->assertSee('"@type":"WebPage"', false);
+    }
+
+    public function test_published_service_page_renders_with_service_schema(): void
+    {
+        $author = User::factory()->create();
+        $post = Post::query()->create([
+            'author_user_id' => $author->id,
+            'type' => PostType::Service->value,
+            'status' => PostStatus::Published->value,
+            'published_at' => now(),
+        ]);
+        $post->translations()->create(['locale' => 'fa', 'title' => 'خدمات دندانپزشکی در منزل', 'slug' => 'home-dentistry', 'body' => '<p>توضیحات</p>', 'sanitized_body' => '<p>توضیحات</p>']);
+
+        $this->get('/fa/services/home-dentistry')
+            ->assertOk()
+            ->assertSee('خدمات دندانپزشکی در منزل', false)
+            ->assertSee('"@type":"Service"', false)
+            ->assertSee('"name":"Royadarman"', false);
+    }
+
+    public function test_draft_page_returns_404(): void
+    {
+        $author = User::factory()->create();
+        $post = Post::query()->create([
+            'author_user_id' => $author->id,
+            'type' => PostType::Page->value,
+            'status' => PostStatus::Draft->value,
+            'published_at' => null,
+        ]);
+        $post->translations()->create(['locale' => 'fa', 'title' => 'پیش‌نویس', 'slug' => 'draft-page', 'body' => '<p></p>', 'sanitized_body' => '<p></p>']);
+
+        $this->get('/fa/draft-page')->assertNotFound();
+    }
+
+    public function test_blog_post_is_not_accessible_via_page_route(): void
+    {
+        $author = User::factory()->create();
+        $post = Post::query()->create([
+            'author_user_id' => $author->id,
+            'type' => PostType::Post->value,
+            'status' => PostStatus::Published->value,
+            'published_at' => now(),
+        ]);
+        $post->translations()->create(['locale' => 'fa', 'title' => 'مقاله', 'slug' => 'blog-post-via-page', 'body' => '<p></p>', 'sanitized_body' => '<p></p>']);
+
+        // A blog post type must NOT render via the page route (only blog/{slug}).
+        $this->get('/fa/blog-post-via-page')->assertNotFound();
+    }
+
     public function test_cms_media_is_served_publicly(): void
     {
         \Storage::fake('public-cms');
