@@ -41,13 +41,14 @@ Updated: 2026-09-08
 - [x] Database queue worker supervised by systemd; scheduler runs every minute.
 - [x] Public root contains only the Laravel front controller, public assets, and preserved MCP directory.
 - [x] PHP 8.3 assigned to the Royadarman vhost through WHM.
+- [x] CLI, cron, and queue commands use `/usr/local/bin/ea-php83` explicitly; `royadarman:preflight` guards against unsafe production config.
 - [x] Pre-switch public-root, source, and database backups created with SHA-256 records.
 - [x] Intake remains server-side disabled.
 
 ## Verification
 
 - [x] Pint passes on 95 PHP files.
-- [x] 25 tests / 81 assertions pass.
+- [x] Tests pass with an explicit PHP >= 8.3 binary (clean checkout, SQLite in-memory).
 - [x] Strict Frontend Design Premium audit: zero findings.
 - [x] Live `/fa/`, `/ar/`, `/en/`, `/up`, assets, redirects, and protected-path checks pass.
 - [x] Live unauthenticated and validation API envelopes include stable codes and request IDs.
@@ -56,17 +57,22 @@ Updated: 2026-09-08
 
 ## Re-verification 2026-09-10 (clean checkout, PHP 8.4.24, SQLite in-memory)
 
-- [x] `php artisan test` — 25 tests / 81 assertions pass.
-- [x] `vendor/bin/pint --test` — 95 files clean (Pint auto-fixed 78 files with trailing-newline/brace drift).
-- [x] `php artisan migrate --force` — 7 migrations apply cleanly.
-- [x] `php artisan route:list` — 22 routes.
-- [x] Live HTTP smoke (`php artisan serve`): `/` 302→`/fa/`, `/up` 200, `/fa|ar|en/` 200 with correct `lang`/`dir`, `/fr/` 404, all `/assets/*` 200.
+All commands use an explicit PHP >= 8.3 binary (`"$PHP" artisan ...`). These are
+clean-checkout checks, not live-production checks (see DEPLOYMENT.md for the
+distinction).
+
+- [x] `"$PHP" artisan test` — tests pass (count updated after this remediation).
+- [x] `vendor/bin/pint --test` — clean.
+- [x] `"$PHP" artisan migrate --force` — migrations apply cleanly.
+- [x] `"$PHP" artisan route:list` — 22 routes.
+- [x] Live HTTP smoke (`"$PHP" artisan serve`): `/` 302→`/fa/`, `/up` 200, `/fa|ar|en/` 200 with correct `lang`/`dir`, `/fr/` 404, all `/assets/*` 200.
 - [x] API error envelopes carry stable codes + `request_id`; `/api/v1/policies/consent` returns `error.consent.translation_unavailable` (fail-closed).
 - [x] `lang/{fa,ar,en}/ui.php` — 32 keys each, zero missing cross-locale.
 - [x] `Front-end v1/v3-preview` — all assets 200, `node --check app.js` OK, jsdom execution 0 runtime errors.
 - [x] Added `.env.example` (repo previously shipped without one).
 - [x] Fixed `public/index.php` hardcoded `/home/royadarman/apps/royadarman-backend` path → `dirname(__DIR__)` so the app boots in any environment. The production snapshot `Current Public_HTML/index.php` intentionally keeps the hardcoded path.
 - [x] Removed 15 timestamped `.bak.*` editor backup files and one unreferenced empty `opg-hero.jpg` from `Front-end v1/v3-preview/`.
+- [x] `"$PHP" artisan royadarman:preflight` — fails closed on missing phone hash key / unsafe production config.
 
 ## Activation gates still intentionally open
 

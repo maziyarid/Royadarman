@@ -1,26 +1,97 @@
 # Royadarman deployment and rollback
 
+## Runtime requirement
+
+The shared host exposes multiple PHP versions. Laravel 13 requires PHP >= 8.3,
+while the default CLI `php` on the host may be 8.2 and will fail before Laravel
+boots. **Always run Artisan, Composer, cron and queue commands with an explicit
+PHP 8.3 binary**, not bare `php`.
+
+Define the binary once per session and use it everywhere:
+
+```bash
+PHP=/usr/local/bin/ea-php83
+"$PHP" -v   # must report 8.3.x
+```
+
+Before any deploy step, verify every command that will run on the host uses the
+same PHP 8.3 binary:
+
+- [ ] `"$PHP" -v` reports PHP 8.3.x
+- [ ] Composer uses it: `"$PHP" $(which composer) install ...` (or `composer` is
+      symlinked to the 8.3 binary)
+- [ ] Cron entry invokes `"$PHP" artisan schedule:run`
+- [ ] `royadarman-queue.service` `ExecStart` uses `/usr/local/bin/ea-php83`
+- [ ] The web vhost is assigned PHP 8.3 in WHM/cPanel (FPM)
+
+Do **not** assume the web-vhost PHP version equals the CLI PHP version; verify
+both. The scheduler and queue service already use `/usr/local/bin/ea-php83`
+correctly on the live host.
+
 ## Release gate
 
-- [ ] `composer.lock` is present and `composer install --no-dev --prefer-dist --optimize-autoloader` succeeds.
+- [ ] `composer.lock` is present and `"$PHP" $(which composer) install --no-dev --prefer-dist --optimize-autoloader` succeeds.
 - [ ] `.env` is not in the source archive; production uses `APP_ENV=production` and `APP_DEBUG=false`.
 - [ ] `INTAKE_ENABLED=false` remains set until legal consent text, licensed clinical lead, SMS delivery, staffing, scanner, encrypted backup and restore rehearsal are approved.
-- [ ] `ROYADARMAN_PHONE_HASH_KEY` is an independent secret and the SMS callback secret is configured.
+- [ ] `ROYADARMAN_PHONE_HASH_KEY` is an independent non-empty secret and the SMS callback secret is configured.
+- [ ] `"$PHP" artisan royadarman:preflight` passes (refuses empty APP_KEY / phone hash key, debug true, intake enabled without provider/scanner/retention, unsafe disks/queues).
 - [ ] MariaDB uses InnoDB, `utf8mb4_unicode_ci`, UTC and strict SQL mode.
 - [ ] `/home/royadarman/private_uploads/{quarantine,approved}` is outside `public_html`, mode `0750`, and not reachable over HTTP.
 - [ ] ClamAV is installed, current, and a real clean/EICAR/timeout test passes before intake activation.
 - [ ] Apache routes only through the Laravel front controller; `.env`, application files, storage and vendor are not web-accessible.
-- [ ] Queue supervisors run `otp`, `scanning`, `notifications`, and `maintenance` queues with bounded retries.
-- [ ] Scheduler runs once per minute and retention has an approved configured duration; no duration is invented by code.
+- [ ] Queue supervisors run `otp`, `scanning`, `notifications`, and `maintenance` queues with bounded retries using `/usr/local/bin/ea-php83`.
+- [ ] Scheduler runs once per minute (via `/usr/local/bin/ea-php83`) and retention has an approved configured duration; no duration is invented by code.
 - [ ] Encrypted application/database/file backups have a successful restore rehearsal.
-- [ ] `php artisan test`, Pint, route listing, locale smoke tests and production HTTP/security-header checks pass.
+
+## Verification: clean checkout vs. live production
+
+Two distinct verification regimes exist. Do not mix them.
+
+### Clean-checkout verification (pre-deployment, CI)
+
+Run in a fresh checkout/build with an isolated test database (SQLite `:memory:`
+or a throwaway MariaDB schema) and **no** inherited production configuration
+cache. This is the primary comprehensive regression gate.
+
+```bash
+PHP=/usr/local/bin/ea-php83  # or php >= 8.3 in CI
+"$PHP" $(which composer) install
+"$PHP" $(which composer) validate
+"$PHP" -v                    # >= 8.3
+"$PHP" artisan config:clear   # only in the clean test environment
+"$PHP" artisan migrate:fresh --force
+"$PHP" artisan test
+vendor/bin/pint --test
+"$PHP" artisan route:list
+"$PHP" artisan route:cache && "$PHP" artisan route:clear
+"$PHP" artisan royadarman:preflight
+# locale parity, JS syntax/build, browser smoke tests
+```
+
+### Live-production smoke verification (post-deployment)
+
+Run only **non-destructive** checks against the live configured application.
+Never run `config:clear`, `config:cache`, `migrate`, or `php artisan test`
+against production merely to satisfy a checklist; PHPUnit against a cached
+production configuration produces misleading results (the testing environment
+from `phpunit.xml` does not safely replace a cached production config).
+
+Safe post-deploy checks:
+
+- [ ] `GET /up` (or `/fa/`) returns 200.
+- [ ] `GET /api/v1/...` unauthenticated and validation paths return the standard
+      error envelope with a `request_id` and the expected status.
+- [ ] `/fa/`, `/ar/`, `/en/` render with correct `lang` and `dir`.
+- [ ] `"$PHP" artisan royadarman:preflight` passes against the production `.env`.
+- [ ] Queue workers and scheduler are running with `/usr/local/bin/ea-php83`.
+- [ ] No HTTP 5xx spike; no new failed jobs in the `failed_jobs` table.
 
 ## Database-safe release
 
 1. Take encrypted database, application and public-root backups and record hashes.
 2. Put the application in maintenance mode only for the short schema switch if an online expand step is impossible.
 3. Deploy additive code and additive migrations first. Do not rename or drop live columns in the same release that stops writing them.
-4. Run `php artisan migrate --force`, warm caches, start workers, then smoke-test with intake still disabled.
+4. Run `"$PHP" artisan migrate --force`, warm caches, start workers, then smoke-test with intake still disabled.
 5. Remove maintenance mode and monitor HTTP 5xx, queue failures, scanner failures and authentication throttles.
 
 ## Rollback
