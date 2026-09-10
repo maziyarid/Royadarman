@@ -162,6 +162,33 @@ class StaffWorkflowTest extends TestCase
         $this->assertDatabaseHas('case_assignments', ['case_id' => $caseValid->id, 'assignee_user_id' => $valid->id, 'purpose' => 'clinical_review']);
     }
 
+    public function test_reassigning_same_clinician_is_idempotent_and_does_not_duplicate(): void
+    {
+        $coordinator = User::factory()->create(['role' => 'coordinator']);
+        $patient = User::factory()->create(['role' => 'patient']);
+        $clinician = User::factory()->create(['role' => 'clinician']);
+        $this->makePractitioner($clinician, 'verified', now()->addYear());
+        $case = $this->makeCase($patient);
+        $this->assignCoordinator($coordinator, $case);
+
+        $first = $this->actingAs($coordinator)
+            ->postJson("/api/v1/staff/cases/{$case->id}/assignments", [
+                'assignee_user_id' => $clinician->id,
+                'purpose' => 'clinical_review',
+                'version' => 1,
+            ])
+            ->assertOk();
+        $second = $this->actingAs($coordinator)
+            ->postJson("/api/v1/staff/cases/{$case->id}/assignments", [
+                'assignee_user_id' => $clinician->id,
+                'purpose' => 'clinical_review',
+                'version' => $first->json('data.version'),
+            ])
+            ->assertOk();
+
+        $this->assertSame(1, DB::table('case_assignments')->where(['case_id' => $case->id, 'assignee_user_id' => $clinician->id, 'purpose' => 'clinical_review', 'released_at' => null])->count());
+    }
+
     public function test_unassigned_coordinator_cannot_assign(): void
     {
         $coordinator = User::factory()->create(['role' => 'coordinator']);
