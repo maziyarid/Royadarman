@@ -28,6 +28,7 @@ return [
         ],
     ],
     'sms' => [
+        'provider' => env('ROYADARMAN_SMS_PROVIDER', 'http'),
         'endpoint' => env('ROYADARMAN_SMS_ENDPOINT'),
         'token' => env('ROYADARMAN_SMS_TOKEN'),
         'callback_secret' => env('ROYADARMAN_SMS_CALLBACK_SECRET'),

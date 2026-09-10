@@ -5,9 +5,12 @@ namespace App\Providers;
 use App\Domain\Documents\Contracts\DocumentScanner;
 use App\Domain\Identity\Contracts\OtpSender;
 use App\Domain\Operations\Contracts\NotificationSender;
+use App\Domain\Operations\Contracts\SmsProvider;
+use App\Domain\Operations\Services\SmsManager;
 use App\Infrastructure\Documents\ClamAvDocumentScanner;
 use App\Infrastructure\Identity\HttpOtpSender;
 use App\Infrastructure\Operations\HttpNotificationSender;
+use App\Infrastructure\Operations\HttpSmsProvider;
 use App\Models\ClinicalDocument;
 use App\Models\Cms\Post;
 use App\Models\PatientCase;
@@ -26,6 +29,14 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(DocumentScanner::class, ClamAvDocumentScanner::class);
         $this->app->bind(OtpSender::class, HttpOtpSender::class);
         $this->app->bind(NotificationSender::class, HttpNotificationSender::class);
+
+        $this->app->singleton(SmsManager::class, function ($app): SmsManager {
+            $manager = new SmsManager($app);
+            $manager->extend('http', fn (): SmsProvider => $app->make(HttpSmsProvider::class));
+
+            return $manager;
+        });
+        $this->app->bind(SmsProvider::class, fn ($app): SmsProvider => $app->make(SmsManager::class)->provider());
     }
 
     public function boot(): void
