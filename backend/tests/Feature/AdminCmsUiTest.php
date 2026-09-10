@@ -75,6 +75,27 @@ final class AdminCmsUiTest extends TestCase
         $this->assertStringContainsString('<p>ok</p>', $body);
     }
 
+    public function test_sanitizer_rejects_embedded_control_chars_in_url_scheme(): void
+    {
+        $owner = User::factory()->create(['role' => 'owner']);
+        // Entity-decoded by the browser to java\nscript: — must be stripped.
+        $payload = '<a href="java&#x0A;script:alert(1)">click</a><img src="java&#x09;script:alert(2)"><a href="https://royadarman.com">safe</a><img src="/cms-media/safe.jpg">';
+
+        $this->actingAs($owner)->post('/admin/cms/posts', [
+            'type' => PostType::Post->value,
+            'status' => PostStatus::Draft->value,
+            'is_featured' => false,
+            'translations' => [
+                ['locale' => 'fa', 'title' => 'Ctrl char XSS', 'slug' => 'ctrl-xss', 'body' => $payload],
+            ],
+        ])->assertRedirect();
+
+        $body = Post::first()->translations()->first()->sanitized_body;
+        $this->assertStringNotContainsString('script:', $body, 'dangerous scheme with embedded control chars must be stripped');
+        $this->assertStringContainsString('https://royadarman.com', $body, 'safe https URL must be preserved');
+        $this->assertStringContainsString('/cms-media/safe.jpg', $body, 'safe relative img URL must be preserved');
+    }
+
     public function test_owner_can_publish_a_post_from_admin(): void
     {
         $owner = User::factory()->create(['role' => 'owner']);

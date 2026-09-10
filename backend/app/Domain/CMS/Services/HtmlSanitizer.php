@@ -83,8 +83,7 @@ final class HtmlSanitizer
             if (! $node instanceof \DOMElement) {
                 continue;
             }
-            $href = $node->getAttribute('href');
-            if (preg_match('/^\s*(javascript|data|vbscript):/i', $href)) {
+            if (! $this->isSafeUrl($node->getAttribute('href'))) {
                 $node->removeAttribute('href');
             }
         }
@@ -92,10 +91,31 @@ final class HtmlSanitizer
             if (! $node instanceof \DOMElement) {
                 continue;
             }
-            $src = $node->getAttribute('src');
-            if (preg_match('/^\s*(javascript|vbscript|data):/i', $src)) {
+            if (! $this->isSafeUrl($node->getAttribute('src'))) {
                 $node->removeAttribute('src');
             }
         }
+    }
+
+    /**
+     * Allowlist-based URL safety: permit http(s), mailto, tel, fragment (#),
+     * protocol-relative (//), and scheme-less relative URLs. Reject everything
+     * else (javascript:, vbscript:, data:, file:, ...). Control characters are
+     * stripped before parsing so embedded newlines/tabs/null bytes cannot
+     * disguise a dangerous scheme (e.g. "java\nscript:").
+     */
+    private function isSafeUrl(string $value): bool
+    {
+        $normalized = preg_replace('/[\x00-\x20\x7F]/u', '', $value);
+        if ($normalized === '' || $normalized === '#') {
+            return true;
+        }
+        if (preg_match('#^[a-zA-Z][a-zA-Z0-9+.-]*:#', $normalized, $matches)) {
+            $scheme = strtolower($matches[0]);
+
+            return in_array($scheme, ['http:', 'https:', 'mailto:', 'tel:'], true);
+        }
+
+        return str_starts_with($normalized, '/') || ! str_contains($normalized, ':');
     }
 }
