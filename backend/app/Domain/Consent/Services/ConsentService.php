@@ -20,6 +20,16 @@ final class ConsentService
             ->first();
     }
 
+    public function latestPublishedPolicy(string $policyKey, string $locale): ?PolicyVersion
+    {
+        return PolicyVersion::query()
+            ->where('policy_key', $policyKey)
+            ->where('locale', $locale)
+            ->whereNotNull('published_at')
+            ->latest('published_at')
+            ->first();
+    }
+
     public function hasActiveConsent(User $subject, string $purpose, ?string $caseId = null, ?string $policyKey = null): bool
     {
         return ConsentEvent::query()
@@ -64,7 +74,7 @@ final class ConsentService
         return $event->refresh();
     }
 
-    public function latestActiveFor(User $subject, string $purpose, ?string $caseId = null): ?ConsentEvent
+    public function latestActiveFor(User $subject, string $purpose, ?string $caseId = null, ?string $policyKey = null): ?ConsentEvent
     {
         return ConsentEvent::query()
             ->where('subject_user_id', $subject->id)
@@ -72,6 +82,9 @@ final class ConsentService
             ->where('decision', 'accepted')
             ->whereNull('revoked_at')
             ->when($caseId !== null, fn (Builder $q) => $q->where('case_id', $caseId))
+            ->when($policyKey !== null, function (Builder $q) use ($policyKey): void {
+                $q->whereHas('policyVersion', fn (Builder $pq) => $pq->where('policy_key', $policyKey));
+            })
             ->latest('created_at')
             ->first();
     }

@@ -6,6 +6,7 @@ use App\Domain\Documents\Enums\DocumentStatus;
 use App\Jobs\ScanClinicalDocument;
 use App\Models\AuditEvent;
 use App\Models\ClinicalDocument;
+use App\Models\ConsentEvent;
 use App\Models\PatientCase;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -24,7 +25,7 @@ class QuarantineClinicalDocument
         'png' => ['image/png'],
     ];
 
-    public function handle(PatientCase $case, User $uploader, UploadedFile $file): ClinicalDocument
+    public function handle(PatientCase $case, User $uploader, UploadedFile $file, ?ConsentEvent $consentEvent = null): ClinicalDocument
     {
         if ($case->documents()->whereNotIn('status', [DocumentStatus::Deleted->value, DocumentStatus::Rejected->value])->count() >= 3) {
             throw ValidationException::withMessages(['document' => __('ui.errors.document_limit')]);
@@ -36,7 +37,7 @@ class QuarantineClinicalDocument
         $stream = fopen($file->getRealPath(), 'rb');
 
         if ($stream === false) {
-            throw ValidationException::withMessages(['opg' => 'خواندن فایل ممکن نیست؛ دوباره تلاش کنید.']);
+            throw ValidationException::withMessages(['opg' => __('ui.errors.document_unreadable')]);
         }
 
         try {
@@ -46,10 +47,11 @@ class QuarantineClinicalDocument
         }
 
         try {
-            $document = DB::transaction(function () use ($case, $uploader, $file, $disk, $key, $detectedMime, $extension): ClinicalDocument {
+            $document = DB::transaction(function () use ($case, $uploader, $file, $disk, $key, $detectedMime, $extension, $consentEvent): ClinicalDocument {
                 $document = ClinicalDocument::query()->create([
                     'case_id' => $case->id,
                     'uploaded_by_user_id' => $uploader->id,
+                    'consent_event_id' => $consentEvent?->id,
                     'original_name' => Str::limit(basename($file->getClientOriginalName()), 180, ''),
                     'storage_disk' => $disk,
                     'storage_key' => $key,
@@ -86,26 +88,26 @@ class QuarantineClinicalDocument
     private function validateFile(UploadedFile $file): array
     {
         if (! $file->isValid()) {
-            throw ValidationException::withMessages(['opg' => 'انتقال فایل کامل نشد؛ دوباره تلاش کنید.']);
+            throw ValidationException::withMessages(['opg' => __('ui.errors.document_incomplete')]);
         }
 
         $size = $file->getSize();
         $maxBytes = (int) config('royadarman.opg.max_kilobytes', 15 * 1024) * 1024;
 
         if ($size === false || $size < 1 || $size > $maxBytes) {
-            throw ValidationException::withMessages(['opg' => 'اندازه فایل خارج از محدوده مجاز است.']);
+            throw ValidationException::withMessages(['opg' => __('ui.errors.document_too_large')]);
         }
 
         $extension = strtolower($file->getClientOriginalExtension());
 
         if (! array_key_exists($extension, self::MIME_BY_EXTENSION)) {
-            throw ValidationException::withMessages(['opg' => 'فقط JPEG، PNG یا PDF پذیرفته می‌شود.']);
+            throw ValidationException::withMessages(['opg' => __('ui.errors.document_extension')]);
         }
 
         $detectedMime = (new \finfo(FILEINFO_MIME_TYPE))->file($file->getRealPath());
 
         if (! is_string($detectedMime) || ! in_array($detectedMime, self::MIME_BY_EXTENSION[$extension], true)) {
-            throw ValidationException::withMessages(['opg' => 'محتوای فایل با پسوند آن هم‌خوانی ندارد.']);
+            throw ValidationException::withMessages(['opg' => __('ui.errors.document_mime_mismatch')]);
         }
 
         $dimensions = getimagesize($file->getRealPath());

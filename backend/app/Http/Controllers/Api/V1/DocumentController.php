@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\Consent\Services\ConsentService;
 use App\Domain\Documents\Enums\DocumentStatus;
 use App\Domain\Documents\Services\QuarantineClinicalDocument;
 use App\Http\Controllers\Controller;
@@ -16,11 +17,15 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class DocumentController extends Controller
 {
-    public function store(Request $request, PatientCase $case, QuarantineClinicalDocument $quarantine): JsonResponse
+    public function store(Request $request, PatientCase $case, QuarantineClinicalDocument $quarantine, ConsentService $consent): JsonResponse
     {
         abort_unless((int) $case->patient_user_id === (int) $request->user()->id, 404);
         $request->validate(['document' => ['required', 'file', 'max:'.config('royadarman.opg.max_kilobytes')]]);
-        $document = $quarantine->handle($case, $request->user(), $request->file('document'));
+
+        $consentEvent = $consent->latestActiveFor($request->user(), 'opg_document_sharing', $case->id, 'opg_document_sharing');
+        abort_unless($consentEvent !== null, 403, 'document.consent_required');
+
+        $document = $quarantine->handle($case, $request->user(), $request->file('document'), $consentEvent);
 
         return response()->json(['data' => ['id' => $document->id, 'status' => $document->status->value]], 202);
     }

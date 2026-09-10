@@ -16,6 +16,7 @@ class ClinicalDocument extends Model
     protected $fillable = [
         'case_id',
         'uploaded_by_user_id',
+        'consent_event_id',
         'original_name',
         'storage_disk',
         'storage_key',
