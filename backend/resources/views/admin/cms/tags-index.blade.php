@@ -21,7 +21,7 @@
         <div class="empty">{{ __('ui.admin.empty') }}</div>
     @else
     <table>
-        <thead><tr><th>{{ __('ui.admin.name') }}</th><th>{{ __('ui.admin.slug') }}</th><th>{{ __('ui.admin.actions') }}</th></tr></thead>
+        <thead><tr><th scope="col">{{ __('ui.admin.name') }}</th><th scope="col">{{ __('ui.admin.slug') }}</th><th scope="col">{{ __('ui.admin.actions') }}</th></tr></thead>
         <tbody>
         @foreach($tags as $tag)
             @php $fa = $tag->translations->firstWhere('locale', 'fa') ?? $tag->translations->first() @endphp

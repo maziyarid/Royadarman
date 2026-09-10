@@ -12,7 +12,7 @@
     @if(count($data['case_queue']) === 0)
         <div class="empty">{{ __('ui.dashboard.no_cases_queue') }}</div>
     @else
-    <table><thead><tr><th>{{ __('ui.dashboard.col_id') }}</th><th>{{ __('ui.dashboard.col_status') }}</th><th>{{ __('ui.dashboard.col_service') }}</th><th>{{ __('ui.dashboard.col_documents') }}</th><th>{{ __('ui.dashboard.col_review') }}</th><th>{{ __('ui.dashboard.col_updated') }}</th></tr></thead>
+    <table><thead><tr><th scope="col">{{ __('ui.dashboard.col_id') }}</th><th scope="col">{{ __('ui.dashboard.col_status') }}</th><th scope="col">{{ __('ui.dashboard.col_service') }}</th><th scope="col">{{ __('ui.dashboard.col_documents') }}</th><th scope="col">{{ __('ui.dashboard.col_review') }}</th><th scope="col">{{ __('ui.dashboard.col_updated') }}</th></tr></thead>
         <tbody>@foreach($data['case_queue'] as $c)<tr><td>{{ $c['id'] }}</td><td><span class="badge {{ $c['status'] }}">{{ __('ui.dashboard.status.'.$c['status']) }}</span></td><td>{{ __('ui.dashboard.service.'.$c['service_type']) }}</td><td>{{ $c['documents_count'] }}</td><td>@if($c['has_published_review'])<span class="ok">{{ __('ui.dashboard.yes') }}</span>@else<span class="muted">{{ __('ui.dashboard.no') }}</span>@endif</td><td>{{ $c['updated_at'] }}</td></tr>@endforeach</tbody>
     </table>
     @endif

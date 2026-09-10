@@ -27,7 +27,7 @@
         </form>
         @if($menu->items->isNotEmpty())
         <table style="margin-top:12px">
-            <thead><tr><th>{{ __('ui.admin.label') }}</th><th>URL</th><th>{{ __('ui.admin.actions') }}</th></tr></thead>
+            <thead><tr><th scope="col">{{ __('ui.admin.label') }}</th><th scope="col">URL</th><th scope="col">{{ __('ui.admin.actions') }}</th></tr></thead>
             <tbody>@foreach($menu->items as $i)@php $l = $i->translations->firstWhere('locale','fa') @endphp
                 <tr><td>{{ $l?->label ?? '#'.$i->id }}</td><td class="muted">{{ $i->url ?? '—' }}</td>
                 <td class="row-actions"><form method="POST" action="{{ route('admin.cms.menus.items.destroy', [$menu, $i]) }}">@csrf @method('DELETE')<button class="btn sm danger" type="submit" onclick="return confirm('{{ __('ui.admin.delete_confirm') }}')">{{ __('ui.admin.delete') }}</button></form></td></tr>

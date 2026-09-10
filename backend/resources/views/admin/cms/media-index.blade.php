@@ -19,7 +19,7 @@
         <div class="empty">{{ __('ui.admin.empty') }}</div>
     @else
     <table>
-        <thead><tr><th>{{ __('ui.admin.filename') }}</th><th>{{ __('ui.admin.dimensions') }}</th><th>{{ __('ui.admin.filesize') }}</th><th>{{ __('ui.admin.actions') }}</th></tr></thead>
+        <thead><tr><th scope="col">{{ __('ui.admin.filename') }}</th><th scope="col">{{ __('ui.admin.dimensions') }}</th><th scope="col">{{ __('ui.admin.filesize') }}</th><th scope="col">{{ __('ui.admin.actions') }}</th></tr></thead>
         <tbody>
         @foreach($media as $m)
             <tr>

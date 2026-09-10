@@ -12,7 +12,7 @@
         <div class="empty">{{ __('ui.admin.empty') }}</div>
     @else
     <table>
-        <thead><tr><th>{{ __('ui.admin.locale') }}</th><th>{{ __('ui.admin.seo_title') }}</th><th>{{ __('ui.admin.focus_keyword') }}</th><th>{{ __('ui.admin.entity') }}</th><th>{{ __('ui.admin.actions') }}</th></tr></thead>
+        <thead><tr><th scope="col">{{ __('ui.admin.locale') }}</th><th scope="col">{{ __('ui.admin.seo_title') }}</th><th scope="col">{{ __('ui.admin.focus_keyword') }}</th><th scope="col">{{ __('ui.admin.entity') }}</th><th scope="col">{{ __('ui.admin.actions') }}</th></tr></thead>
         <tbody>
         @foreach($seo as $s)
             <tr><td>{{ $s->locale }}</td><td>{{ $s->seo_title ?? '—' }}</td><td class="muted">{{ $s->focus_keyword ?? '—' }}</td><td><span class="muted">{{ Str::afterLast($s->entity_type, '\\') }}#{{ $s->entity_id }}</span></td>

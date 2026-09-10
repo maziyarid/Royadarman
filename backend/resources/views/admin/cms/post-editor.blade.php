@@ -136,7 +136,7 @@
 <div class="card">
     <h3 style="margin:0 0 12px;font-size:15px">{{ __('ui.admin.revisions') }}</h3>
     <table>
-        <thead><tr><th>{{ __('ui.admin.locale') }}</th><th>{{ __('ui.admin.author') }}</th><th>{{ __('ui.admin.updated') }}</th></tr></thead>
+        <thead><tr><th scope="col">{{ __('ui.admin.locale') }}</th><th scope="col">{{ __('ui.admin.author') }}</th><th scope="col">{{ __('ui.admin.updated') }}</th></tr></thead>
         <tbody>
             @foreach($post->revisions->take(10) as $rev)
                 <tr><td>{{ $rev->locale }}</td><td class="muted">{{ $rev->author?->name ?? '—' }}</td><td class="muted">{{ $rev->created_at?->format('Y-m-d H:i') }}</td></tr>

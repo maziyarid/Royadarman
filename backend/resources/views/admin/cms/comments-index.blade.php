@@ -12,7 +12,7 @@
         <div class="empty">{{ __('ui.admin.empty') }}</div>
     @else
     <table>
-        <thead><tr><th>{{ __('ui.admin.author') }}</th><th>{{ __('ui.admin.body') }}</th><th>{{ __('ui.admin.status') }}</th><th>{{ __('ui.admin.col_updated') }}</th><th>{{ __('ui.admin.actions') }}</th></tr></thead>
+        <thead><tr><th scope="col">{{ __('ui.admin.author') }}</th><th scope="col">{{ __('ui.admin.body') }}</th><th scope="col">{{ __('ui.admin.status') }}</th><th scope="col">{{ __('ui.admin.col_updated') }}</th><th scope="col">{{ __('ui.admin.actions') }}</th></tr></thead>
         <tbody>
         @foreach($comments as $c)
             @php $st = $c->status->value @endphp

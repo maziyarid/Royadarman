@@ -33,7 +33,7 @@
         <div class="empty">{{ __('ui.admin.empty') }}</div>
     @else
     <table>
-        <thead><tr><th>{{ __('ui.admin.title_label') }}</th><th>{{ __('ui.admin.type') }}</th><th>{{ __('ui.admin.status') }}</th><th>{{ __('ui.admin.author') }}</th><th>{{ __('ui.admin.updated') }}</th><th>{{ __('ui.admin.actions') }}</th></tr></thead>
+        <thead><tr><th scope="col">{{ __('ui.admin.title_label') }}</th><th scope="col">{{ __('ui.admin.type') }}</th><th scope="col">{{ __('ui.admin.status') }}</th><th scope="col">{{ __('ui.admin.author') }}</th><th scope="col">{{ __('ui.admin.updated') }}</th><th scope="col">{{ __('ui.admin.actions') }}</th></tr></thead>
         <tbody>
         @foreach($posts as $post)
             @php $tr = $post->translations->firstWhere('locale', app()->getLocale()) ?? $post->translations->first(); @endphp

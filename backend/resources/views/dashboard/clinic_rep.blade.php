@@ -11,7 +11,7 @@
     @if(count($data['clinics']) === 0)
         <div class="empty">{{ __('ui.dashboard.no_clinics') }}</div>
     @else
-    <table><thead><tr><th>{{ __('ui.dashboard.col_name') }}</th><th>{{ __('ui.dashboard.col_status') }}</th></tr></thead>
+    <table><thead><tr><th scope="col">{{ __('ui.dashboard.col_name') }}</th><th scope="col">{{ __('ui.dashboard.col_status') }}</th></tr></thead>
         <tbody>@foreach($data['clinics'] as $c)<tr><td>{{ $c['name'] }}</td><td>@if($c['is_active'])<span class="ok">{{ __('ui.dashboard.active') }}</span>@else<span class="muted">{{ __('ui.dashboard.inactive') }}</span>@endif</td></tr>@endforeach</tbody>
     </table>
     @endif
@@ -22,7 +22,7 @@
     @if(count($data['active_referral_grants']) === 0)
         <div class="empty">{{ __('ui.dashboard.no_grants') }}</div>
     @else
-    <table><thead><tr><th>{{ __('ui.dashboard.col_case') }}</th><th>{{ __('ui.dashboard.col_status') }}</th><th>{{ __('ui.dashboard.col_granted') }}</th><th>{{ __('ui.dashboard.col_expires') }}</th></tr></thead>
+    <table><thead><tr><th scope="col">{{ __('ui.dashboard.col_case') }}</th><th scope="col">{{ __('ui.dashboard.col_status') }}</th><th scope="col">{{ __('ui.dashboard.col_granted') }}</th><th scope="col">{{ __('ui.dashboard.col_expires') }}</th></tr></thead>
         <tbody>@foreach($data['active_referral_grants'] as $g)<tr><td>{{ $g['case_id'] }}</td><td><span class="badge {{ $g['case_status'] }}">{{ __('ui.dashboard.status.'.$g['case_status']) }}</span></td><td>{{ $g['granted_at'] }}</td><td>{{ $g['expires_at'] }}</td></tr>@endforeach</tbody>
     </table>
     @endif

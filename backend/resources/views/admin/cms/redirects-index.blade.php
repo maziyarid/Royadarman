@@ -16,7 +16,7 @@
         <div class="empty">{{ __('ui.admin.empty') }}</div>
     @else
     <table>
-        <thead><tr><th>{{ __('ui.admin.source_path') }}</th><th>{{ __('ui.admin.destination_url') }}</th><th>{{ __('ui.admin.status_code') }}</th><th>{{ __('ui.admin.hits') }}</th><th>{{ __('ui.admin.actions') }}</th></tr></thead>
+        <thead><tr><th scope="col">{{ __('ui.admin.source_path') }}</th><th scope="col">{{ __('ui.admin.destination_url') }}</th><th scope="col">{{ __('ui.admin.status_code') }}</th><th scope="col">{{ __('ui.admin.hits') }}</th><th scope="col">{{ __('ui.admin.actions') }}</th></tr></thead>
         <tbody>
         @foreach($redirects as $r)
             <tr><td>{{ $r->source_path }}</td><td>{{ $r->destination_url }}</td><td><span class="badge {{ $r->status_code === 301 ? 'published' : 'in_review' }}">{{ $r->status_code }}</span></td><td class="muted">{{ $r->hit_count }}</td>

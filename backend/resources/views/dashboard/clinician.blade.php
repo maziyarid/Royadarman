@@ -20,7 +20,7 @@
         <div class="empty">{{ __('ui.dashboard.no_reviews') }}</div>
     @else
     <table>
-        <thead><tr><th>{{ __('ui.dashboard.col_id') }}</th><th>{{ __('ui.dashboard.col_case') }}</th><th>{{ __('ui.dashboard.col_status') }}</th><th>{{ __('ui.dashboard.col_published') }}</th><th>{{ __('ui.dashboard.col_updated') }}</th></tr></thead>
+        <thead><tr><th scope="col">{{ __('ui.dashboard.col_id') }}</th><th scope="col">{{ __('ui.dashboard.col_case') }}</th><th scope="col">{{ __('ui.dashboard.col_status') }}</th><th scope="col">{{ __('ui.dashboard.col_published') }}</th><th scope="col">{{ __('ui.dashboard.col_updated') }}</th></tr></thead>
         <tbody>
         @foreach($data['assigned_reviews'] as $r)
             <tr>

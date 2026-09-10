@@ -14,7 +14,7 @@
     @if($data['case_status_counts']->isEmpty())
         <div class="empty">{{ __('ui.dashboard.no_cases') }}</div>
     @else
-    <table><thead><tr><th>{{ __('ui.dashboard.col_status') }}</th><th>{{ __('ui.dashboard.col_count') }}</th></tr></thead>
+    <table><thead><tr><th scope="col">{{ __('ui.dashboard.col_status') }}</th><th scope="col">{{ __('ui.dashboard.col_count') }}</th></tr></thead>
         <tbody>@foreach($data['case_status_counts'] as $status => $count)<tr><td><span class="badge {{ $status }}">{{ __('ui.dashboard.status.'.$status) }}</span></td><td>{{ $count }}</td></tr>@endforeach</tbody>
     </table>
     @endif

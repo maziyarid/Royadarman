@@ -10,12 +10,12 @@
     <h2>{{ __('ui.dashboard.my_cases') }}</h2>
     @forelse($data['cases'] as $case)
         <table>
-            <tr><th>{{ __('ui.dashboard.col_id') }}</th><td>{{ $case['id'] }}</td></tr>
-            <tr><th>{{ __('ui.dashboard.col_status') }}</th><td><span class="badge {{ $case['status'] }}">{{ __('ui.dashboard.status.'.$case['status']) }}</span></td></tr>
-            <tr><th>{{ __('ui.dashboard.col_service') }}</th><td>{{ __('ui.dashboard.service.'.$case['service_type']) }}</td></tr>
-            <tr><th>{{ __('ui.dashboard.col_documents') }}</th><td>{{ $case['documents_count'] }}</td></tr>
-            <tr><th>{{ __('ui.dashboard.col_review') }}</th><td>@if($case['has_published_review'])<span class="ok">{{ __('ui.dashboard.yes') }}</span>@else<span class="muted">{{ __('ui.dashboard.no') }}</span>@endif</td></tr>
-            <tr><th>{{ __('ui.dashboard.col_updated') }}</th><td>{{ $case['created_at'] }}</td></tr>
+            <tr><th scope="row">{{ __('ui.dashboard.col_id') }}</th><td>{{ $case['id'] }}</td></tr>
+            <tr><th scope="row">{{ __('ui.dashboard.col_status') }}</th><td><span class="badge {{ $case['status'] }}">{{ __('ui.dashboard.status.'.$case['status']) }}</span></td></tr>
+            <tr><th scope="row">{{ __('ui.dashboard.col_service') }}</th><td>{{ __('ui.dashboard.service.'.$case['service_type']) }}</td></tr>
+            <tr><th scope="row">{{ __('ui.dashboard.col_documents') }}</th><td>{{ $case['documents_count'] }}</td></tr>
+            <tr><th scope="row">{{ __('ui.dashboard.col_review') }}</th><td>@if($case['has_published_review'])<span class="ok">{{ __('ui.dashboard.yes') }}</span>@else<span class="muted">{{ __('ui.dashboard.no') }}</span>@endif</td></tr>
+            <tr><th scope="row">{{ __('ui.dashboard.col_updated') }}</th><td>{{ $case['created_at'] }}</td></tr>
         </table>
     @empty
         <div class="empty">{{ __('ui.dashboard.no_cases') }}</div>
@@ -25,7 +25,7 @@
 <div class="card">
     <h2>{{ __('ui.dashboard.home_service_requests') }}</h2>
     @forelse($data['home_service_requests'] as $h)
-        <table><tr><th>{{ __('ui.dashboard.col_status') }}</th><td><span class="badge {{ $h['status'] }}">{{ __('ui.dashboard.home_status.'.$h['status']) }}</span></td></tr><tr><th>{{ __('ui.dashboard.col_area') }}</th><td>{{ $h['tehran_area'] }}</td></tr></table>
+        <table><tr><th scope="row">{{ __('ui.dashboard.col_status') }}</th><td><span class="badge {{ $h['status'] }}">{{ __('ui.dashboard.home_status.'.$h['status']) }}</span></td></tr><tr><th scope="row">{{ __('ui.dashboard.col_area') }}</th><td>{{ $h['tehran_area'] }}</td></tr></table>
     @empty
         <div class="empty">{{ __('ui.dashboard.no_home_service') }}</div>
     @endforelse
