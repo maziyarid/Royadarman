@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\CmsSeoMetadataController;
 use App\Http\Controllers\Api\V1\CmsTagController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\DocumentController;
+use App\Http\Controllers\Api\V1\HomeServiceController;
 use App\Http\Controllers\Api\V1\NotificationCallbackController;
 use App\Http\Controllers\Api\V1\PolicyController;
 use App\Http\Controllers\Api\V1\ProfileController;
@@ -102,6 +103,10 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
             Route::post('/staff/cases/{case}/referral-proposals', [StaffCaseController::class, 'proposeReferral']);
             Route::post('/staff/cases/{case}/reviews', [StaffCaseController::class, 'createReview']);
             Route::post('/staff/cases/{case}/reviews/{review}/publish', [StaffCaseController::class, 'publishReview']);
+            Route::get('/cases/{case}/home-service', [HomeServiceController::class, 'indexForCase']);
+            Route::post('/home-services/{homeService}/transition', [HomeServiceController::class, 'transition']);
+            Route::post('/home-services/{homeService}/confirm', [HomeServiceController::class, 'confirm']);
+            Route::get('/home-services/{homeService}', [HomeServiceController::class, 'show']);
         });
     });
 });
