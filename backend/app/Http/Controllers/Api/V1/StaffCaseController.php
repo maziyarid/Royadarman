@@ -22,7 +22,7 @@ final class StaffCaseController extends Controller
 {
     public function assign(Request $request, PatientCase $case): JsonResponse
     {
-        abort_unless($request->user()->role === UserRole::Coordinator, 403);
+        abort_unless($request->user()->role === UserRole::Coordinator && $request->user()->can('view', $case), 404);
         $data = $request->validate([
             'assignee_user_id' => ['required', 'exists:users,id'],
             'purpose' => ['required', 'in:coordination,clinical_review'],
