@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Domain\Support\Enums\ConversationStatus;
 use App\Domain\Support\Enums\SupportCategory;
+use App\Models\PatientCase;
 use App\Models\SupportConversation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -35,6 +36,38 @@ final class SupportSystemTest extends TestCase
         $this->assertDatabaseHas('support_messages', [
             'author_user_id' => $patient->id,
             'is_internal' => false,
+        ]);
+    }
+
+    public function test_patient_cannot_link_support_conversation_to_another_patients_case(): void
+    {
+        $patient = User::factory()->create(['role' => 'patient']);
+        $otherPatient = User::factory()->create(['role' => 'patient']);
+        $otherCase = PatientCase::query()->create([
+            'public_reference' => 'RD-OTHER-1',
+            'patient_user_id' => $otherPatient->id,
+            'service_type' => 'opg_review',
+            'status' => 'submitted',
+            'patient_mobile' => '09120000000',
+            'patient_mobile_hash' => hash('sha256', 'other'),
+            'budget_band' => 'balanced',
+            'source_language' => 'fa',
+            'budget_input_unit' => 'toman',
+            'currency' => 'IRR',
+        ]);
+
+        $this->actingAs($patient)
+            ->postJson('/api/v1/support', [
+                'case_id' => $otherCase->id,
+                'category' => SupportCategory::Coordination->value,
+                'source_language' => 'fa',
+                'message' => 'trying to link someone else case',
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('support_conversations', [
+            'patient_user_id' => $patient->id,
+            'case_id' => $otherCase->id,
         ]);
     }
 

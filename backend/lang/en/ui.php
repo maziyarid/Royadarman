@@ -30,7 +30,7 @@ return [
         ['q' => 'Where is home dentistry available?', 'a' => 'It is currently coordinated only within Tehran city.'],
     ],
     'footer' => 'Royadarman — dental guidance, coordination and support',
-    'errors' => ['mobile' => 'Enter a valid mobile number.', 'otp_delivery' => 'The code cannot be sent right now.', 'otp_invalid' => 'The code is invalid or expired.', 'mfa_invalid' => 'The security code is invalid.', 'area_required' => 'Choose a Tehran area for home service.', 'document_limit' => 'A request can have up to three active images.', 'image_dimensions' => 'The image dimensions or structure are invalid.'],
+    'errors' => ['mobile' => 'Enter a valid mobile number.', 'otp_delivery' => 'The code cannot be sent right now.', 'otp_invalid' => 'The code is invalid or expired.', 'mfa_invalid' => 'The security code is invalid.', 'area_required' => 'Choose a Tehran area for home service.', 'document_limit' => 'A request can have up to three active images.', 'image_dimensions' => 'The image dimensions or structure are invalid.', 'case_not_owned' => 'The selected request is not yours.'],
     'admin' => [
         'title' => 'Admin Panel',
         'posts' => 'Posts',

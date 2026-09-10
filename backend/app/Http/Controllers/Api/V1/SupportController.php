@@ -6,6 +6,7 @@ use App\Domain\Identity\Enums\UserRole;
 use App\Domain\Support\Enums\ConversationStatus;
 use App\Domain\Support\Enums\SupportCategory;
 use App\Http\Controllers\Controller;
+use App\Models\PatientCase;
 use App\Models\SupportConversation;
 use App\Models\SupportMessage;
 use App\Models\SupportStatusEvent;
@@ -43,16 +44,27 @@ final class SupportController extends Controller
         abort_unless($user->role === UserRole::Patient, 403);
 
         $data = $request->validate([
-            'case_id' => ['nullable', 'ulid', 'exists:patient_cases,id'],
+            'case_id' => ['nullable', 'ulid'],
             'subject' => ['nullable', 'string', 'max:200'],
             'category' => ['required', Rule::enum(SupportCategory::class)],
             'source_language' => ['required', 'in:fa,ar,en'],
             'message' => ['required', 'string', 'max:5000'],
         ]);
 
+        $caseId = null;
+        if (! empty($data['case_id'])) {
+            $caseId = PatientCase::query()
+                ->whereKey($data['case_id'])
+                ->where('patient_user_id', $user->id)
+                ->value('id');
+            if ($caseId === null) {
+                abort(422, __('ui.errors.case_not_owned'));
+            }
+        }
+
         $conversation = SupportConversation::query()->create([
             'patient_user_id' => $user->id,
-            'case_id' => $data['case_id'] ?? null,
+            'case_id' => $caseId,
             'subject' => $data['subject'] ?? null,
             'category' => $data['category'],
             'status' => ConversationStatus::Open,
