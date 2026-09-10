@@ -194,10 +194,18 @@ entering the production code path.
     browser QA, accessibility, performance, dependency audit, TODO/stub scan.
    **Progress:** `composer audit` (incl. dev) = no advisories; Laravel v13.29.0;
     TODO/FIXME/stub scan of app/ + tests/ + config/ = **zero markers**; IDOR/
-    cross-record + list-scope tests done (item 2). **Remaining:** MariaDB
-    integration tests; browser QA; accessibility audit; performance audit.
+    cross-record + list-scope tests done (item 2); **translation parity = 224
+    keys × 3 locales, zero missing**; **accessibility**: all images have alt
+    (decorative alt=""), no empty buttons/links, all 15 dashboard+admin tables
+    now carry scope="col"/scope="row" (WCAG 2.2 AA). **Remaining:** MariaDB
+    integration tests (need production env); browser QA (need browser);
+    performance audit; full accessibility audit with a tool.
 11. Production drift reconciliation: backups, source comparison, deployment
     plan, migrations, worker/scheduler, cache, health, rollback.
+    **Progress:** read-only drift inspection complete (production == main,
+    healthy, intake disabled, no overbuild deployed). **Remaining:** formal
+    deployment plan for the new completion branch; backup snapshot before
+    deploy.
 12. Deploy technically-complete release with `INTAKE_ENABLED=false`; verify
     every route for that state.
 13. ClickUp + docs + memory reconciliation.
