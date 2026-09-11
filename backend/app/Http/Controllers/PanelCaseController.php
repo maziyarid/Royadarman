@@ -91,9 +91,11 @@ final class PanelCaseController extends Controller
     private function clinicRepresentativeData(Request $request, PatientCase $case): array
     {
         $grant = DB::table('referral_grants')
+            ->join('clinics', 'clinics.id', '=', 'referral_grants.clinic_id')
             ->join('clinic_memberships', 'clinic_memberships.clinic_id', '=', 'referral_grants.clinic_id')
             ->join('consent_events', 'consent_events.id', '=', 'referral_grants.consent_event_id')
             ->where('referral_grants.case_id', $case->id)
+            ->where('clinics.is_active', true)
             ->where('clinic_memberships.user_id', $request->user()->id)
             ->where('clinic_memberships.active_from', '<=', now())
             ->where(fn ($q) => $q->whereNull('clinic_memberships.active_until')->orWhere('clinic_memberships.active_until', '>', now()))
