@@ -70,6 +70,14 @@ class PreflightTest extends TestCase
         $this->artisan('royadarman:preflight')->assertFailed();
     }
 
+    public function test_preflight_rejects_plain_http_tsms_endpoint(): void
+    {
+        $this->configureSafeTsmsIntake();
+        config()->set('royadarman.sms.tsms.endpoint', 'http://tsms.ir/url/tsmshttp.php');
+
+        $this->artisan('royadarman:preflight')->assertFailed();
+    }
+
     public function test_preflight_does_not_require_callback_secret_for_send_only_tsms(): void
     {
         $this->configureSafeTsmsIntake();
