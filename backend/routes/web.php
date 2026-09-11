@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MarketingContentController;
+use App\Http\Controllers\NetworkAdminController;
 use App\Http\Controllers\PanelCaseController;
 use App\Http\Controllers\PanelController;
 use App\Http\Controllers\PatientRequestController;
@@ -38,6 +39,15 @@ Route::prefix('{locale}')
                 Route::get('/{page}/edit', [MarketingContentController::class, 'edit'])->name('marketing.edit');
                 Route::put('/{page}', [MarketingContentController::class, 'update'])->name('marketing.update');
                 Route::post('/{page}/publish', [MarketingContentController::class, 'publish'])->name('marketing.publish');
+            });
+
+            Route::prefix('panel/network')->group(function (): void {
+                Route::get('/', [NetworkAdminController::class, 'index'])->name('network.index');
+                Route::post('/clinics', [NetworkAdminController::class, 'storeClinic'])->name('network.clinic.store');
+                Route::put('/clinics/{clinic}', [NetworkAdminController::class, 'updateClinic'])->name('network.clinic.update');
+                Route::post('/practitioners/{user}', [NetworkAdminController::class, 'savePractitioner'])->whereNumber('user')->name('network.practitioner.save');
+                Route::post('/memberships', [NetworkAdminController::class, 'storeMembership'])->name('network.membership.store');
+                Route::delete('/memberships/{membership}', [NetworkAdminController::class, 'revokeMembership'])->name('network.membership.revoke');
             });
         });
     });
