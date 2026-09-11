@@ -2,7 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Domain\Identity\Enums\UserRole;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 final class Preflight extends Command
 {
@@ -83,6 +86,8 @@ final class Preflight extends Command
             if (! is_numeric($grantTtl) || (int) $grantTtl <= 0) {
                 $failures[] = 'INTAKE_ENABLED is true but ROYADARMAN_REFERRAL_GRANT_TTL_MINUTES is not a positive integer; referral grants must be time-limited.';
             }
+
+            $this->checkOperationalStaffing($failures);
         }
 
         $disk = (string) config('filesystems.default');
@@ -111,5 +116,34 @@ final class Preflight extends Command
         $this->info('Preflight OK: configuration passes the safety gates.');
 
         return self::SUCCESS;
+    }
+
+    /** @param list<string> $failures */
+    private function checkOperationalStaffing(array &$failures): void
+    {
+        if (! Schema::hasTable('users') || ! Schema::hasTable('practitioners')) {
+            $failures[] = 'INTAKE_ENABLED is true but operational staff tables are not available; run migrations before launch.';
+
+            return;
+        }
+
+        $hasCoordinator = DB::table('users')
+            ->where('role', UserRole::Coordinator->value)
+            ->where('is_active', true)
+            ->exists();
+        if (! $hasCoordinator) {
+            $failures[] = 'INTAKE_ENABLED is true but no active coordinator is provisioned.';
+        }
+
+        $hasClinicalLead = DB::table('users')
+            ->join('practitioners', 'practitioners.user_id', '=', 'users.id')
+            ->where('users.role', UserRole::Clinician->value)
+            ->where('users.is_active', true)
+            ->where('practitioners.credential_status', 'verified')
+            ->where(fn ($query) => $query->whereNull('practitioners.expires_at')->orWhere('practitioners.expires_at', '>', now()))
+            ->exists();
+        if (! $hasClinicalLead) {
+            $failures[] = 'INTAKE_ENABLED is true but no active verified non-expired clinician is provisioned.';
+        }
     }
 }
