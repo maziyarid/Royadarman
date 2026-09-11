@@ -62,8 +62,13 @@ final class Preflight extends Command
                     $failures[] = 'TSMS callback delivery is not enabled in this integration; set ROYADARMAN_SMS_CALLBACKS_ENABLED=false.';
                 }
             } elseif ($smsProvider === 'http') {
-                if (empty(config('royadarman.sms.endpoint')) || empty(config('royadarman.sms.token'))) {
+                $endpoint = (string) config('royadarman.sms.endpoint');
+                $token = (string) config('royadarman.sms.token');
+                if ($endpoint === '' || $token === '') {
                     $failures[] = 'INTAKE_ENABLED is true but generic SMS endpoint/token are not configured.';
+                } elseif (strtolower((string) parse_url($endpoint, PHP_URL_SCHEME)) !== 'https'
+                    || trim((string) parse_url($endpoint, PHP_URL_HOST)) === '') {
+                    $failures[] = 'INTAKE_ENABLED is true but generic SMS endpoint does not use HTTPS.';
                 }
             } else {
                 $failures[] = 'INTAKE_ENABLED is true but ROYADARMAN_SMS_PROVIDER is unsupported.';
