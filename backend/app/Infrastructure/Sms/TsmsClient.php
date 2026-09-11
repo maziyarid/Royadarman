@@ -76,10 +76,10 @@ final class TsmsClient
         $scheme = strtolower((string) parse_url($endpoint, PHP_URL_SCHEME));
         $host = strtolower((string) parse_url($endpoint, PHP_URL_HOST));
         $path = (string) parse_url($endpoint, PHP_URL_PATH);
-        if (! in_array($scheme, ['https', 'http'], true)
+        if ($scheme !== 'https'
             || ! in_array($host, ['tsms.ir', 'www.tsms.ir'], true)
             || $path !== '/url/tsmshttp.php') {
-            throw new RuntimeException('TSMS API endpoint is not allowed.');
+            throw new RuntimeException('TSMS API endpoint is not allowed; HTTPS to the approved TSMS URL API endpoint is required.');
         }
 
         return [$endpoint, $username, $password, $from];
