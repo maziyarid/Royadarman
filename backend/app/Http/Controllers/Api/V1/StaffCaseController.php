@@ -37,15 +37,25 @@ final class StaffCaseController extends Controller
                 return response()->json(['error' => ['code' => 'case.version_conflict'], 'request_id' => $request->attributes->get('request_id')], 409);
             }
 
-            if ($data['purpose'] === 'clinical_review') {
-                $assignee = (int) $data['assignee_user_id'];
-                $isClinician = DB::table('users')->where('id', $assignee)->value('role');
-                if ($isClinician !== UserRole::Clinician->value) {
+            $assignee = DB::table('users')
+                ->where('id', $data['assignee_user_id'])
+                ->first(['id', 'role', 'is_active']);
+
+            if ($assignee === null || ! (bool) $assignee->is_active) {
+                throw new DomainException(403, 'assignment.assignee_inactive');
+            }
+
+            if ($data['purpose'] === 'coordination') {
+                if ($assignee->role !== UserRole::Coordinator->value) {
+                    throw new DomainException(403, 'assignment.role_mismatch');
+                }
+            } else {
+                if ($assignee->role !== UserRole::Clinician->value) {
                     throw new DomainException(403, 'assignment.role_mismatch');
                 }
 
                 $active = DB::table('practitioners')
-                    ->where('user_id', $assignee)
+                    ->where('user_id', $assignee->id)
                     ->where('credential_status', 'verified')
                     ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
                     ->exists();
@@ -139,14 +149,8 @@ final class StaffCaseController extends Controller
         ]);
 
         $revision = DB::transaction(function () use ($request, $case, $data): ReviewRevision {
-            // Serialise review allocation by locking the case row.
             PatientCase::query()->lockForUpdate()->findOrFail($case->id);
 
-            // An OPG clinical review must be traceable to the exact approved
-            // document being reviewed. The document must belong to the same case
-            // and remain approved/authorised at creation time. The linked sharing
-            // consent must still be active — a revoked consent removes clinician
-            // access to the document and therefore blocks review creation.
             $doc = ClinicalDocument::query()
                 ->where('id', $data['clinical_document_id'])
                 ->where('case_id', $case->id)
@@ -179,7 +183,6 @@ final class StaffCaseController extends Controller
         abort_unless($review->case_id === $case->id && (int) $review->clinician_user_id === (int) $request->user()->id && $request->user()->role === UserRole::Clinician && $request->user()->can('view', $case), 404);
 
         return DB::transaction(function () use ($request, $case, $review): JsonResponse {
-            // Row-lock the revision and revalidate state inside the transaction.
             $locked = ReviewRevision::query()->lockForUpdate()->findOrFail($review->id);
             abort_unless($locked->case_id === $case->id, 404);
 
@@ -187,7 +190,6 @@ final class StaffCaseController extends Controller
                 return response()->json(['error' => ['code' => 'review.already_published'], 'request_id' => $request->attributes->get('request_id')], 409);
             }
 
-            // Revalidate credential authority at publication time.
             $active = DB::table('practitioners')
                 ->where('user_id', $request->user()->id)
                 ->where('credential_status', 'verified')
@@ -207,10 +209,6 @@ final class StaffCaseController extends Controller
                 throw new DomainException(403, 'review.assignment_released');
             }
 
-            // Revalidate the source document relationship at publication time: the
-            // linked OPG must still belong to this case and remain approved/authorised.
-            // The linked sharing consent is rechecked inside the lock so a consent
-            // revoked between draft creation and publication stops publication.
             $document = ClinicalDocument::query()
                 ->where('id', $locked->clinical_document_id)
                 ->where('case_id', $case->id)
@@ -239,12 +237,6 @@ final class StaffCaseController extends Controller
         });
     }
 
-    /**
-     * Verify the document's linked OPG/document-sharing consent event is still
-     * active (accepted and not revoked). A document with no consent event fails
-     * closed (no access). This mirrors ClinicalDocumentPolicy::view but is usable
-     * inside transactional controller paths that already hold the document row lock.
-     */
     private function documentConsentActive(ClinicalDocument $document): bool
     {
         if ($document->consent_event_id === null) {
