@@ -13,7 +13,7 @@ class AssignmentRoleGuardTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_coordination_assignment_requires_active_coordinator(): void
+    public function test_coordination_assignment_requires_active_coordinator_and_replaces_previous_owner(): void
     {
         $actor = User::factory()->create(['role' => 'coordinator', 'is_active' => true]);
         $patient = User::factory()->create(['role' => 'patient']);
@@ -31,6 +31,7 @@ class AssignmentRoleGuardTest extends TestCase
             'budget_band' => 'balanced',
             'source_language' => 'fa',
             'version' => 1,
+            'current_coordinator_id' => $actor->id,
         ]);
 
         DB::table('case_assignments')->insert([
@@ -68,13 +69,29 @@ class AssignmentRoleGuardTest extends TestCase
                 'purpose' => 'coordination',
                 'version' => 1,
             ])
-            ->assertOk();
+            ->assertOk()
+            ->assertJsonPath('data.version', 2);
 
+        $this->assertDatabaseHas('patient_cases', [
+            'id' => $case->id,
+            'current_coordinator_id' => $validCoordinator->id,
+            'version' => 2,
+        ]);
         $this->assertDatabaseHas('case_assignments', [
             'case_id' => $case->id,
             'assignee_user_id' => $validCoordinator->id,
             'purpose' => 'coordination',
             'released_at' => null,
         ]);
+        $this->assertNotNull(DB::table('case_assignments')
+            ->where('case_id', $case->id)
+            ->where('assignee_user_id', $actor->id)
+            ->where('purpose', 'coordination')
+            ->value('released_at'));
+        $this->assertSame(1, DB::table('case_assignments')
+            ->where('case_id', $case->id)
+            ->where('purpose', 'coordination')
+            ->whereNull('released_at')
+            ->count());
     }
 }
