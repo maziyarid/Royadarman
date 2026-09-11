@@ -99,6 +99,7 @@ class CoordinatorBootstrapTest extends TestCase
             ->postJson("/api/v1/cases/{$draft['id']}/submit", [
                 'version' => $draft['version'],
                 'policy_version' => $policy->version,
+                'content_hash' => $policy->content_hash,
             ])
             ->assertOk()
             ->assertJsonPath('data.status', 'submitted');
@@ -134,6 +135,7 @@ class CoordinatorBootstrapTest extends TestCase
             ->postJson("/api/v1/cases/{$draft['id']}/submit", [
                 'version' => $draft['version'],
                 'policy_version' => $policy->version,
+                'content_hash' => $policy->content_hash,
             ])
             ->assertStatus(503)
             ->assertJsonPath('error.code', 'coordination.no_active_coordinator');
