@@ -53,10 +53,10 @@ final class Preflight extends Command
                 $host = strtolower((string) parse_url($endpoint, PHP_URL_HOST));
                 $path = (string) parse_url($endpoint, PHP_URL_PATH);
                 $scheme = strtolower((string) parse_url($endpoint, PHP_URL_SCHEME));
-                if (! in_array($scheme, ['http', 'https'], true)
+                if ($scheme !== 'https'
                     || ! in_array($host, ['tsms.ir', 'www.tsms.ir'], true)
                     || $path !== '/url/tsmshttp.php') {
-                    $failures[] = 'INTAKE_ENABLED is true but TSMS_API_URL is not the allowed TSMS URL API endpoint.';
+                    $failures[] = 'INTAKE_ENABLED is true but TSMS_API_URL is not the approved HTTPS TSMS URL API endpoint.';
                 }
                 if (config('royadarman.sms.callbacks_enabled') === true) {
                     $failures[] = 'TSMS callback delivery is not enabled in this integration; set ROYADARMAN_SMS_CALLBACKS_ENABLED=false.';
