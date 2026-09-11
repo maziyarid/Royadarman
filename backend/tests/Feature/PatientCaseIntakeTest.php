@@ -27,6 +27,7 @@ class PatientCaseIntakeTest extends TestCase
         Queue::fake([ProcessOutboxEvent::class]);
         config()->set('royadarman.intake_enabled', true);
         $user = User::factory()->create(['role' => 'patient', 'locale' => 'fa', 'phone' => '09121234567', 'phone_hash' => hash('sha256', 'patient')]);
+        $coordinator = User::factory()->create(['role' => 'coordinator', 'is_active' => true]);
         $policy = PolicyVersion::query()->create(['policy_key' => 'case_coordination', 'version' => 'approved-1', 'locale' => 'fa', 'content' => 'متن رضایت', 'content_hash' => hash('sha256', 'متن رضایت'), 'published_at' => now()]);
         $payload = ['service_type' => 'opg_review', 'name' => 'سارا', 'budget_band' => 'balanced', 'budget_input_unit' => 'toman', 'source_language' => 'fa'];
 
@@ -39,6 +40,15 @@ class PatientCaseIntakeTest extends TestCase
         $this->assertDatabaseCount('patient_cases', 1);
         $this->assertDatabaseCount('consent_events', 1);
         $this->assertDatabaseCount('outbox_events', 1);
+        $this->assertDatabaseCount('case_assignments', 1);
+        $this->assertDatabaseHas('patient_cases', ['id' => $caseId, 'current_coordinator_id' => $coordinator->id]);
+        $this->assertDatabaseHas('case_assignments', [
+            'case_id' => $caseId,
+            'assignee_user_id' => $coordinator->id,
+            'purpose' => 'coordination',
+            'assigned_by_user_id' => null,
+            'released_at' => null,
+        ]);
         $this->assertDatabaseMissing('patient_cases', ['patient_name' => 'سارا']);
     }
 
