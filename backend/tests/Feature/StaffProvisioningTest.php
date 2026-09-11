@@ -50,7 +50,7 @@ class StaffProvisioningTest extends TestCase
         PatientCase::query()->create([
             'public_reference' => 'RD-'.strtoupper(Str::random(8)),
             'patient_user_id' => $patient->id,
-            'service_type' => 'referral',
+            'service_type' => 'guidance_referral',
             'status' => 'draft',
             'patient_mobile' => '09121111111',
             'patient_mobile_hash' => $hash,
