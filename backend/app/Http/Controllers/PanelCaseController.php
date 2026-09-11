@@ -27,6 +27,7 @@ final class PanelCaseController extends Controller
             'case' => $case,
             'roleKey' => $role->value,
             'locale' => $locale,
+            'allowedStatuses' => $role === UserRole::Coordinator ? $case->status->allowedTargets() : [],
             ...$data,
         ]);
     }
@@ -41,7 +42,7 @@ final class PanelCaseController extends Controller
             'referrals' => DB::table('referral_proposals')->join('clinics', 'clinics.id', '=', 'referral_proposals.clinic_id')
                 ->where('case_id', $case->id)->orderByDesc('proposed_at')
                 ->get(['referral_proposals.id', 'referral_proposals.status', 'referral_proposals.source_language', 'referral_proposals.proposed_at', 'clinics.name as clinic_name']),
-            'clinics' => collect(), 'assignments' => collect(), 'draftReviews' => collect(), 'shared' => [],
+            'clinics' => collect(), 'assignments' => collect(), 'draftReviews' => collect(), 'eligibleClinicians' => collect(), 'shared' => [],
         ];
     }
 
@@ -50,6 +51,11 @@ final class PanelCaseController extends Controller
         return [
             'documents' => collect(), 'reviews' => collect(), 'referrals' => collect(), 'draftReviews' => collect(),
             'clinics' => DB::table('clinics')->where('is_active', true)->orderBy('name')->get(['id', 'name', 'city', 'area_code']),
+            'eligibleClinicians' => DB::table('users')->join('practitioners', 'practitioners.user_id', '=', 'users.id')
+                ->where('users.role', UserRole::Clinician->value)->where('users.is_active', true)
+                ->where('practitioners.credential_status', 'verified')
+                ->where(fn ($q) => $q->whereNull('practitioners.expires_at')->orWhere('practitioners.expires_at', '>', now()))
+                ->orderBy('users.name')->get(['users.id', 'users.name']),
             'assignments' => DB::table('case_assignments')->join('users', 'users.id', '=', 'case_assignments.assignee_user_id')
                 ->where('case_assignments.case_id', $case->id)->whereNull('case_assignments.released_at')
                 ->get(['case_assignments.assignee_user_id', 'case_assignments.purpose', 'users.name', 'users.role']),
@@ -75,7 +81,7 @@ final class PanelCaseController extends Controller
             ->get(['clinical_documents.id', 'clinical_documents.original_name', 'clinical_documents.status', 'clinical_documents.created_at']);
 
         return [
-            'documents' => $documents, 'reviews' => collect(), 'referrals' => collect(), 'clinics' => collect(), 'assignments' => collect(), 'shared' => [],
+            'documents' => $documents, 'reviews' => collect(), 'referrals' => collect(), 'clinics' => collect(), 'assignments' => collect(), 'eligibleClinicians' => collect(), 'shared' => [],
             'draftReviews' => DB::table('review_revisions')->where('case_id', $case->id)
                 ->where('clinician_user_id', $request->user()->id)->whereNull('signed_at')
                 ->orderByDesc('created_at')->get(['id', 'revision_number', 'clinical_document_id', 'created_at']),
@@ -89,6 +95,8 @@ final class PanelCaseController extends Controller
             ->join('consent_events', 'consent_events.id', '=', 'referral_grants.consent_event_id')
             ->where('referral_grants.case_id', $case->id)
             ->where('clinic_memberships.user_id', $request->user()->id)
+            ->where('clinic_memberships.active_from', '<=', now())
+            ->where(fn ($q) => $q->whereNull('clinic_memberships.active_until')->orWhere('clinic_memberships.active_until', '>', now()))
             ->whereNull('referral_grants.revoked_at')->whereNotNull('referral_grants.expires_at')->where('referral_grants.expires_at', '>', now())
             ->where('consent_events.decision', 'accepted')->whereNull('consent_events.revoked_at')
             ->first(['referral_grants.scope', 'referral_grants.expires_at']);
@@ -96,7 +104,7 @@ final class PanelCaseController extends Controller
         $scope = json_decode($grant->scope, true) ?: [];
 
         return [
-            'documents' => collect(), 'reviews' => collect(), 'referrals' => collect(), 'clinics' => collect(), 'assignments' => collect(), 'draftReviews' => collect(),
+            'documents' => collect(), 'reviews' => collect(), 'referrals' => collect(), 'clinics' => collect(), 'assignments' => collect(), 'draftReviews' => collect(), 'eligibleClinicians' => collect(),
             'shared' => [
                 'patient_name' => in_array('contact', $scope, true) ? $case->patient_name : null,
                 'patient_mobile' => in_array('contact', $scope, true) ? $case->patient_mobile : null,
