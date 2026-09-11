@@ -21,6 +21,7 @@
             @endif
             @if($canManageMarketing)
                 <a class="btn primary" href="{{ route('marketing.index', ['locale' => app()->getLocale()]) }}">{{ __('panel.marketing') }}</a>
+                <a class="btn" href="{{ route('network.index', ['locale' => app()->getLocale()]) }}">{{ __('network.title') }}</a>
             @endif
             <a class="btn" href="{{ route('public.home', ['locale' => app()->getLocale()]) }}">{{ __('panel.back_home') }}</a>
             <button id="logout" class="btn" type="button">{{ __('panel.logout') }}</button>
