@@ -42,6 +42,7 @@ final class NotificationCallbackController extends Controller
 
         $updated = DB::transaction(function () use ($data): int {
             $delivery = DB::table('notification_deliveries')
+                ->where('channel', 'sms')
                 ->where('provider_reference', $data['reference'])
                 ->lockForUpdate()
                 ->first();
