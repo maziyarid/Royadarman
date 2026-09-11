@@ -63,6 +63,21 @@ class TsmsIntegrationTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_plain_http_tsms_endpoint_is_rejected_before_credentials_can_be_sent(): void
+    {
+        config()->set('royadarman.sms.tsms.endpoint', 'http://tsms.ir/url/tsmshttp.php');
+        Http::fake();
+
+        try {
+            $this->app->make(TsmsClient::class)->send('09121234567', 'test message');
+            $this->fail('Expected insecure TSMS transport to fail closed.');
+        } catch (RuntimeException $exception) {
+            $this->assertStringContainsString('https', strtolower($exception->getMessage()));
+        }
+
+        Http::assertNothingSent();
+    }
+
     public function test_container_binds_otp_sender_to_tsms_and_localises_message(): void
     {
         Http::fake(['tsms.ir/*' => Http::response('otp-1', 200)]);
