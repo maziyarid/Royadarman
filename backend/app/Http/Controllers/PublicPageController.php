@@ -3,39 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Models\MarketingPage;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\Response;
 
 final class PublicPageController extends Controller
 {
-    public function home(string $locale): View
+    public function home(string $locale): Response
     {
         $page = $this->published('home', $locale);
         if ($page === null) {
-            return view('public.home');
+            return $this->publicResponse('public.home');
         }
 
-        return view('public.marketing-page', $this->viewData($page, $locale, 'home'));
+        return $this->publicResponse('public.marketing-page', $this->viewData($page, $locale, 'home'));
     }
 
-    public function opg(string $locale): View
+    public function opg(string $locale): Response
     {
-        return $this->marketingView('services/opg', $locale, 'opg');
+        return $this->marketingResponse('services/opg', $locale, 'opg');
     }
 
-    public function homeDentistry(string $locale): View
+    public function homeDentistry(string $locale): Response
     {
-        return $this->marketingView('services/home-dentistry', $locale, 'home_dentistry');
+        return $this->marketingResponse('services/home-dentistry', $locale, 'home_dentistry');
     }
 
-    public function referrals(string $locale): View
+    public function referrals(string $locale): Response
     {
-        return $this->marketingView('referrals', $locale, 'referrals');
+        return $this->marketingResponse('referrals', $locale, 'referrals');
     }
 
-    public function contact(string $locale): View
+    public function contact(string $locale): Response
     {
-        return $this->marketingView('contact', $locale, 'contact');
+        return $this->marketingResponse('contact', $locale, 'contact');
     }
 
     public function sitemap(): Response
@@ -54,17 +53,20 @@ final class PublicPageController extends Controller
         }
         $xml .= '</urlset>';
 
-        return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
+        return response($xml, 200, [
+            'Content-Type' => 'application/xml; charset=UTF-8',
+            'Cache-Control' => 'public, max-age=300',
+        ]);
     }
 
-    private function marketingView(string $slug, string $locale, string $fallbackKey): View
+    private function marketingResponse(string $slug, string $locale, string $fallbackKey): Response
     {
         $page = $this->published($slug, $locale);
         if ($page !== null) {
-            return view('public.marketing-page', $this->viewData($page, $locale, $fallbackKey));
+            return $this->publicResponse('public.marketing-page', $this->viewData($page, $locale, $fallbackKey));
         }
 
-        return view('public.marketing-page', [
+        return $this->publicResponse('public.marketing-page', [
             'page' => null,
             'locale' => $locale,
             'pageKey' => $fallbackKey,
@@ -98,5 +100,12 @@ final class PublicPageController extends Controller
             'metaTitle' => $page->meta_title ?: $page->title,
             'metaDescription' => $page->meta_description ?: ($page->excerpt ?: $page->title),
         ];
+    }
+
+    private function publicResponse(string $view, array $data = []): Response
+    {
+        return response()->view($view, $data)
+            ->header('Cache-Control', 'public, max-age=300')
+            ->header('Vary', 'Accept-Language');
     }
 }
