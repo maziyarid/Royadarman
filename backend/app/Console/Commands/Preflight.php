@@ -39,11 +39,35 @@ final class Preflight extends Command
         }
 
         if (config('royadarman.intake_enabled') === true) {
-            if (empty(config('royadarman.sms.endpoint')) || empty(config('royadarman.sms.token'))) {
-                $failures[] = 'INTAKE_ENABLED is true but SMS endpoint/token are not configured.';
+            $smsProvider = (string) config('royadarman.sms.provider');
+            if ($smsProvider === 'tsms') {
+                foreach (['username', 'password', 'from'] as $key) {
+                    if (trim((string) config('royadarman.sms.tsms.'.$key)) === '') {
+                        $failures[] = 'INTAKE_ENABLED is true but TSMS '.strtoupper($key).' is not configured.';
+                    }
+                }
+                $endpoint = (string) config('royadarman.sms.tsms.endpoint');
+                $host = strtolower((string) parse_url($endpoint, PHP_URL_HOST));
+                $path = (string) parse_url($endpoint, PHP_URL_PATH);
+                $scheme = strtolower((string) parse_url($endpoint, PHP_URL_SCHEME));
+                if (! in_array($scheme, ['http', 'https'], true)
+                    || ! in_array($host, ['tsms.ir', 'www.tsms.ir'], true)
+                    || $path !== '/url/tsmshttp.php') {
+                    $failures[] = 'INTAKE_ENABLED is true but TSMS_API_URL is not the allowed TSMS URL API endpoint.';
+                }
+                if (config('royadarman.sms.callbacks_enabled') === true) {
+                    $failures[] = 'TSMS callback delivery is not enabled in this integration; set ROYADARMAN_SMS_CALLBACKS_ENABLED=false.';
+                }
+            } elseif ($smsProvider === 'http') {
+                if (empty(config('royadarman.sms.endpoint')) || empty(config('royadarman.sms.token'))) {
+                    $failures[] = 'INTAKE_ENABLED is true but generic SMS endpoint/token are not configured.';
+                }
+            } else {
+                $failures[] = 'INTAKE_ENABLED is true but ROYADARMAN_SMS_PROVIDER is unsupported.';
             }
-            if (empty(config('royadarman.sms.callback_secret'))) {
-                $failures[] = 'INTAKE_ENABLED is true but SMS callback secret is not configured.';
+
+            if (config('royadarman.sms.callbacks_enabled') === true && empty(config('royadarman.sms.callback_secret'))) {
+                $failures[] = 'SMS callbacks are enabled but ROYADARMAN_SMS_CALLBACK_SECRET is not configured.';
             }
             if (config('royadarman.opg.scanner.enabled') === false) {
                 $failures[] = 'INTAKE_ENABLED is true but the OPG scanner is disabled (must fail closed).';
