@@ -1,0 +1,16 @@
+<?php
+
+return [
+    'back' => 'Back to panel', 'case' => 'Case', 'status' => 'Status', 'service' => 'Service', 'details' => 'Shared details',
+    'documents' => 'Documents', 'reviews' => 'Published clinical review', 'referrals' => 'Referral proposals',
+    'coordinator_actions' => 'Coordination actions', 'clinician_actions' => 'Clinical review actions',
+    'upload' => 'Consent and upload OPG', 'file' => 'OPG image (JPEG/PNG)', 'accept_policy' => 'I have read and accept the displayed policy.',
+    'assign_clinician' => 'Assign clinician', 'change_status' => 'Change case status', 'propose_referral' => 'Propose clinic referral',
+    'reason' => 'Operational reason', 'clinic' => 'Clinic', 'review_document' => 'Reviewed document',
+    'image_adequacy' => 'Image adequacy', 'observations' => 'Observations', 'limitations' => 'Limitations', 'options' => 'Options',
+    'next_step' => 'Recommended next step', 'save_review' => 'Save review draft', 'publish' => 'Publish review',
+    'accept' => 'Accept', 'decline' => 'Decline', 'open_document' => 'Open approved image', 'no_items' => 'No items yet.',
+    'patient_name' => 'Patient name', 'patient_mobile' => 'Patient mobile', 'area' => 'Area', 'contact_time' => 'Preferred contact time',
+    'contact_reason' => 'Contact reason', 'budget' => 'Budget band', 'grant_expires' => 'Grant expires', 'success' => 'Saved successfully.',
+    'error' => 'The action could not be completed.',
+];
