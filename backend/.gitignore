@@ -2,10 +2,11 @@
 /node_modules
 /vendor
 /storage/*.key
-/storage/framework/cache/data
-/storage/framework/sessions
-/storage/framework/views
-/storage/framework/testing
+/storage/app/*
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/framework/testing/*
 /storage/logs/*.log
 /storage/pail
 /database/database.sqlite
