@@ -9,7 +9,7 @@ return [
     'services' => [
         'opg_review' => 'Preliminary OPG review',
         'home_dentistry' => 'Home dentistry coordination',
-        'referral' => 'Clinic referral and coordination',
+        'guidance_referral' => 'Clinic referral and coordination',
     ],
     'name' => 'Name',
     'tehran_area' => 'Tehran area',
