@@ -39,6 +39,17 @@ final class PhoneHashKeyTest extends TestCase
         $this->app->make(PhoneHasher::class);
     }
 
+    public function test_short_key_fails_fast(): void
+    {
+        config(['royadarman.phone_hash_key' => 'short-weak-key']);
+        $this->app->forgetInstance(PhoneHasher::class);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/shorter than 32/i');
+
+        $this->app->make(PhoneHasher::class);
+    }
+
     public function test_otp_challenge_refuses_to_start_without_a_key(): void
     {
         config(['royadarman.phone_hash_key' => '']);

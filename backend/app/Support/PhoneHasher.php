@@ -25,6 +25,12 @@ final class PhoneHasher
             );
         }
 
+        if (strlen($key) < 32) {
+            throw new RuntimeException(
+                'ROYADARMAN_PHONE_HASH_KEY is shorter than 32 characters; use a high-entropy secret (e.g. 64 hex chars) before hashing phone identities.'
+            );
+        }
+
         $this->key = $key;
     }
 

@@ -61,7 +61,7 @@ All commands use an explicit PHP >= 8.3 binary (`"$PHP" artisan ...`). These are
 clean-checkout checks, not live-production checks (see DEPLOYMENT.md for the
 distinction).
 
-- [x] `"$PHP" artisan test` — 171 tests, 437 assertions, 0 failures.
+- [x] `"$PHP" artisan test` — 172 tests, 439 assertions, 0 failures.
 - [x] `vendor/bin/pint --test` — 117 files, 0 issues.
 - [x] `"$PHP" artisan migrate:fresh --force` — 14 migrations apply cleanly.
 - [x] `"$PHP" artisan route:list` — 24 routes (including patient consent accept/revoke).
