@@ -9,7 +9,7 @@ return [
     'services' => [
         'opg_review' => 'بررسی اولیه OPG',
         'home_dentistry' => 'هماهنگی دندانپزشکی در منزل',
-        'referral' => 'معرفی کلینیک و هماهنگی',
+        'guidance_referral' => 'معرفی کلینیک و هماهنگی',
     ],
     'name' => 'نام',
     'tehran_area' => 'محدوده تهران',
