@@ -83,4 +83,65 @@ class ClinicAccessLifecycleTest extends TestCase
         DB::table('clinic_memberships')->where('id', $membershipId)->update(['active_until' => now()->subSecond()]);
         $this->assertFalse($representative->can('view', $case));
     }
+
+    public function test_patient_cannot_accept_stale_proposal_after_clinic_is_deactivated(): void
+    {
+        config()->set('royadarman.intake_enabled', true);
+        config()->set('royadarman.referral.grant_ttl_minutes', 1440);
+
+        $patient = User::factory()->create(['role' => 'patient', 'is_active' => true]);
+        $coordinator = User::factory()->create(['role' => 'coordinator', 'is_active' => true]);
+        $case = PatientCase::query()->create([
+            'public_reference' => 'RD-'.strtoupper(Str::random(8)),
+            'patient_user_id' => $patient->id,
+            'service_type' => 'guidance_referral',
+            'status' => 'in_coordination',
+            'patient_mobile' => '09121234567',
+            'patient_mobile_hash' => hash('sha256', Str::random()),
+            'budget_band' => 'balanced',
+            'source_language' => 'fa',
+            'version' => 2,
+        ]);
+
+        $clinicId = (string) Str::ulid();
+        DB::table('clinics')->insert([
+            'id' => $clinicId, 'name' => 'Inactive Clinic', 'city' => 'Tehran', 'is_active' => false,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $proposalId = (string) Str::ulid();
+        DB::table('referral_proposals')->insert([
+            'id' => $proposalId,
+            'case_id' => $case->id,
+            'clinic_id' => $clinicId,
+            'proposed_by_user_id' => $coordinator->id,
+            'status' => 'proposed',
+            'reasoning' => 'Previously active provider',
+            'source_language' => 'fa',
+            'proposed_at' => now()->subMinute(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $content = 'share referral details';
+        $policy = PolicyVersion::query()->create([
+            'policy_key' => 'referral_sharing',
+            'version' => 'v-stale-clinic',
+            'locale' => 'fa',
+            'content' => $content,
+            'content_hash' => hash('sha256', $content),
+            'published_at' => now(),
+        ]);
+
+        $this->actingAs($patient)
+            ->postJson("/api/v1/cases/{$case->id}/referrals/{$proposalId}/decision", [
+                'decision' => 'accepted',
+                'policy_version' => $policy->version,
+                'content_hash' => $policy->content_hash,
+            ])
+            ->assertUnprocessable()
+            ->assertJsonPath('error.code', 'referral.not_available');
+
+        $this->assertDatabaseHas('referral_proposals', ['id' => $proposalId, 'status' => 'proposed']);
+        $this->assertDatabaseMissing('consent_events', ['case_id' => $case->id, 'purpose' => 'referral_sharing']);
+        $this->assertDatabaseMissing('referral_grants', ['proposal_id' => $proposalId]);
+    }
 }
