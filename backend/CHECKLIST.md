@@ -47,7 +47,7 @@ Updated: 2026-09-11
 
 ## Verification
 
-- [x] Pint passes on 115 PHP files.
+- [x] Pint passes on 117 PHP files.
 - [x] Tests pass with an explicit PHP >= 8.3 binary (clean checkout, SQLite in-memory).
 - [x] Strict Frontend Design Premium audit: zero findings.
 - [x] Live `/fa/`, `/ar/`, `/en/`, `/up`, assets, redirects, and protected-path checks pass.
@@ -61,9 +61,9 @@ All commands use an explicit PHP >= 8.3 binary (`"$PHP" artisan ...`). These are
 clean-checkout checks, not live-production checks (see DEPLOYMENT.md for the
 distinction).
 
-- [x] `"$PHP" artisan test` — 163 tests, 407 assertions, 0 failures.
-- [x] `vendor/bin/pint --test` — 115 files, 0 issues.
-- [x] `"$PHP" artisan migrate:fresh --force` — 12 migrations apply cleanly.
+- [x] `"$PHP" artisan test` — 171 tests, 437 assertions, 0 failures.
+- [x] `vendor/bin/pint --test` — 117 files, 0 issues.
+- [x] `"$PHP" artisan migrate:fresh --force` — 14 migrations apply cleanly.
 - [x] `"$PHP" artisan route:list` — 24 routes (including patient consent accept/revoke).
 - [x] `"$PHP" artisan route:cache` then `route:clear` — cached route boot verified.
 - [x] `"$PHP" artisan config:cache` then `config:clear` — config cache verified.

@@ -92,7 +92,7 @@ Royadarman/
 │   ├── public/                            Front controller + public assets
 │   ├── resources/views/public/home.blade.php
 │   ├── routes/{web,api,console}.php
-│   ├── tests/                             163 tests / 407 assertions
+│   ├── tests/                             171 tests / 437 assertions
 │   ├── ARCHITECTURE.md, DESIGN.md, DEPLOYMENT.md, CHECKLIST.md, design-qa.md
 │   └── premium-audit.json                 Strict design audit (0 findings)
 ├── Front-end v1/
@@ -453,7 +453,7 @@ returned on every response.
 | GET | `/up` | Health check (`{"status":"ok"}`) |
 | GET | `/{locale}/` | Server-rendered home, `locale ∈ {fa, ar, en}` |
 
-Total: **22 routes** (`php artisan route:list`).
+Total: **24 routes** (`php artisan route:list`).
 
 ---
 
@@ -627,9 +627,9 @@ path because that is the real production application root. The development sourc
 
 | Gate | Command | Expected |
 |---|---|---|
-| Tests | `php artisan test` | 163 tests, 407 assertions, 0 failures |
-| Lint | `vendor/bin/pint --test` | 115 files, 0 issues |
-| Migrations | `php artisan migrate --force` | 12 migrations apply cleanly |
+| Tests | `php artisan test` | 171 tests, 437 assertions, 0 failures |
+| Lint | `vendor/bin/pint --test` | 117 files, 0 issues |
+| Migrations | `php artisan migrate --force` | 14 migrations apply cleanly |
 | Preflight | `php artisan royadarman:preflight` | refuses empty APP_KEY, missing/empty/too-short phone-hash key, phone-hash key==APP_KEY, debug true in production, unsafe intake/disk/queue, and (when intake is enabled) missing referral-grant TTL |
 | CI | `.github/workflows/ci.yml` | PHP 8.3/8.4 matrix, frontend smoke, locale parity |
 
@@ -708,14 +708,14 @@ All checks re-run on a clean checkout during this session (PHP 8.4.24, Laravel
 
 ```text
 $ cd backend && php artisan test
-Tests: 163 passed (407 assertions)   Duration: ~1.8s
+Tests: 171 passed (437 assertions)   Duration: ~1.9s
 
 $ vendor/bin/pint --test
-Laravel  PASS  ......................................................... 115 files
+Laravel  PASS  ......................................................... 117 files
 
 $ php artisan migrate:fresh --force
-# 12 migrations applied (0001_* x3, 2026_08_31_* x2, 2026_09_08_* x2,
-# 2026_09_10_* x3, 2026_09_11_* x2)
+# 14 migrations applied (0001_* x3, 2026_08_31_* x2, 2026_09_08_* x2,
+# 2026_09_10_* x3, 2026_09_11_* x4)
 
 $ php artisan route:list
 # 24 routes listed
@@ -766,7 +766,7 @@ cross-locale.
 2. Added `backend/.env.example` (the repo shipped without one, so `php artisan
    key:generate` and first-time setup failed).
 3. Ran `vendor/bin/pint` to bring 78 files into compliance (trailing-newline and
-   brace-position drift); `pint --test` now reports 115 files clean.
+   brace-position drift); `pint --test` now reports 117 files clean.
 4. Removed 15 timestamped `.bak.*` editor backup files and one unreferenced
    empty `opg-hero.jpg` from `Front-end v1/v3-preview/`.
 
