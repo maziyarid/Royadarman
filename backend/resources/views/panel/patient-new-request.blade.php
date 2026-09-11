@@ -32,7 +32,7 @@
                     <div>
                         <label for="service_type">{{ __('request.service_type') }}</label>
                         <select id="service_type" required>
-                            @foreach(['opg_review','home_dentistry','referral'] as $service)
+                            @foreach(['opg_review','home_dentistry','guidance_referral'] as $service)
                                 <option value="{{ $service }}">{{ __('request.services.'.$service) }}</option>
                             @endforeach
                         </select>
