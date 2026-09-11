@@ -162,7 +162,7 @@
             const submitResponse = await fetch(`/api/v1/cases/${encodeURIComponent(draft.id)}/submit`, {
                 method:'POST',
                 headers:headers(key()),
-                body:JSON.stringify({version:draft.version, policy_version:policy.version})
+                body:JSON.stringify({version:draft.version, policy_version:policy.version, content_hash:policy.content_hash})
             });
             const submitPayload = await submitResponse.json();
             if (!submitResponse.ok || !submitPayload.data) throw new Error(errorText(submitPayload));
