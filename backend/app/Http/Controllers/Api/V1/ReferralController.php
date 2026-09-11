@@ -30,6 +30,17 @@ final class ReferralController extends Controller
             }
 
             if ($data['decision'] === 'accepted') {
+                // Lock and revalidate the provider at decision time. A clinic may
+                // have been active when proposed but deactivated before the patient
+                // accepts; no consent/grant may be created for that stale proposal.
+                $clinic = DB::table('clinics')
+                    ->where('id', $locked->clinic_id)
+                    ->lockForUpdate()
+                    ->first(['id', 'is_active']);
+                if ($clinic === null || ! (bool) $clinic->is_active) {
+                    return response()->json(['error' => ['code' => 'referral.not_available'], 'request_id' => $request->attributes->get('request_id')], 422);
+                }
+
                 // Validate ALL prerequisites BEFORE mutating proposal state, so a
                 // failed acceptance never leaves the proposal accepted without a
                 // consent event or grant. Returning here rolls back the transaction.
