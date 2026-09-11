@@ -24,7 +24,7 @@ class AssignmentRoleGuardTest extends TestCase
         $case = PatientCase::query()->create([
             'public_reference' => 'RD-'.strtoupper(Str::random(8)),
             'patient_user_id' => $patient->id,
-            'service_type' => 'referral',
+            'service_type' => 'guidance_referral',
             'status' => 'in_coordination',
             'patient_mobile' => '09121234567',
             'patient_mobile_hash' => hash('sha256', Str::random()),
