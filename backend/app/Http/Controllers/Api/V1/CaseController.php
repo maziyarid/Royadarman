@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Domain\Cases\Enums\CaseStatus;
 use App\Domain\Cases\Enums\ServiceType;
 use App\Domain\Consent\Services\ConsentService;
+use App\Domain\Coordination\Services\CoordinatorAssignment;
 use App\Domain\Operations\Services\Idempotency;
 use App\Domain\Operations\Services\Outbox;
 use App\Http\Controllers\Controller;
@@ -68,16 +69,22 @@ final class CaseController extends Controller
             ->header('Cache-Control', 'private, no-store');
     }
 
-    public function submit(Request $request, PatientCase $case, Idempotency $idempotency, Outbox $outbox, ConsentService $consent): JsonResponse
-    {
+    public function submit(
+        Request $request,
+        PatientCase $case,
+        Idempotency $idempotency,
+        Outbox $outbox,
+        ConsentService $consent,
+        CoordinatorAssignment $coordinatorAssignment,
+    ): JsonResponse {
         abort_unless((int) $case->patient_user_id === (int) $request->user()->id, 404);
         $data = $request->validate([
             'version' => ['required', 'integer', 'min:1'],
             'policy_version' => ['required', 'string', 'max:50'],
         ]);
 
-        $result = $idempotency->execute($request->user(), 'case.submit.'.$case->id, (string) $request->header('Idempotency-Key'), $data, function () use ($request, $case, $data, $outbox, $consent): array {
-            return DB::transaction(function () use ($request, $case, $data, $outbox, $consent): array {
+        $result = $idempotency->execute($request->user(), 'case.submit.'.$case->id, (string) $request->header('Idempotency-Key'), $data, function () use ($request, $case, $data, $outbox, $consent, $coordinatorAssignment): array {
+            return DB::transaction(function () use ($request, $case, $data, $outbox, $consent, $coordinatorAssignment): array {
                 $locked = PatientCase::query()->lockForUpdate()->findOrFail($case->id);
                 if ($locked->status !== CaseStatus::Draft || $locked->version !== (int) $data['version']) {
                     abort(409, 'case.version_conflict');
@@ -95,6 +102,8 @@ final class CaseController extends Controller
                     'version' => $locked->version + 1,
                     'submitted_at' => now(),
                 ]);
+
+                $coordinatorAssignment->assignInitial($locked);
 
                 $outbox->record('case.submitted', PatientCase::class, $locked->id, [
                     'template_key' => 'case_submitted',
