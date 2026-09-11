@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MarketingContentController;
+use App\Http\Controllers\PanelCaseController;
 use App\Http\Controllers\PanelController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Middleware\SetLocale;
@@ -26,6 +27,7 @@ Route::prefix('{locale}')
 
         Route::middleware('auth')->group(function (): void {
             Route::get('/panel', PanelController::class)->name('panel');
+            Route::get('/panel/cases/{case}', [PanelCaseController::class, 'show'])->name('panel.case');
 
             Route::prefix('panel/marketing')->group(function (): void {
                 Route::get('/', [MarketingContentController::class, 'index'])->name('marketing.index');
