@@ -81,6 +81,7 @@ final class CaseController extends Controller
         $data = $request->validate([
             'version' => ['required', 'integer', 'min:1'],
             'policy_version' => ['required', 'string', 'max:50'],
+            'content_hash' => ['required', 'string', 'size:64'],
         ]);
 
         $result = $idempotency->execute($request->user(), 'case.submit.'.$case->id, (string) $request->header('Idempotency-Key'), $data, function () use ($request, $case, $data, $outbox, $consent, $coordinatorAssignment): array {
@@ -93,6 +94,9 @@ final class CaseController extends Controller
                 $policy = $consent->resolvePolicy('case_coordination', $data['policy_version'], $locked->source_language);
                 if (! $policy) {
                     return ['status' => 503, 'body' => ['error' => ['code' => 'error.consent.translation_unavailable'], 'request_id' => $request->attributes->get('request_id')]];
+                }
+                if (! hash_equals($policy->content_hash, $data['content_hash'])) {
+                    return ['status' => 422, 'body' => ['error' => ['code' => 'consent.policy_mismatch'], 'request_id' => $request->attributes->get('request_id')]];
                 }
 
                 $consent->record($request->user(), 'case_coordination', $policy->id, $locked->source_language, $request, $locked->id);
