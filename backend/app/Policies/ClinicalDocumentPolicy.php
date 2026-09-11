@@ -12,12 +12,14 @@ final class ClinicalDocumentPolicy
 {
     public function upload(User $user, ClinicalDocument $document): bool
     {
-        return $user->role === UserRole::Patient && (int) $document->patientCase->patient_user_id === (int) $user->id;
+        return $user->is_active
+            && $user->role === UserRole::Patient
+            && (int) $document->patientCase->patient_user_id === (int) $user->id;
     }
 
     public function view(User $user, ClinicalDocument $document): bool
     {
-        if ($document->status !== DocumentStatus::Approved) {
+        if (! $user->is_active || $document->status !== DocumentStatus::Approved) {
             return false;
         }
         if ($user->role === UserRole::Patient) {
@@ -40,7 +42,16 @@ final class ClinicalDocumentPolicy
             return false;
         }
 
-        return DB::table('case_assignments')->where('case_id', $document->case_id)->where('assignee_user_id', $user->id)->where('purpose', 'clinical_review')->whereNull('released_at')->exists()
-            && DB::table('practitioners')->where('user_id', $user->id)->where('credential_status', 'verified')->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))->exists();
+        return DB::table('case_assignments')
+            ->where('case_id', $document->case_id)
+            ->where('assignee_user_id', $user->id)
+            ->where('purpose', 'clinical_review')
+            ->whereNull('released_at')
+            ->exists()
+            && DB::table('practitioners')
+                ->where('user_id', $user->id)
+                ->where('credential_status', 'verified')
+                ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
+                ->exists();
     }
 }
