@@ -43,6 +43,7 @@ class PatientRequestPageTest extends TestCase
             ->assertSee('id="request-form"', false)
             ->assertSee('/api/v1/policies/case_coordination', false)
             ->assertSee('guidance_referral', false)
-            ->assertSee('Idempotency-Key', false);
+            ->assertSee('Idempotency-Key', false)
+            ->assertSee('content_hash:policy.content_hash', false);
     }
 }
