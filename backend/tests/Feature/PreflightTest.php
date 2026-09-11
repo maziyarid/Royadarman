@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class PreflightTest extends TestCase
@@ -85,14 +88,28 @@ class PreflightTest extends TestCase
         $this->artisan('royadarman:preflight')->assertFailed();
     }
 
-    public function test_preflight_passes_when_intake_enabled_with_all_tsms_gates(): void
+    public function test_preflight_fails_without_active_coordinator(): void
+    {
+        $this->configureSafeTsmsIntake(false, true);
+
+        $this->artisan('royadarman:preflight')->assertFailed();
+    }
+
+    public function test_preflight_fails_without_verified_clinician(): void
+    {
+        $this->configureSafeTsmsIntake(true, false);
+
+        $this->artisan('royadarman:preflight')->assertFailed();
+    }
+
+    public function test_preflight_passes_when_intake_enabled_with_all_tsms_and_staffing_gates(): void
     {
         $this->configureSafeTsmsIntake();
 
         $this->artisan('royadarman:preflight')->assertSuccessful();
     }
 
-    private function configureSafeTsmsIntake(): void
+    private function configureSafeTsmsIntake(bool $withCoordinator = true, bool $withClinician = true): void
     {
         config()->set('royadarman.phone_hash_key', str_repeat('a', 64));
         config()->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
@@ -109,5 +126,23 @@ class PreflightTest extends TestCase
         config()->set('royadarman.opg.scanner.command', '/usr/bin/clamscan');
         config()->set('royadarman.retention.document_days', 30);
         config()->set('royadarman.referral.grant_ttl_minutes', 43200);
+
+        if ($withCoordinator) {
+            User::factory()->create(['role' => 'coordinator', 'is_active' => true]);
+        }
+        if ($withClinician) {
+            $clinician = User::factory()->create(['role' => 'clinician', 'is_active' => true]);
+            DB::table('practitioners')->insert([
+                'id' => (string) Str::ulid(),
+                'user_id' => $clinician->id,
+                'licence_number' => encrypt('TEST-LICENCE'),
+                'licence_hash' => hash('sha256', 'TEST-LICENCE-'.$clinician->id),
+                'credential_status' => 'verified',
+                'verified_at' => now(),
+                'expires_at' => now()->addYear(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 }
