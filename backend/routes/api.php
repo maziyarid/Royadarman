@@ -26,21 +26,25 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
         Route::get('/me', [ProfileController::class, 'show']);
         Route::patch('/me/preferences', [ProfileController::class, 'update']);
 
+        // The intake switch controls acquisition of new requests only. Existing
+        // cases must remain operable if intake is paused, so patients can view or
+        // revoke consent and assigned staff can continue coordination/clinical work.
         Route::middleware(EnsurePatientIntakeEnabled::class)->group(function (): void {
             Route::post('/cases/draft', [CaseController::class, 'draft']);
             Route::post('/cases/{case}/submit', [CaseController::class, 'submit']);
-            Route::get('/cases/{case}', [CaseController::class, 'show']);
-            Route::post('/cases/{case}/consent/{purpose}', [ConsentController::class, 'accept']);
-            Route::delete('/cases/{case}/consent/{purpose}', [ConsentController::class, 'revoke']);
-            Route::post('/cases/{case}/documents', [DocumentController::class, 'store']);
-            Route::get('/cases/{case}/documents/{document}', [DocumentController::class, 'status']);
-            Route::get('/cases/{case}/documents/{document}/content', [DocumentController::class, 'content']);
-            Route::post('/cases/{case}/referrals/{proposal}/decision', [ReferralController::class, 'decide']);
-            Route::post('/staff/cases/{case}/assignments', [StaffCaseController::class, 'assign']);
-            Route::patch('/staff/cases/{case}/status', [StaffCaseController::class, 'status']);
-            Route::post('/staff/cases/{case}/referral-proposals', [StaffCaseController::class, 'proposeReferral']);
-            Route::post('/staff/cases/{case}/reviews', [StaffCaseController::class, 'createReview']);
-            Route::post('/staff/cases/{case}/reviews/{review}/publish', [StaffCaseController::class, 'publishReview']);
         });
+
+        Route::get('/cases/{case}', [CaseController::class, 'show']);
+        Route::post('/cases/{case}/consent/{purpose}', [ConsentController::class, 'accept']);
+        Route::delete('/cases/{case}/consent/{purpose}', [ConsentController::class, 'revoke']);
+        Route::post('/cases/{case}/documents', [DocumentController::class, 'store']);
+        Route::get('/cases/{case}/documents/{document}', [DocumentController::class, 'status']);
+        Route::get('/cases/{case}/documents/{document}/content', [DocumentController::class, 'content']);
+        Route::post('/cases/{case}/referrals/{proposal}/decision', [ReferralController::class, 'decide']);
+        Route::post('/staff/cases/{case}/assignments', [StaffCaseController::class, 'assign']);
+        Route::patch('/staff/cases/{case}/status', [StaffCaseController::class, 'status']);
+        Route::post('/staff/cases/{case}/referral-proposals', [StaffCaseController::class, 'proposeReferral']);
+        Route::post('/staff/cases/{case}/reviews', [StaffCaseController::class, 'createReview']);
+        Route::post('/staff/cases/{case}/reviews/{review}/publish', [StaffCaseController::class, 'publishReview']);
     });
 });
