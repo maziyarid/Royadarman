@@ -97,8 +97,10 @@ final class PanelController extends Controller
     {
         $cases = DB::table('patient_cases')
             ->join('referral_grants', 'referral_grants.case_id', '=', 'patient_cases.id')
+            ->join('clinics', 'clinics.id', '=', 'referral_grants.clinic_id')
             ->join('clinic_memberships', 'clinic_memberships.clinic_id', '=', 'referral_grants.clinic_id')
             ->join('consent_events', 'consent_events.id', '=', 'referral_grants.consent_event_id')
+            ->where('clinics.is_active', true)
             ->where('clinic_memberships.user_id', $userId)
             ->where('clinic_memberships.active_from', '<=', now())
             ->where(fn ($q) => $q->whereNull('clinic_memberships.active_until')->orWhere('clinic_memberships.active_until', '>', now()))
@@ -122,8 +124,6 @@ final class PanelController extends Controller
 
     private function ownerPanel(): array
     {
-        // Owner visibility is aggregate-only: no patient IDs, names, phone numbers,
-        // radiographs, clinical notes, or individual case records are returned.
         return [[
             'open_cases' => DB::table('patient_cases')->whereNotIn('status', ['closed', 'cancelled'])->count(),
             'active_clinics' => DB::table('clinics')->where('is_active', true)->count(),
@@ -135,7 +135,6 @@ final class PanelController extends Controller
 
     private function technicalPanel(): array
     {
-        // Technical administrators see system health only, never routine clinical data.
         return [[
             'queued_jobs' => DB::table('jobs')->count(),
             'failed_jobs' => DB::table('failed_jobs')->count(),
