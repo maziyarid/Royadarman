@@ -9,7 +9,7 @@ return [
     'services' => [
         'opg_review' => 'مراجعة أولية لصورة OPG',
         'home_dentistry' => 'تنسيق طب الأسنان المنزلي',
-        'referral' => 'الإحالة إلى عيادة والتنسيق',
+        'guidance_referral' => 'الإحالة إلى عيادة والتنسيق',
     ],
     'name' => 'الاسم',
     'tehran_area' => 'منطقة طهران',
