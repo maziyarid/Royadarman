@@ -49,6 +49,13 @@ final class StaffCaseController extends Controller
                 if ($assignee->role !== UserRole::Coordinator->value) {
                     throw new DomainException(403, 'assignment.role_mismatch');
                 }
+
+                DB::table('case_assignments')
+                    ->where('case_id', $case->id)
+                    ->where('purpose', 'coordination')
+                    ->whereNull('released_at')
+                    ->where('assignee_user_id', '!=', $assignee->id)
+                    ->update(['released_at' => now(), 'updated_at' => now()]);
             } else {
                 if ($assignee->role !== UserRole::Clinician->value) {
                     throw new DomainException(403, 'assignment.role_mismatch');
@@ -69,7 +76,11 @@ final class StaffCaseController extends Controller
                 ['id' => (string) Str::ulid(), 'assigned_by_user_id' => $request->user()->id, 'assigned_at' => now(), 'created_at' => now(), 'updated_at' => now()]
             );
 
-            $locked->increment('version');
+            if ($data['purpose'] === 'coordination') {
+                $locked->current_coordinator_id = $assignee->id;
+            }
+            $locked->version++;
+            $locked->save();
 
             return response()->json(['data' => ['case_id' => $case->id, 'version' => $locked->version]])
                 ->header('Cache-Control', 'private, no-store');
