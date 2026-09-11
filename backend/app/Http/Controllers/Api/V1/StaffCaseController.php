@@ -107,7 +107,7 @@ final class StaffCaseController extends Controller
     {
         abort_unless($request->user()->role === UserRole::Coordinator && $request->user()->can('view', $case), 404);
         $data = $request->validate([
-            'clinic_id' => ['required', 'exists:clinics,id'],
+            'clinic_id' => ['required', Rule::exists('clinics', 'id')->where(fn ($query) => $query->where('is_active', true))],
             'reasoning' => ['required', 'string', 'max:2000'],
             'source_language' => ['required', 'in:fa,ar,en'],
         ]);
