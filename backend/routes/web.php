@@ -6,6 +6,7 @@ use App\Http\Controllers\PanelCaseController;
 use App\Http\Controllers\PanelController;
 use App\Http\Controllers\PatientRequestController;
 use App\Http\Controllers\PublicPageController;
+use App\Http\Middleware\EnsureActiveUser;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
@@ -27,7 +28,7 @@ Route::prefix('{locale}')
             : response()->view('auth.login', ['locale' => $locale])->header('Cache-Control', 'private, no-store'))
             ->name('login');
 
-        Route::middleware('auth')->group(function (): void {
+        Route::middleware(['auth', EnsureActiveUser::class])->group(function (): void {
             Route::get('/panel', PanelController::class)->name('panel');
             Route::get('/panel/cases/new', [PatientRequestController::class, 'create'])->name('patient.request.create');
             Route::get('/panel/cases/{case}', [PanelCaseController::class, 'show'])->name('panel.case');
