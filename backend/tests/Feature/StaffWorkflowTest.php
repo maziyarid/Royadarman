@@ -25,6 +25,7 @@ class StaffWorkflowTest extends TestCase
     {
         parent::setUp();
         config()->set('royadarman.intake_enabled', true);
+        config()->set('royadarman.referral.grant_ttl_minutes', 43200);
     }
 
     private function makeCase(User $patient, CaseStatus $status = CaseStatus::InCoordination): PatientCase
@@ -346,7 +347,7 @@ class StaffWorkflowTest extends TestCase
         $coordinator = User::factory()->create(['role' => 'coordinator']);
         $patient = User::factory()->create(['role' => 'patient']);
         $clinicId = $this->makeClinic();
-        PolicyVersion::query()->create([
+        $policy = PolicyVersion::query()->create([
             'policy_key' => 'referral_sharing',
             'version' => 'approved-1',
             'locale' => 'fa',
@@ -370,6 +371,8 @@ class StaffWorkflowTest extends TestCase
         $this->actingAs($patient)
             ->postJson("/api/v1/cases/{$case->id}/referrals/{$proposal->id}/decision", [
                 'decision' => 'accepted',
+                'policy_version' => $policy->version,
+                'content_hash' => $policy->content_hash,
             ])
             ->assertOk()
             ->assertJsonPath('data.status', 'accepted');
@@ -379,6 +382,7 @@ class StaffWorkflowTest extends TestCase
         $grant = DB::table('referral_grants')->where('proposal_id', $proposal->id)->first();
         $consent = DB::table('consent_events')->where('subject_user_id', $patient->id)->where('purpose', 'referral_sharing')->first();
         $this->assertSame($consent->id, $grant->consent_event_id);
+        $this->assertNotNull($grant->expires_at, 'Referral grant must be time-limited.');
     }
 
     public function test_patient_can_decline_referral_without_grant(): void
@@ -439,6 +443,8 @@ class StaffWorkflowTest extends TestCase
         $this->actingAs($patient)
             ->postJson("/api/v1/cases/{$case->id}/referrals/{$proposal->id}/decision", [
                 'decision' => 'accepted',
+                'policy_version' => 'approved-1',
+                'content_hash' => hash('sha256', 'referral sharing text'),
             ])
             ->assertUnprocessable()
             ->assertJsonPath('error.code', 'referral.not_available');
@@ -592,12 +598,14 @@ class StaffWorkflowTest extends TestCase
         $this->makePractitioner($author, 'verified', now()->addYear());
         $this->makePractitioner($other, 'verified', now()->addYear());
         $case = $this->makeCase($patient, CaseStatus::ClinicianReview);
+        $doc = $this->approvedDocument($case);
         DB::table('case_assignments')->insert(['id' => (string) Str::ulid(), 'case_id' => $case->id, 'assignee_user_id' => $author->id, 'assigned_by_user_id' => $author->id, 'purpose' => 'clinical_review', 'assigned_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
         $revision = ReviewRevision::query()->create([
             'case_id' => $case->id,
             'clinician_user_id' => $author->id,
             'revision_number' => 1,
             'source_language' => 'fa',
+            'clinical_document_id' => $doc->id,
             'image_adequacy' => 'adequate',
             'observations' => 'observations',
             'limitations' => 'limitations',
@@ -621,12 +629,14 @@ class StaffWorkflowTest extends TestCase
         $author = User::factory()->create(['role' => 'clinician']);
         $this->makePractitioner($author, 'verified', now()->addYear());
         $case = $this->makeCase($patient, CaseStatus::ClinicianReview);
+        $doc = $this->approvedDocument($case);
         DB::table('case_assignments')->insert(['id' => (string) Str::ulid(), 'case_id' => $case->id, 'assignee_user_id' => $author->id, 'assigned_by_user_id' => $author->id, 'purpose' => 'clinical_review', 'assigned_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
         $revision = ReviewRevision::query()->create([
             'case_id' => $case->id,
             'clinician_user_id' => $author->id,
             'revision_number' => 1,
             'source_language' => 'fa',
+            'clinical_document_id' => $doc->id,
             'image_adequacy' => 'adequate',
             'observations' => 'observations',
             'limitations' => 'limitations',
@@ -648,12 +658,14 @@ class StaffWorkflowTest extends TestCase
         $author = User::factory()->create(['role' => 'clinician']);
         $this->makePractitioner($author, 'verified', now()->addYear());
         $case = $this->makeCase($patient, CaseStatus::ClinicianReview);
+        $doc = $this->approvedDocument($case);
         DB::table('case_assignments')->insert(['id' => (string) Str::ulid(), 'case_id' => $case->id, 'assignee_user_id' => $author->id, 'assigned_by_user_id' => $author->id, 'purpose' => 'clinical_review', 'assigned_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
         $revision = ReviewRevision::query()->create([
             'case_id' => $case->id,
             'clinician_user_id' => $author->id,
             'revision_number' => 1,
             'source_language' => 'fa',
+            'clinical_document_id' => $doc->id,
             'image_adequacy' => 'adequate',
             'observations' => 'observations',
             'limitations' => 'limitations',
@@ -674,12 +686,14 @@ class StaffWorkflowTest extends TestCase
         $author = User::factory()->create(['role' => 'clinician']);
         $this->makePractitioner($author, 'verified', now()->addYear());
         $case = $this->makeCase($patient, CaseStatus::ClinicianReview);
+        $doc = $this->approvedDocument($case);
         DB::table('case_assignments')->insert(['id' => (string) Str::ulid(), 'case_id' => $case->id, 'assignee_user_id' => $author->id, 'assigned_by_user_id' => $author->id, 'purpose' => 'clinical_review', 'assigned_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
         $revision = ReviewRevision::query()->create([
             'case_id' => $case->id,
             'clinician_user_id' => $author->id,
             'revision_number' => 1,
             'source_language' => 'fa',
+            'clinical_document_id' => $doc->id,
             'image_adequacy' => 'adequate',
             'observations' => 'observations',
             'limitations' => 'limitations',
@@ -722,5 +736,53 @@ class StaffWorkflowTest extends TestCase
 
         $this->assertSame(1, $first);
         $this->assertSame(2, $second);
+    }
+
+    public function test_review_without_document_id_is_rejected(): void
+    {
+        $patient = User::factory()->create(['role' => 'patient']);
+        $clinician = User::factory()->create(['role' => 'clinician']);
+        $this->makePractitioner($clinician, 'verified', now()->addYear());
+        $case = $this->makeCase($patient, CaseStatus::ClinicianReview);
+        $doc = $this->approvedDocument($case);
+        DB::table('case_assignments')->insert(['id' => (string) Str::ulid(), 'case_id' => $case->id, 'assignee_user_id' => $clinician->id, 'assigned_by_user_id' => $clinician->id, 'purpose' => 'clinical_review', 'assigned_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
+
+        $this->actingAs($clinician)
+            ->postJson("/api/v1/staff/cases/{$case->id}/reviews", [
+                'source_language' => 'fa',
+                'image_adequacy' => 'v1', 'observations' => 'o', 'limitations' => 'l', 'options' => 'op', 'recommended_next_step' => 's',
+            ])
+            ->assertUnprocessable();
+    }
+
+    public function test_publish_rejects_when_linked_document_no_longer_approved(): void
+    {
+        $patient = User::factory()->create(['role' => 'patient']);
+        $author = User::factory()->create(['role' => 'clinician']);
+        $this->makePractitioner($author, 'verified', now()->addYear());
+        $case = $this->makeCase($patient, CaseStatus::ClinicianReview);
+        $doc = $this->approvedDocument($case);
+        DB::table('case_assignments')->insert(['id' => (string) Str::ulid(), 'case_id' => $case->id, 'assignee_user_id' => $author->id, 'assigned_by_user_id' => $author->id, 'purpose' => 'clinical_review', 'assigned_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
+        $revision = ReviewRevision::query()->create([
+            'case_id' => $case->id,
+            'clinician_user_id' => $author->id,
+            'revision_number' => 1,
+            'source_language' => 'fa',
+            'clinical_document_id' => $doc->id,
+            'image_adequacy' => 'adequate',
+            'observations' => 'observations',
+            'limitations' => 'limitations',
+            'options' => 'options',
+            'recommended_next_step' => 'next step',
+        ]);
+
+        // The document is retracted after the review was created but before publication.
+        $doc->update(['status' => DocumentStatus::Rejected]);
+
+        $this->actingAs($author)
+            ->postJson("/api/v1/staff/cases/{$case->id}/reviews/{$revision->id}/publish")
+            ->assertStatus(422)
+            ->assertJsonPath('error.code', 'review.document_not_approved');
+        $this->assertDatabaseCount('publication_events', 0);
     }
 }

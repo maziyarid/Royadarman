@@ -92,7 +92,7 @@ Royadarman/
 │   ├── public/                            Front controller + public assets
 │   ├── resources/views/public/home.blade.php
 │   ├── routes/{web,api,console}.php
-│   ├── tests/                             25 tests / 81 assertions
+│   ├── tests/                             163 tests / 407 assertions
 │   ├── ARCHITECTURE.md, DESIGN.md, DEPLOYMENT.md, CHECKLIST.md, design-qa.md
 │   └── premium-audit.json                 Strict design audit (0 findings)
 ├── Front-end v1/
@@ -150,17 +150,25 @@ and value objects. Cross-cutting infrastructure adapters live under
 4. `web` middleware group provides session + CSRF protection to the API routes
    that need it.
 
-**Error envelopes.** All API failures return a stable, documented envelope:
+**Error envelopes.** All API failures return a stable, documented envelope.
+`request_id` is a top-level key (sibling of `error`), not nested inside `error`,
+and is also echoed back as the `X-Request-ID` response header:
 ```json
 {
   "error": {
     "code": "error.consent.translation_unavailable",
-    "request_id": "01M2655..."
-  }
+    "message": "Consent translation is unavailable."
+  },
+  "request_id": "01M2655..."
 }
 ```
-HTTP-level errors additionally carry a `message`. The `request_id` lets support
-correlate any client report to a single request across logs.
+HTTP-level errors additionally carry a `message`. Validation errors also include
+a `details` object with per-field messages. Domain-specific failures thrown via
+`App\Support\DomainException` carry their stable code in `error.code` (for example
+`assignment.role_mismatch`, `review.document_not_approved`) rather than the
+generic `error.http.<status>` produced by ordinary `abort(...)` calls. The
+`request_id` lets support correlate any client report to a single request across
+logs.
 
 ---
 
@@ -338,14 +346,37 @@ supersede their own review but cannot edit a signed review.
 - `POST /api/v1/staff/cases/{case}/referral-proposals` — staff create a
   `referral_proposal` (minimum data).
 - `POST /api/v1/cases/{case}/referrals/{proposal}/decision` — patient accepts or
-  declines; acceptance creates a minimum-data `referral_grant`.
+  declines against the exact published `referral_sharing` policy version/hash
+  they were shown (not `latestPublishedPolicy()` at decision time). Acceptance
+  records a versioned `consent_event` and creates a scope-limited, time-limited
+  (`ROYADARMAN_REFERRAL_GRANT_TTL_MINUTES`), revocable `referral_grant` whose
+  `consent_event_id` and `expires_at` are non-null. Revoking the linked consent
+  or the grant immediately removes clinic-representative access.
+
+**Patient consent**
+
+- `POST /api/v1/cases/{case}/consent/{purpose}` — authenticated patient accepts
+  the exact published policy version/hash for the given purpose
+  (`opg_document_sharing`, `referral_sharing`). Rejects unpublished, mismatched,
+  wrong-locale and wrong-patient policies; records an immutable `consent_event`
+  bound to the patient and case.
+- `DELETE /api/v1/cases/{case}/consent/{purpose}` — patient revokes the consent
+  for the given purpose; future uploads/referral access fail immediately.
 
 **Clinical reviews**
 
 - `POST /api/v1/staff/cases/{case}/reviews` — clinician drafts a preliminary
   review.
 - `POST /api/v1/staff/cases/{case}/reviews/{review}/publish` — only the
-  assigned licensed clinician can publish; revisions are append-only.
+  assigned licensed clinician can publish; revisions are append-only. At
+  publication the linked document relationship, clinician credential and
+  assignment are revalidated inside a row lock.
+
+**Document traceability.** A clinical review revision is linked at the database
+level to the exact `clinical_document` it reviews (`clinical_document_id` is
+required, non-null). The linked document must belong to the same case and remain
+approved; a review cannot be created or published against a rejected,
+scan-failed, deleted or unauthorised document.
 
 ---
 
@@ -555,7 +586,7 @@ repo previously shipped without one).
 | Variable | Default | Purpose |
 |---|---|---|
 | `INTAKE_ENABLED` | `false` | Fail-safe intake gate. **Do not enable until activation gates approved.** |
-| `ROYADARMAN_PHONE_HASH_KEY` | required; no default | Independent phone-hash secret. There is no `APP_KEY` fallback: missing/empty throws in `PhoneHasher` and the app refuses to start. Generate with `php -r "echo bin2hex(random_bytes(32));"` |
+| `ROYADARMAN_PHONE_HASH_KEY` | required; no default | Independent phone-hash secret. There is no `APP_KEY` fallback. The application itself boots, but `royadarman:preflight` fails closed and `PhoneHasher` throws `RuntimeException` at resolution time (i.e. when any code path actually hashes a phone number) if the key is missing or empty, so no empty-key HMAC is ever executed. Generate with `php -r "echo bin2hex(random_bytes(32));"` |
 | `ROYADARMAN_OPG_DISK` | `private-opg` | Approved document disk |
 | `ROYADARMAN_OPG_QUARANTINE_DISK` | `opg-quarantine` | Quarantine disk |
 | `ROYADARMAN_OPG_SCANNER_ENABLED` | `false` | Enable ClamAV scanning |
@@ -564,6 +595,7 @@ repo previously shipped without one).
 | `ROYADARMAN_SMS_ENDPOINT` / `ROYADARMAN_SMS_TOKEN` | — | SMS provider credentials |
 | `ROYADARMAN_SMS_CALLBACK_SECRET` | — | Signed callback verification secret |
 | `ROYADARMAN_DOCUMENT_RETENTION_DAYS` | unset | **Must stay unset** until an operator approves a retention period |
+| `ROYADARMAN_REFERRAL_GRANT_TTL_MINUTES` | unset | Referral-grant expiry. **Must be a positive integer** before intake is enabled; `royadarman:preflight` fails if intake is on and this is unset/non-positive. Has a deterministic test value in CI/phpunit.xml. |
 
 ---
 
@@ -595,10 +627,10 @@ path because that is the real production application root. The development sourc
 
 | Gate | Command | Expected |
 |---|---|---|
-| Tests | `php artisan test` | 120 tests, 291 assertions, 0 failures |
-| Lint | `vendor/bin/pint --test` | 107 files, 0 issues |
-| Migrations | `php artisan migrate --force` | 10 migrations apply cleanly |
-| Preflight | `php artisan royadarman:preflight` | refuses empty APP_KEY/phone-hash key, debug true, unsafe intake/disk/queue |
+| Tests | `php artisan test` | 163 tests, 407 assertions, 0 failures |
+| Lint | `vendor/bin/pint --test` | 115 files, 0 issues |
+| Migrations | `php artisan migrate --force` | 12 migrations apply cleanly |
+| Preflight | `php artisan royadarman:preflight` | refuses empty APP_KEY, missing/empty/too-short phone-hash key, phone-hash key==APP_KEY, debug true in production, unsafe intake/disk/queue, and (when intake is enabled) missing referral-grant TTL |
 | CI | `.github/workflows/ci.yml` | PHP 8.3/8.4 matrix, frontend smoke, locale parity |
 
 **Test coverage** (`backend/tests/`):
@@ -607,30 +639,55 @@ path because that is the real production application root. The development sourc
   staff recovery codes.
 - `Feature/OtpInvariantTest` — Persian/Arabic digit normalisation, invalid
   mobile rejection, expiry, single-use, 5-attempt lock, resend cooldown, phone/IP
-  hourly limits, inactive user rejection, concurrent verification safety.
+  hourly limits, inactive user rejection, concurrent verification safety, **OTP
+  supersession invariant** (new challenge invalidates prior active challenges
+  atomically under a row lock; a superseded challenge cannot be verified; expired
+  challenges are not superseded but remain rejected).
 - `Feature/PhoneHashKeyTest` — fail-fast on missing/empty phone-hash key, valid
   key consistency.
+- `Feature/ConsentAcceptanceTest` — patient accepts the exact published OPG/
+  document-sharing policy version/hash over the real HTTP path, substituted/
+  unpublished/wrong-locale/wrong-patient policies are rejected, revocation blocks
+  future uploads, unsupported purposes are rejected.
+- `Feature/ReferralAndConsentLifecycleTest` — clinic-representative access before/
+  after a versioned referral-sharing grant, grant revocation, grant expiry (TTL),
+  linked-consent revocation, cross-clinic/cross-case denial, substituted policy
+  hash rejected, unconfigured TTL fails closed, clinician document access with/
+  without active consent, owner/tech-admin default-deny.
+- `Feature/PreflightTest` — preflight passes with a valid independent phone-hash
+  key and intake disabled; fails on missing/empty/too-short key and on
+  key==APP_KEY; fails when intake is enabled without a configured referral-grant
+  TTL; passes when intake is enabled with all gates configured.
+- `Feature/DomainErrorCodesTest` — stable domain error codes
+  (`assignment.role_mismatch`, `assignment.credential_invalid`,
+  `review.document_not_approved`, `review.credential_revoked`,
+  `review.assignment_released`) are returned in `error.code` with `request_id`,
+  not the generic `error.http.<status>`.
 - `Feature/PatientCaseIntakeTest` — intake server-side disabled, idempotent
   create/submit with localized consent, missing-translation blocks submission.
 - `Feature/CaseWorkflowTest` — state-machine transitions with audit.
 - `Feature/StaffWorkflowTest` — referral proposal (coordinator-only), patient
   accept/decline, grant linked to versioned consent, assignment role/credential
-  enforcement, review creation (assigned clinician only, document traceability),
-  review publishing (author-only, idempotent, credential/assignment rechecked),
-  revision sequencing, version conflicts.
+  enforcement, review creation (assigned clinician only, document traceability,
+  `clinical_document_id` required), review publishing (author-only, idempotent,
+  credential/assignment rechecked inside the lock, linked document revalidated at
+  publication), revision sequencing, version conflicts.
 - `Feature/ClinicalDocumentPipelineTest` — OPG validation, quarantine, scan,
   promotion, audited streaming.
 - `Feature/DocumentConsentTest` — upload without/revoked/wrong-patient/wrong-
   policy consent, executable/oversized/zero-byte/PDF rejection, document limit.
 - `Feature/DocumentStreamingHeadersTest` — inline disposition, no-store, nosniff,
-  restrictive CSP, rejected/scan-failed not streamable, IDOR/nested mismatch.
+  restrictive CSP, rejected/scan-failed not streamable, IDOR/nested mismatch,
+  documents linked to a consent event.
 - `Feature/ClinicalAccessTest` — owner/tech-admin/clinic-rep/unverified-clinician
   default-deny, credential revocation.
 - `Feature/IdempotencyTest` — replay caching, key reuse conflict, unique-
   constraint race resolved deterministically, actor isolation.
 - `Feature/NotificationCallbackTest` — signed callback, status-regression
   prevention, replay idempotency, stale timestamp, missing secret, validation,
-  CSRF exclusion.
+  CSRF exclusion, **`sending`-state callbacks** (early provider callbacks while a
+  delivery row is in the pre-reference/sending phase are matched and promoted,
+  not discarded).
 - `Feature/OperationsTest` — outbox localisation/idempotency, provider-accepts-
   then-worker-dies retry safety, retention fail-closed without a configured
   duration.
@@ -651,22 +708,26 @@ All checks re-run on a clean checkout during this session (PHP 8.4.24, Laravel
 
 ```text
 $ cd backend && php artisan test
-Tests: 120 passed (291 assertions)   Duration: ~1.3s
+Tests: 163 passed (407 assertions)   Duration: ~1.8s
 
 $ vendor/bin/pint --test
-Laravel  PASS  .......................................... 107 files
+Laravel  PASS  ......................................................... 115 files
 
-$ php artisan migrate --force
-# 10 migrations applied (0001_* x3, 2026_08_31_* x2, 2026_09_08_* x2, 2026_09_10_* x3)
+$ php artisan migrate:fresh --force
+# 12 migrations applied (0001_* x3, 2026_08_31_* x2, 2026_09_08_* x2,
+# 2026_09_10_* x3, 2026_09_11_* x2)
 
 $ php artisan route:list
-# 22 routes listed
+# 24 routes listed
 
 $ php artisan royadarman:preflight
 Preflight OK: configuration passes the safety gates.
 
 $ php artisan route:cache && php artisan route:clear
 # Routes cached successfully / Route cache cleared successfully
+
+$ composer audit --locked
+# No security vulnerability advisories found.
 ```
 
 **Live HTTP smoke test** (`php artisan serve`, probed via Node http):
@@ -705,7 +766,7 @@ cross-locale.
 2. Added `backend/.env.example` (the repo shipped without one, so `php artisan
    key:generate` and first-time setup failed).
 3. Ran `vendor/bin/pint` to bring 78 files into compliance (trailing-newline and
-   brace-position drift); `pint --test` now reports 95 files clean.
+   brace-position drift); `pint --test` now reports 115 files clean.
 4. Removed 15 timestamped `.bak.*` editor backup files and one unreferenced
    empty `opg-hero.jpg` from `Front-end v1/v3-preview/`.
 

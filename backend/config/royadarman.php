@@ -32,6 +32,9 @@ return [
         'token' => env('ROYADARMAN_SMS_TOKEN'),
         'callback_secret' => env('ROYADARMAN_SMS_CALLBACK_SECRET'),
     ],
+    'referral' => [
+        'grant_ttl_minutes' => env('ROYADARMAN_REFERRAL_GRANT_TTL_MINUTES'),
+    ],
     'retention' => [
         'document_days' => env('ROYADARMAN_DOCUMENT_RETENTION_DAYS'),
     ],

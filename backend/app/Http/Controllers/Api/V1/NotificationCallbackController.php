@@ -16,7 +16,7 @@ final class NotificationCallbackController extends Controller
      * delivery, so a delayed failure cannot corrupt a confirmed delivery and a
      * delayed delivery cannot resurrect a recorded failure.
      */
-    private const STATUS_ORDER = ['queued' => 0, 'sent' => 1, 'delivered' => 2, 'failed' => 2];
+    private const STATUS_ORDER = ['queued' => 0, 'sending' => 0, 'sent' => 1, 'delivered' => 2, 'failed' => 2];
 
     private const MAX_SKEW_SECONDS = 300;
 
@@ -36,7 +36,7 @@ final class NotificationCallbackController extends Controller
 
         $data = $request->validate([
             'reference' => ['required', 'string', 'max:120'],
-            'status' => ['required', 'in:queued,sent,delivered,failed'],
+            'status' => ['required', 'in:queued,sending,sent,delivered,failed'],
             'failure_code' => ['nullable', 'string', 'max:80'],
         ]);
 

@@ -11,6 +11,7 @@ use App\Models\ClinicalDocument;
 use App\Models\PatientCase;
 use App\Models\ReferralProposal;
 use App\Models\ReviewRevision;
+use App\Support\DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -39,14 +40,18 @@ final class StaffCaseController extends Controller
             if ($data['purpose'] === 'clinical_review') {
                 $assignee = (int) $data['assignee_user_id'];
                 $isClinician = DB::table('users')->where('id', $assignee)->value('role');
-                abort_unless($isClinician === UserRole::Clinician->value, 403, 'assignment.role_mismatch');
+                if ($isClinician !== UserRole::Clinician->value) {
+                    throw new DomainException(403, 'assignment.role_mismatch');
+                }
 
                 $active = DB::table('practitioners')
                     ->where('user_id', $assignee)
                     ->where('credential_status', 'verified')
                     ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
                     ->exists();
-                abort_unless($active, 403, 'assignment.credential_invalid');
+                if (! $active) {
+                    throw new DomainException(403, 'assignment.credential_invalid');
+                }
             }
 
             DB::table('case_assignments')->updateOrInsert(
@@ -124,7 +129,7 @@ final class StaffCaseController extends Controller
 
         $data = $request->validate([
             'source_language' => ['required', 'in:fa,ar,en'],
-            'clinical_document_id' => ['nullable', 'ulid', 'exists:clinical_documents,id'],
+            'clinical_document_id' => ['required', 'ulid', 'exists:clinical_documents,id'],
             'image_adequacy' => ['required', 'string', 'max:1000'],
             'observations' => ['required', 'string', 'max:5000'],
             'limitations' => ['required', 'string', 'max:3000'],
@@ -137,14 +142,17 @@ final class StaffCaseController extends Controller
             // Serialise review allocation by locking the case row.
             PatientCase::query()->lockForUpdate()->findOrFail($case->id);
 
-            $documentId = $data['clinical_document_id'] ?? null;
-            if ($documentId !== null) {
-                $doc = ClinicalDocument::query()
-                    ->where('id', $documentId)
-                    ->where('case_id', $case->id)
-                    ->where('status', DocumentStatus::Approved)
-                    ->first();
-                abort_unless($doc !== null, 422, 'review.document_not_approved');
+            // An OPG clinical review must be traceable to the exact approved
+            // document being reviewed. The document must belong to the same case
+            // and remain approved/authorised at creation time.
+            $doc = ClinicalDocument::query()
+                ->where('id', $data['clinical_document_id'])
+                ->where('case_id', $case->id)
+                ->where('status', DocumentStatus::Approved)
+                ->lockForUpdate()
+                ->first();
+            if ($doc === null) {
+                throw new DomainException(422, 'review.document_not_approved');
             }
 
             $number = ((int) ReviewRevision::query()->where('case_id', $case->id)->max('revision_number')) + 1;
@@ -180,7 +188,9 @@ final class StaffCaseController extends Controller
                 ->where('credential_status', 'verified')
                 ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
                 ->exists();
-            abort_unless($active, 403, 'review.credential_revoked');
+            if (! $active) {
+                throw new DomainException(403, 'review.credential_revoked');
+            }
 
             $assigned = DB::table('case_assignments')
                 ->where('case_id', $case->id)
@@ -188,7 +198,21 @@ final class StaffCaseController extends Controller
                 ->where('purpose', 'clinical_review')
                 ->whereNull('released_at')
                 ->exists();
-            abort_unless($assigned, 403, 'review.assignment_released');
+            if (! $assigned) {
+                throw new DomainException(403, 'review.assignment_released');
+            }
+
+            // Revalidate the source document relationship at publication time: the
+            // linked OPG must still belong to this case and remain approved/authorised.
+            $document = ClinicalDocument::query()
+                ->where('id', $locked->clinical_document_id)
+                ->where('case_id', $case->id)
+                ->where('status', DocumentStatus::Approved)
+                ->lockForUpdate()
+                ->first();
+            if ($document === null) {
+                throw new DomainException(422, 'review.document_not_approved');
+            }
 
             $locked->update(['signed_at' => now()]);
 

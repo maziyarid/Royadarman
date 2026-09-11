@@ -35,7 +35,7 @@ final class DocumentController extends Controller
     public function status(Request $request, PatientCase $case, ClinicalDocument $document): JsonResponse
     {
         abort_unless($document->case_id === $case->id, 404);
-        abort_unless((int) $case->patient_user_id === (int) $request->user()->id || $request->user()->can('view', $case), 404);
+        abort_unless($request->user()->can('view', $document), 404);
 
         return response()->json(['data' => ['id' => $document->id, 'status' => $document->status->value, 'mime' => $document->detected_mime, 'bytes' => $document->byte_size]])->header('Cache-Control', 'private, no-store');
     }

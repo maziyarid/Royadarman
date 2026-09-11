@@ -27,6 +27,19 @@ final class ClinicalDocumentPolicy
             return false;
         }
 
+        if ($document->consent_event_id === null) {
+            return false;
+        }
+
+        $consentActive = DB::table('consent_events')
+            ->where('id', $document->consent_event_id)
+            ->where('decision', 'accepted')
+            ->whereNull('revoked_at')
+            ->exists();
+        if (! $consentActive) {
+            return false;
+        }
+
         return DB::table('case_assignments')->where('case_id', $document->case_id)->where('assignee_user_id', $user->id)->where('purpose', 'clinical_review')->whereNull('released_at')->exists()
             && DB::table('practitioners')->where('user_id', $user->id)->where('credential_status', 'verified')->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))->exists();
     }

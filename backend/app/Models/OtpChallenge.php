@@ -15,6 +15,6 @@ class OtpChallenge extends Model
 
     protected function casts(): array
     {
-        return ['phone' => 'encrypted', 'expires_at' => 'immutable_datetime', 'used_at' => 'immutable_datetime', 'last_sent_at' => 'immutable_datetime'];
+        return ['phone' => 'encrypted', 'expires_at' => 'immutable_datetime', 'used_at' => 'immutable_datetime', 'last_sent_at' => 'immutable_datetime', 'superseded_at' => 'immutable_datetime'];
     }
 }

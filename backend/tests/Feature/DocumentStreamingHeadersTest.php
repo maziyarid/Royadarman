@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Domain\Documents\Enums\DocumentStatus;
 use App\Models\ClinicalDocument;
+use App\Models\ConsentEvent;
 use App\Models\PatientCase;
+use App\Models\PolicyVersion;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -141,10 +143,22 @@ final class DocumentStreamingHeadersTest extends TestCase
             'budget_band' => 'balanced',
             'version' => 1,
         ]);
+        $policyVersion = 'approved-'.Str::random(6);
+        $policy = PolicyVersion::query()->create([
+            'policy_key' => 'opg_document_sharing', 'version' => $policyVersion, 'locale' => 'fa',
+            'content' => 'opg text '.$policyVersion, 'content_hash' => hash('sha256', 'opg text '.$policyVersion), 'published_at' => now(),
+        ]);
+        $consent = ConsentEvent::query()->create([
+            'subject_user_id' => $patient->id, 'case_id' => $case->id, 'policy_version_id' => $policy->id,
+            'purpose' => 'opg_document_sharing', 'decision' => 'accepted', 'locale' => 'fa', 'channel' => 'web',
+            'ip_hash' => hash('sha256', 'ip'), 'user_agent_hash' => hash('sha256', 'ua'), 'created_at' => now(),
+        ]);
         $bytes = base64_decode(self::PNG_BYTES, true);
         $storageKey = 'cases/'.$case->id.'/opg.png';
         $document = ClinicalDocument::query()->create([
             'case_id' => $case->id,
+            'uploaded_by_user_id' => $patient->id,
+            'consent_event_id' => $consent->id,
             'storage_disk' => 'private-opg',
             'storage_key' => $storageKey,
             'original_name' => 'opg.png',

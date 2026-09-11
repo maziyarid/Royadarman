@@ -28,6 +28,14 @@ final class Preflight extends Command
         $phoneHashKey = config('royadarman.phone_hash_key');
         if (! is_string($phoneHashKey) || trim($phoneHashKey) === '') {
             $failures[] = 'ROYADARMAN_PHONE_HASH_KEY is missing or empty; identities cannot be hashed safely.';
+        } else {
+            $appKey = (string) config('app.key');
+            if ($appKey !== '' && hash_equals($appKey, $phoneHashKey)) {
+                $failures[] = 'ROYADARMAN_PHONE_HASH_KEY must not equal APP_KEY; it is an independent lookup secret.';
+            }
+            if (strlen($phoneHashKey) < 32) {
+                $failures[] = 'ROYADARMAN_PHONE_HASH_KEY is shorter than 32 characters; use a high-entropy secret (e.g. 64 hex chars).';
+            }
         }
 
         if (config('royadarman.intake_enabled') === true) {
@@ -46,6 +54,10 @@ final class Preflight extends Command
             $retention = config('royadarman.retention.document_days');
             if (! is_numeric($retention) || (int) $retention <= 0) {
                 $failures[] = 'INTAKE_ENABLED is true but ROYADARMAN_DOCUMENT_RETENTION_DAYS is not a positive integer.';
+            }
+            $grantTtl = config('royadarman.referral.grant_ttl_minutes');
+            if (! is_numeric($grantTtl) || (int) $grantTtl <= 0) {
+                $failures[] = 'INTAKE_ENABLED is true but ROYADARMAN_REFERRAL_GRANT_TTL_MINUTES is not a positive integer; referral grants must be time-limited.';
             }
         }
 

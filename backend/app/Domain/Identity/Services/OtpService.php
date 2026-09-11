@@ -38,11 +38,26 @@ final class OtpService
         }
 
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        $challenge = OtpChallenge::query()->create([
-            'phone' => $mobile, 'phone_hash' => $phoneHash, 'code_hash' => Hash::make($code),
-            'locale' => $locale, 'purpose' => 'login', 'expires_at' => now()->addMinutes(5),
-            'last_sent_at' => now(), 'request_ip_hash' => $ipHash,
-        ]);
+        $challenge = DB::transaction(function () use ($mobile, $locale, $phoneHash, $ipHash, $code): OtpChallenge {
+            // Atomically supersede all prior active challenges for this phone+
+            // purpose before the new challenge becomes usable, so only one active
+            // challenge can exist per identity at a time. The lock + update is
+            // serialised against concurrent issuance.
+            OtpChallenge::query()
+                ->where('phone_hash', $phoneHash)
+                ->where('purpose', 'login')
+                ->whereNull('used_at')
+                ->whereNull('superseded_at')
+                ->where('expires_at', '>', now())
+                ->lockForUpdate()
+                ->update(['superseded_at' => now()]);
+
+            return OtpChallenge::query()->create([
+                'phone' => $mobile, 'phone_hash' => $phoneHash, 'code_hash' => Hash::make($code),
+                'locale' => $locale, 'purpose' => 'login', 'expires_at' => now()->addMinutes(5),
+                'last_sent_at' => now(), 'request_ip_hash' => $ipHash,
+            ]);
+        });
 
         try {
             $this->sender->send($mobile, $code, $locale);
@@ -59,7 +74,7 @@ final class OtpService
     {
         return DB::transaction(function () use ($challengeId, $code, $totpCode, $recoveryCode): User {
             $challenge = OtpChallenge::query()->lockForUpdate()->findOrFail($challengeId);
-            if ($challenge->used_at || $challenge->expires_at->isPast() || $challenge->attempts >= 5) {
+            if ($challenge->used_at || $challenge->superseded_at || $challenge->expires_at->isPast() || $challenge->attempts >= 5) {
                 throw ValidationException::withMessages(['code' => __('ui.errors.otp_invalid')]);
             }
             $challenge->increment('attempts');

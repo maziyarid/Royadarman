@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CaseController;
+use App\Http\Controllers\Api\V1\ConsentController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\NotificationCallbackController;
 use App\Http\Controllers\Api\V1\PolicyController;
@@ -28,6 +29,8 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
             Route::post('/cases/draft', [CaseController::class, 'draft']);
             Route::post('/cases/{case}/submit', [CaseController::class, 'submit']);
             Route::get('/cases/{case}', [CaseController::class, 'show']);
+            Route::post('/cases/{case}/consent/{purpose}', [ConsentController::class, 'accept']);
+            Route::delete('/cases/{case}/consent/{purpose}', [ConsentController::class, 'revoke']);
             Route::post('/cases/{case}/documents', [DocumentController::class, 'store']);
             Route::get('/cases/{case}/documents/{document}', [DocumentController::class, 'status']);
             Route::get('/cases/{case}/documents/{document}/content', [DocumentController::class, 'content']);

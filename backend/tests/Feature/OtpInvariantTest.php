@@ -161,4 +161,66 @@ class OtpInvariantTest extends TestCase
         $this->expectException(ValidationException::class);
         $service->verify($challenge->id, $sender->code);
     }
+
+    public function test_new_challenge_supersedes_prior_active_challenge(): void
+    {
+        [$service, $sender] = $this->serviceWithCapture();
+        $first = $service->challenge('09121234567', 'en', '127.0.0.1');
+        $firstCode = $sender->code;
+        $this->assertNull($first->fresh()->superseded_at);
+
+        // Advance past the resend cooldown so a new challenge can be issued.
+        $this->travel(2)->minutes();
+        $second = $service->challenge('09121234567', 'en', '127.0.0.1');
+        $this->assertNotSame($first->id, $second->id);
+
+        // The first challenge is now superseded and cannot be verified.
+        $this->assertNotNull($first->fresh()->superseded_at);
+        $this->expectException(ValidationException::class);
+        $service->verify($first->id, $firstCode);
+    }
+
+    public function test_replacement_challenge_works_after_supersession(): void
+    {
+        [$service, $sender] = $this->serviceWithCapture();
+        $service->challenge('09121234567', 'en', '127.0.0.1');
+        $this->travel(2)->minutes();
+        $second = $service->challenge('09121234567', 'en', '127.0.0.1');
+
+        $user = $service->verify($second->id, $sender->code);
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertNotNull($second->fresh()->used_at);
+    }
+
+    public function test_no_two_active_challenges_remain_after_replacement(): void
+    {
+        [$service, $sender] = $this->serviceWithCapture();
+        $service->challenge('09121234567', 'en', '127.0.0.1');
+        $this->travel(2)->minutes();
+        $service->challenge('09121234567', 'en', '127.0.0.1');
+
+        $phoneHash = hash_hmac('sha256', '09121234567', (string) config('royadarman.phone_hash_key'));
+        $active = OtpChallenge::query()
+            ->where('phone_hash', $phoneHash)
+            ->where('purpose', 'login')
+            ->whereNull('used_at')
+            ->whereNull('superseded_at')
+            ->where('expires_at', '>', now())
+            ->count();
+        $this->assertSame(1, $active, 'Exactly one active challenge must remain after a replacement is issued.');
+    }
+
+    public function test_expired_challenge_is_not_marked_superseded_but_still_rejected(): void
+    {
+        [$service, $sender] = $this->serviceWithCapture();
+        $first = $service->challenge('09121234567', 'en', '127.0.0.1');
+        // Let it expire naturally before a new one is issued.
+        $this->travel(6)->minutes();
+        $second = $service->challenge('09121234567', 'en', '127.0.0.1');
+        $this->assertNotSame($first->id, $second->id);
+        $this->assertNull($first->fresh()->superseded_at, 'An already-expired challenge is not superseded, it is simply expired.');
+
+        $this->expectException(ValidationException::class);
+        $service->verify($first->id, $sender->code);
+    }
 }

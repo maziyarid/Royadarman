@@ -113,6 +113,33 @@ final class NotificationCallbackTest extends TestCase
         $this->assertDatabaseHas('notification_deliveries', ['id' => $delivery, 'status' => 'delivered']);
     }
 
+    public function test_callback_during_sending_state_promotes_to_delivered(): void
+    {
+        $delivery = $this->seedDelivery('provider-11', 'sending');
+        $this->postCallback(['reference' => 'provider-11', 'status' => 'delivered'])
+            ->assertOk()
+            ->assertJsonPath('data.applied', true);
+        $this->assertDatabaseHas('notification_deliveries', ['id' => $delivery, 'status' => 'delivered']);
+    }
+
+    public function test_callback_during_sending_state_promotes_to_sent(): void
+    {
+        $delivery = $this->seedDelivery('provider-12', 'sending');
+        $this->postCallback(['reference' => 'provider-12', 'status' => 'sent'])
+            ->assertOk()
+            ->assertJsonPath('data.applied', true);
+        $this->assertDatabaseHas('notification_deliveries', ['id' => $delivery, 'status' => 'sent']);
+    }
+
+    public function test_sending_to_queued_is_not_a_regression(): void
+    {
+        $delivery = $this->seedDelivery('provider-13', 'sending');
+        $this->postCallback(['reference' => 'provider-13', 'status' => 'queued'])
+            ->assertOk()
+            ->assertJsonPath('data.applied', false);
+        $this->assertDatabaseHas('notification_deliveries', ['id' => $delivery, 'status' => 'sending']);
+    }
+
     private function seedDelivery(string $reference, string $status): string
     {
         $patient = User::factory()->create(['role' => 'patient']);

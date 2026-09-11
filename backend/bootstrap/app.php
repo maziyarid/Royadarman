@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\RequestId;
+use App\Support\DomainException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -60,6 +61,15 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 404);
         });
 
+        $exceptions->render(function (DomainException $exception, Request $request) {
+            return response()->json([
+                'error' => [
+                    'code' => $exception->domainCode(),
+                    'message' => $exception->getMessage() !== '' ? $exception->getMessage() : __('Request failed.'),
+                ],
+                'request_id' => $request->attributes->get('request_id'),
+            ], $exception->getStatusCode(), $exception->getHeaders());
+        });
         $exceptions->render(function (HttpExceptionInterface $exception, Request $request) {
             $status = $exception->getStatusCode();
             $code = match ($status) {

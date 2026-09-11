@@ -15,7 +15,15 @@ final class PatientCasePolicy
             UserRole::Patient => (int) $case->patient_user_id === (int) $user->id,
             UserRole::Coordinator => DB::table('case_assignments')->where('case_id', $case->id)->where('assignee_user_id', $user->id)->where('purpose', 'coordination')->whereNull('released_at')->exists(),
             UserRole::Clinician => $this->activeClinicalAssignment($user, $case),
-            UserRole::ClinicRepresentative => DB::table('referral_grants')->join('clinic_memberships', 'clinic_memberships.clinic_id', '=', 'referral_grants.clinic_id')->where('referral_grants.case_id', $case->id)->where('clinic_memberships.user_id', $user->id)->whereNull('referral_grants.revoked_at')->where(fn ($q) => $q->whereNull('referral_grants.expires_at')->orWhere('referral_grants.expires_at', '>', now()))->exists(),
+            UserRole::ClinicRepresentative => DB::table('referral_grants')
+                ->join('clinic_memberships', 'clinic_memberships.clinic_id', '=', 'referral_grants.clinic_id')
+                ->leftJoin('consent_events', 'consent_events.id', '=', 'referral_grants.consent_event_id')
+                ->where('referral_grants.case_id', $case->id)
+                ->where('clinic_memberships.user_id', $user->id)
+                ->whereNull('referral_grants.revoked_at')
+                ->where(fn ($q) => $q->whereNull('referral_grants.expires_at')->orWhere('referral_grants.expires_at', '>', now()))
+                ->where(fn ($q) => $q->whereNull('consent_events.revoked_at'))
+                ->exists(),
             default => false,
         };
     }

@@ -18,6 +18,13 @@ final class PhoneHasher
             );
         }
 
+        $appKey = (string) config('app.key');
+        if ($appKey !== '' && hash_equals($appKey, $key)) {
+            throw new RuntimeException(
+                'ROYADARMAN_PHONE_HASH_KEY must not equal APP_KEY. It is an independent lookup secret; reusing APP_KEY defeats the separate lookup-secret architecture.'
+            );
+        }
+
         $this->key = $key;
     }
 

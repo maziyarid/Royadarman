@@ -51,6 +51,10 @@ final class ProcessOutboxEvent implements ShouldQueue
         if (! $delivery) {
             DB::table('notification_deliveries')->insert([
                 'id' => (string) Str::ulid(), 'outbox_event_id' => $event->id, 'channel' => 'sms', 'status' => 'sending',
+                // Pre-populate the provider reference with the idempotency key (outbox
+                // event id) so a fast provider callback arriving while the row is still
+                // "sending" can be matched and applied rather than discarded.
+                'provider_reference' => $event->id,
                 'recipient_locale' => $event->recipient_locale ?? 'fa', 'template_key' => (string) ($event->payload['template_key'] ?? $event->event_type),
                 'created_at' => now(), 'updated_at' => now(),
             ]);
