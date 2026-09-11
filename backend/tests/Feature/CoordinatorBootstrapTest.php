@@ -50,7 +50,7 @@ class CoordinatorBootstrapTest extends TestCase
         return $this->actingAs($patient)
             ->withHeaders(['X-Locale' => 'fa', 'Idempotency-Key' => (string) Str::uuid()])
             ->postJson('/api/v1/cases/draft', [
-                'service_type' => 'referral',
+                'service_type' => 'guidance_referral',
                 'name' => 'Patient',
                 'preferred_contact_time' => 'any',
                 'contact_reason' => 'Need coordination',
@@ -73,7 +73,7 @@ class CoordinatorBootstrapTest extends TestCase
         $existing = PatientCase::query()->create([
             'public_reference' => 'RD-'.strtoupper(Str::random(8)),
             'patient_user_id' => $otherPatient->id,
-            'service_type' => 'referral',
+            'service_type' => 'guidance_referral',
             'status' => 'submitted',
             'patient_mobile' => '09120000000',
             'patient_mobile_hash' => hash('sha256', Str::random()),
