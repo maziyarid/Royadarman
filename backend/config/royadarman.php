@@ -28,9 +28,18 @@ return [
         ],
     ],
     'sms' => [
+        'provider' => strtolower((string) env('ROYADARMAN_SMS_PROVIDER', 'tsms')),
+        'callbacks_enabled' => filter_var(env('ROYADARMAN_SMS_CALLBACKS_ENABLED', false), FILTER_VALIDATE_BOOL),
+        'callback_secret' => env('ROYADARMAN_SMS_CALLBACK_SECRET'),
+        // Legacy/generic HTTP adapter retained as an explicit fallback provider.
         'endpoint' => env('ROYADARMAN_SMS_ENDPOINT'),
         'token' => env('ROYADARMAN_SMS_TOKEN'),
-        'callback_secret' => env('ROYADARMAN_SMS_CALLBACK_SECRET'),
+        'tsms' => [
+            'endpoint' => env('TSMS_API_URL', 'https://tsms.ir/url/tsmshttp.php'),
+            'username' => env('TSMS_USERNAME'),
+            'password' => env('TSMS_PASSWORD'),
+            'from' => env('TSMS_FROM'),
+        ],
     ],
     'referral' => [
         'grant_ttl_minutes' => env('ROYADARMAN_REFERRAL_GRANT_TTL_MINUTES'),
