@@ -1,0 +1,48 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class PatientRequestPageTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_patient_can_review_new_request_page_but_cannot_submit_when_intake_disabled(): void
+    {
+        config()->set('royadarman.intake_enabled', false);
+        $patient = User::factory()->create(['role' => 'patient', 'is_active' => true]);
+
+        $this->actingAs($patient)
+            ->get('/en/panel/cases/new')
+            ->assertOk()
+            ->assertSee('Start a new care request')
+            ->assertSee('New requests are not open yet')
+            ->assertDontSee('id="request-form"', false);
+    }
+
+    public function test_non_patient_cannot_open_patient_new_request_page(): void
+    {
+        $coordinator = User::factory()->create(['role' => 'coordinator', 'is_active' => true]);
+
+        $this->actingAs($coordinator)
+            ->get('/en/panel/cases/new')
+            ->assertNotFound();
+    }
+
+    public function test_enabled_request_page_contains_fail_closed_consent_workflow(): void
+    {
+        config()->set('royadarman.intake_enabled', true);
+        $patient = User::factory()->create(['role' => 'patient', 'is_active' => true]);
+
+        $this->actingAs($patient)
+            ->get('/en/panel/cases/new')
+            ->assertOk()
+            ->assertSee('id="request-form"', false)
+            ->assertSee('/api/v1/policies/case_coordination', false)
+            ->assertSee('guidance_referral', false)
+            ->assertSee('Idempotency-Key', false);
+    }
+}
