@@ -1,0 +1,16 @@
+<?php
+
+return [
+    'back' => 'العودة إلى اللوحة', 'case' => 'الحالة', 'status' => 'الحالة', 'service' => 'الخدمة', 'details' => 'التفاصيل المسموح بها',
+    'documents' => 'الوثائق', 'reviews' => 'المراجعة السريرية المنشورة', 'referrals' => 'اقتراحات الإحالة',
+    'coordinator_actions' => 'إجراءات التنسيق', 'clinician_actions' => 'إجراءات المراجعة السريرية',
+    'upload' => 'الموافقة ورفع صورة OPG', 'file' => 'صورة OPG ‏(JPEG/PNG)', 'accept_policy' => 'قرأت السياسة المعروضة وأوافق عليها.',
+    'assign_clinician' => 'إسناد طبيب', 'change_status' => 'تغيير حالة الطلب', 'propose_referral' => 'اقتراح إحالة إلى عيادة',
+    'reason' => 'سبب تشغيلي', 'clinic' => 'العيادة', 'review_document' => 'الوثيقة محل المراجعة',
+    'image_adequacy' => 'كفاية الصورة', 'observations' => 'الملاحظات', 'limitations' => 'القيود', 'options' => 'الخيارات',
+    'next_step' => 'الخطوة التالية المقترحة', 'save_review' => 'حفظ مسودة المراجعة', 'publish' => 'نشر المراجعة',
+    'accept' => 'قبول', 'decline' => 'رفض', 'open_document' => 'فتح الصورة المعتمدة', 'no_items' => 'لا توجد عناصر بعد.',
+    'patient_name' => 'اسم المريض', 'patient_mobile' => 'هاتف المريض', 'area' => 'المنطقة', 'contact_time' => 'وقت التواصل المفضل',
+    'contact_reason' => 'سبب التواصل', 'budget' => 'فئة الميزانية', 'grant_expires' => 'انتهاء التفويض', 'success' => 'تم الحفظ بنجاح.',
+    'error' => 'تعذر إكمال الإجراء.',
+];
