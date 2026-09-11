@@ -555,7 +555,7 @@ repo previously shipped without one).
 | Variable | Default | Purpose |
 |---|---|---|
 | `INTAKE_ENABLED` | `false` | Fail-safe intake gate. **Do not enable until activation gates approved.** |
-| `ROYADARMAN_PHONE_HASH_KEY` | `APP_KEY` | Independent phone-hash secret (must differ from `APP_KEY` in prod) |
+| `ROYADARMAN_PHONE_HASH_KEY` | required; no default | Independent phone-hash secret. There is no `APP_KEY` fallback: missing/empty throws in `PhoneHasher` and the app refuses to start. Generate with `php -r "echo bin2hex(random_bytes(32));"` |
 | `ROYADARMAN_OPG_DISK` | `private-opg` | Approved document disk |
 | `ROYADARMAN_OPG_QUARANTINE_DISK` | `opg-quarantine` | Quarantine disk |
 | `ROYADARMAN_OPG_SCANNER_ENABLED` | `false` | Enable ClamAV scanning |
