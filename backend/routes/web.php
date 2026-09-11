@@ -19,11 +19,15 @@ Route::prefix('{locale}')
         Route::get('/services/home-dentistry', [PublicPageController::class, 'homeDentistry'])->name('public.home-dentistry');
         Route::get('/referrals', [PublicPageController::class, 'referrals'])->name('public.referrals');
         Route::get('/contact', [PublicPageController::class, 'contact'])->name('public.contact');
+        Route::get('/login', fn (string $locale) => auth()->check()
+            ? redirect()->route('panel', ['locale' => $locale])
+            : response()->view('auth.login', ['locale' => $locale])->header('Cache-Control', 'private, no-store'))
+            ->name('login');
 
         Route::middleware('auth')->group(function (): void {
             Route::get('/panel', PanelController::class)->name('panel');
 
-            Route::prefix('/panel/marketing')->group(function (): void {
+            Route::prefix('panel/marketing')->group(function (): void {
                 Route::get('/', [MarketingContentController::class, 'index'])->name('marketing.index');
                 Route::get('/create', [MarketingContentController::class, 'create'])->name('marketing.create');
                 Route::post('/', [MarketingContentController::class, 'store'])->name('marketing.store');
