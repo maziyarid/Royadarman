@@ -16,11 +16,20 @@ final class HttpOtpSender implements OtpSender
         if (! is_string($endpoint) || $endpoint === '' || ! is_string($token) || $token === '') {
             throw new RuntimeException('OTP delivery is not configured.');
         }
+        if (strtolower((string) parse_url($endpoint, PHP_URL_SCHEME)) !== 'https'
+            || trim((string) parse_url($endpoint, PHP_URL_HOST)) === '') {
+            throw new RuntimeException('OTP delivery endpoint must use HTTPS.');
+        }
 
-        Http::asJson()->withToken($token)->timeout(8)->retry(2, 250)->post($endpoint, [
-            'recipient' => $mobile,
-            'template' => 'royadarman_otp_'.$locale,
-            'parameters' => ['code' => $code],
-        ])->throw();
+        Http::asJson()
+            ->withToken($token)
+            ->timeout(8)
+            ->retry(2, 250)
+            ->withOptions(['allow_redirects' => false])
+            ->post($endpoint, [
+                'recipient' => $mobile,
+                'template' => 'royadarman_otp_'.$locale,
+                'parameters' => ['code' => $code],
+            ])->throw();
     }
 }
