@@ -6,6 +6,7 @@ use App\Domain\Cases\Enums\CaseStatus;
 use App\Domain\Documents\Enums\DocumentStatus;
 use App\Jobs\ProcessOutboxEvent;
 use App\Models\ClinicalDocument;
+use App\Models\ConsentEvent;
 use App\Models\PatientCase;
 use App\Models\PolicyVersion;
 use App\Models\ReferralProposal;
@@ -452,11 +453,23 @@ class StaffWorkflowTest extends TestCase
 
     // ---------- Clinical reviews ----------
 
-    private function approvedDocument(PatientCase $case): ClinicalDocument
+    private function approvedDocument(PatientCase $case, ?ConsentEvent $consent = null): ClinicalDocument
     {
+        $consent ??= ConsentEvent::query()->create([
+            'subject_user_id' => $case->patient_user_id,
+            'case_id' => $case->id,
+            'policy_version_id' => PolicyVersion::query()->create([
+                'policy_key' => 'opg_document_sharing', 'version' => 'approved-1', 'locale' => 'fa',
+                'content' => 'opg sharing text', 'content_hash' => hash('sha256', 'opg sharing text'), 'published_at' => now(),
+            ])->id,
+            'purpose' => 'opg_document_sharing', 'decision' => 'accepted', 'locale' => 'fa', 'channel' => 'web',
+            'ip_hash' => hash('sha256', 'ip'), 'user_agent_hash' => hash('sha256', 'ua'), 'created_at' => now(),
+        ]);
+
         return ClinicalDocument::query()->create([
             'case_id' => $case->id,
             'uploaded_by_user_id' => $case->patient_user_id,
+            'consent_event_id' => $consent->id,
             'original_name' => encrypt('opg.png'),
             'storage_disk' => 'private-opg',
             'storage_key' => 'cases/'.$case->id.'/'.Str::ulid().'.png',
@@ -784,5 +797,72 @@ class StaffWorkflowTest extends TestCase
             ->assertStatus(422)
             ->assertJsonPath('error.code', 'review.document_not_approved');
         $this->assertDatabaseCount('publication_events', 0);
+    }
+
+    public function test_review_creation_fails_when_consent_revoked(): void
+    {
+        $patient = User::factory()->create(['role' => 'patient']);
+        $clinician = User::factory()->create(['role' => 'clinician']);
+        $this->makePractitioner($clinician, 'verified', now()->addYear());
+        $case = $this->makeCase($patient, CaseStatus::ClinicianReview);
+        $consent = ConsentEvent::query()->create([
+            'subject_user_id' => $patient->id,
+            'case_id' => $case->id,
+            'policy_version_id' => PolicyVersion::query()->create(['policy_key' => 'opg_document_sharing', 'version' => 'approved-1', 'locale' => 'fa', 'content' => 't', 'content_hash' => hash('sha256', 't'), 'published_at' => now()])->id,
+            'purpose' => 'opg_document_sharing', 'decision' => 'accepted', 'locale' => 'fa', 'channel' => 'web',
+            'ip_hash' => hash('sha256', 'ip'), 'user_agent_hash' => hash('sha256', 'ua'), 'created_at' => now(),
+        ]);
+        $doc = $this->approvedDocument($case, $consent);
+        DB::table('case_assignments')->insert(['id' => (string) Str::ulid(), 'case_id' => $case->id, 'assignee_user_id' => $clinician->id, 'assigned_by_user_id' => $clinician->id, 'purpose' => 'clinical_review', 'assigned_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
+
+        // Revoke the document-sharing consent — review creation must fail.
+        $consent->update(['revoked_at' => now()]);
+
+        $this->actingAs($clinician)
+            ->postJson("/api/v1/staff/cases/{$case->id}/reviews", [
+                'source_language' => 'fa',
+                'clinical_document_id' => $doc->id,
+                'image_adequacy' => 'adequate', 'observations' => 'o', 'limitations' => 'l', 'options' => 'op', 'recommended_next_step' => 's',
+            ])
+            ->assertStatus(403)
+            ->assertJsonPath('error.code', 'review.consent_revoked');
+        $this->assertDatabaseCount('review_revisions', 0);
+    }
+
+    public function test_review_publication_fails_when_consent_revoked_after_creation(): void
+    {
+        $patient = User::factory()->create(['role' => 'patient']);
+        $author = User::factory()->create(['role' => 'clinician']);
+        $this->makePractitioner($author, 'verified', now()->addYear());
+        $case = $this->makeCase($patient, CaseStatus::ClinicianReview);
+        $consent = ConsentEvent::query()->create([
+            'subject_user_id' => $patient->id,
+            'case_id' => $case->id,
+            'policy_version_id' => PolicyVersion::query()->create(['policy_key' => 'opg_document_sharing', 'version' => 'approved-1', 'locale' => 'fa', 'content' => 't', 'content_hash' => hash('sha256', 't'), 'published_at' => now()])->id,
+            'purpose' => 'opg_document_sharing', 'decision' => 'accepted', 'locale' => 'fa', 'channel' => 'web',
+            'ip_hash' => hash('sha256', 'ip'), 'user_agent_hash' => hash('sha256', 'ua'), 'created_at' => now(),
+        ]);
+        $doc = $this->approvedDocument($case, $consent);
+        DB::table('case_assignments')->insert(['id' => (string) Str::ulid(), 'case_id' => $case->id, 'assignee_user_id' => $author->id, 'assigned_by_user_id' => $author->id, 'purpose' => 'clinical_review', 'assigned_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
+
+        // Review created while consent is active — succeeds.
+        $this->actingAs($author)
+            ->postJson("/api/v1/staff/cases/{$case->id}/reviews", [
+                'source_language' => 'fa',
+                'clinical_document_id' => $doc->id,
+                'image_adequacy' => 'adequate', 'observations' => 'o', 'limitations' => 'l', 'options' => 'op', 'recommended_next_step' => 's',
+            ])
+            ->assertCreated();
+        $revision = ReviewRevision::query()->where('case_id', $case->id)->first();
+
+        // Consent revoked between draft creation and publication — publication must fail.
+        $consent->update(['revoked_at' => now()]);
+
+        $this->actingAs($author)
+            ->postJson("/api/v1/staff/cases/{$case->id}/reviews/{$revision->id}/publish")
+            ->assertStatus(403)
+            ->assertJsonPath('error.code', 'review.consent_revoked');
+        $this->assertDatabaseCount('publication_events', 0);
+        $this->assertNull(ReviewRevision::query()->whereKey($revision->id)->value('signed_at'));
     }
 }

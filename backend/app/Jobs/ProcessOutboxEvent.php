@@ -68,8 +68,41 @@ final class ProcessOutboxEvent implements ShouldQueue
         $parameters = array_filter($event->payload, fn ($value, $key) => $key !== 'template_key' && is_scalar($value), ARRAY_FILTER_USE_BOTH);
         $reference = $sender->send($case->patient->phone, (string) ($event->payload['template_key'] ?? $event->event_type), $event->recipient_locale ?? $case->patient->locale, $parameters, $event->id);
 
+        // After the provider call returns, lock/re-read the delivery row and
+        // transition to "sent" ONLY if the current state is still pre-terminal.
+        // A fast provider callback may have already promoted the row to
+        // "delivered" or "failed" during send(); we must never regress a terminal
+        // state back to "sent", nor clear a terminal failure_code, nor overwrite a
+        // terminal provider_reference with the value returned by send().
         DB::transaction(function () use ($event, $reference): void {
-            DB::table('notification_deliveries')->where('outbox_event_id', $event->id)->where('channel', 'sms')->update(['status' => 'sent', 'provider_reference' => $reference, 'updated_at' => now()]);
+            $delivery = DB::table('notification_deliveries')
+                ->where('outbox_event_id', $event->id)
+                ->where('channel', 'sms')
+                ->lockForUpdate()
+                ->first();
+
+            if ($delivery === null) {
+                return;
+            }
+
+            if (in_array($delivery->status, ['delivered', 'failed'], true)) {
+                // Terminal — do not regress. Mark the event processed so the
+                // outbox does not re-dispatch.
+                OutboxEvent::query()->whereKey($event->id)->update(['processed_at' => now(), 'attempts' => DB::raw('attempts + 1')]);
+
+                return;
+            }
+
+            $update = ['status' => 'sent', 'updated_at' => now()];
+            // Store the real provider reference, but only if the callback has not
+            // already established one that differs from the pre-populated
+            // idempotency key (which would mean an early callback already
+            // correlated via the real reference).
+            if ($reference !== '' && $reference !== $delivery->provider_reference) {
+                $update['provider_reference'] = $reference;
+            }
+
+            DB::table('notification_deliveries')->where('id', $delivery->id)->update($update);
             OutboxEvent::query()->whereKey($event->id)->update(['processed_at' => now(), 'attempts' => DB::raw('attempts + 1')]);
         });
     }

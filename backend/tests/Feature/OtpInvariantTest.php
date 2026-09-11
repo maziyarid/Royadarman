@@ -7,6 +7,7 @@ use App\Domain\Identity\Services\OtpService;
 use App\Models\OtpChallenge;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -222,5 +223,38 @@ class OtpInvariantTest extends TestCase
 
         $this->expectException(ValidationException::class);
         $service->verify($first->id, $sender->code);
+    }
+
+    public function test_issuance_creates_durable_lock_slot_keyed_by_phone_and_purpose(): void
+    {
+        // Structural invariant: a durable serialisation slot row exists for the
+        // phone_hash + purpose after issuance, so concurrent first-time issuers are
+        // serialised by a row that always exists — not merely by lockForUpdate over
+        // challenge rows that may not exist yet.
+        [$service, $sender] = $this->serviceWithCapture();
+        $service->challenge('09121234567', 'en', '127.0.0.1');
+
+        $phoneHash = hash_hmac('sha256', '09121234567', (string) config('royadarman.phone_hash_key'));
+        $this->assertDatabaseHas('otp_issuance_locks', [
+            'phone_hash' => $phoneHash,
+            'purpose' => 'login',
+        ]);
+    }
+
+    public function test_repeated_issuance_reuses_same_lock_slot(): void
+    {
+        // The lock slot is unique per phone_hash + purpose; repeated issuance
+        // must reuse the same slot row, not create duplicates.
+        [$service, $sender] = $this->serviceWithCapture();
+        $service->challenge('09121234567', 'en', '127.0.0.1');
+        $this->travel(2)->minutes();
+        $service->challenge('09121234567', 'en', '127.0.0.1');
+
+        $phoneHash = hash_hmac('sha256', '09121234567', (string) config('royadarman.phone_hash_key'));
+        $this->assertSame(
+            1,
+            DB::table('otp_issuance_locks')->where('phone_hash', $phoneHash)->where('purpose', 'login')->count(),
+            'Exactly one lock slot row must exist per phone_hash + purpose, regardless of how many challenges are issued.'
+        );
     }
 }

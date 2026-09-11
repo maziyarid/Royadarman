@@ -196,7 +196,9 @@ class ConsentAcceptanceTest extends TestCase
         $this->actingAs($patient)
             ->deleteJson("/api/v1/cases/{$case->id}/consent/opg_document_sharing")
             ->assertOk()
-            ->assertJsonPath('data.revoked', true);
+            ->assertJsonPath('data.revoked_events.0', function ($value): bool {
+                return $value !== null;
+            });
 
         $this->assertDatabaseHas('consent_events', [
             'subject_user_id' => $patient->id,

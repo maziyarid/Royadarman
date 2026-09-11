@@ -144,7 +144,9 @@ final class StaffCaseController extends Controller
 
             // An OPG clinical review must be traceable to the exact approved
             // document being reviewed. The document must belong to the same case
-            // and remain approved/authorised at creation time.
+            // and remain approved/authorised at creation time. The linked sharing
+            // consent must still be active — a revoked consent removes clinician
+            // access to the document and therefore blocks review creation.
             $doc = ClinicalDocument::query()
                 ->where('id', $data['clinical_document_id'])
                 ->where('case_id', $case->id)
@@ -153,6 +155,9 @@ final class StaffCaseController extends Controller
                 ->first();
             if ($doc === null) {
                 throw new DomainException(422, 'review.document_not_approved');
+            }
+            if (! $this->documentConsentActive($doc)) {
+                throw new DomainException(403, 'review.consent_revoked');
             }
 
             $number = ((int) ReviewRevision::query()->where('case_id', $case->id)->max('revision_number')) + 1;
@@ -204,6 +209,8 @@ final class StaffCaseController extends Controller
 
             // Revalidate the source document relationship at publication time: the
             // linked OPG must still belong to this case and remain approved/authorised.
+            // The linked sharing consent is rechecked inside the lock so a consent
+            // revoked between draft creation and publication stops publication.
             $document = ClinicalDocument::query()
                 ->where('id', $locked->clinical_document_id)
                 ->where('case_id', $case->id)
@@ -212,6 +219,9 @@ final class StaffCaseController extends Controller
                 ->first();
             if ($document === null) {
                 throw new DomainException(422, 'review.document_not_approved');
+            }
+            if (! $this->documentConsentActive($document)) {
+                throw new DomainException(403, 'review.consent_revoked');
             }
 
             $locked->update(['signed_at' => now()]);
@@ -227,5 +237,24 @@ final class StaffCaseController extends Controller
             return response()->json(['data' => ['id' => $locked->id, 'published' => true]])
                 ->header('Cache-Control', 'private, no-store');
         });
+    }
+
+    /**
+     * Verify the document's linked OPG/document-sharing consent event is still
+     * active (accepted and not revoked). A document with no consent event fails
+     * closed (no access). This mirrors ClinicalDocumentPolicy::view but is usable
+     * inside transactional controller paths that already hold the document row lock.
+     */
+    private function documentConsentActive(ClinicalDocument $document): bool
+    {
+        if ($document->consent_event_id === null) {
+            return false;
+        }
+
+        return DB::table('consent_events')
+            ->where('id', $document->consent_event_id)
+            ->where('decision', 'accepted')
+            ->whereNull('revoked_at')
+            ->exists();
     }
 }

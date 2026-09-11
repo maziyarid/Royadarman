@@ -28,10 +28,11 @@ final class ReferralController extends Controller
             if ($locked->status !== 'proposed' || $locked->withdrawn_at) {
                 return response()->json(['error' => ['code' => 'referral.not_available'], 'request_id' => $request->attributes->get('request_id')], 422);
             }
-            $locked->update(['status' => $data['decision'], 'decided_at' => now()]);
+
             if ($data['decision'] === 'accepted') {
-                // Bind acceptance to the EXACT published policy version/hash the
-                // patient was shown; do not infer consent from latestPublishedPolicy().
+                // Validate ALL prerequisites BEFORE mutating proposal state, so a
+                // failed acceptance never leaves the proposal accepted without a
+                // consent event or grant. Returning here rolls back the transaction.
                 $policy = $consent->resolvePolicy('referral_sharing', $data['policy_version'], $locked->source_language);
                 if ($policy === null || ! hash_equals($policy->content_hash, $data['content_hash'])) {
                     return response()->json(['error' => ['code' => 'consent.policy_mismatch'], 'request_id' => $request->attributes->get('request_id')], 422);
@@ -41,6 +42,14 @@ final class ReferralController extends Controller
                 if (! is_numeric($ttl) || (int) $ttl <= 0) {
                     return response()->json(['error' => ['code' => 'referral.grant_ttl_unconfigured'], 'request_id' => $request->attributes->get('request_id')], 503);
                 }
+            }
+
+            // Only mutate the proposal once every prerequisite has passed.
+            $locked->update(['status' => $data['decision'], 'decided_at' => now()]);
+
+            if ($data['decision'] === 'accepted') {
+                $policy = $consent->resolvePolicy('referral_sharing', $data['policy_version'], $locked->source_language);
+                $ttl = (int) config('royadarman.referral.grant_ttl_minutes');
 
                 $consentEvent = $consent->record(
                     $request->user(),
@@ -58,7 +67,7 @@ final class ReferralController extends Controller
                     'clinic_id' => $locked->clinic_id,
                     'scope' => json_encode(['contact', 'service_need'], JSON_THROW_ON_ERROR),
                     'granted_at' => now(),
-                    'expires_at' => now()->addMinutes((int) $ttl),
+                    'expires_at' => now()->addMinutes($ttl),
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

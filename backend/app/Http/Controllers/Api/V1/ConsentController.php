@@ -63,14 +63,15 @@ final class ConsentController extends Controller
         $supported = ['opg_document_sharing', 'referral_sharing'];
         abort_unless(in_array($purpose, $supported, true), 404);
 
-        $event = $this->consent->latestActiveFor($request->user(), $purpose, $case->id, $purpose);
-        if ($event === null) {
+        // Revoke ALL active consent events for this patient/case/purpose (not just
+        // the latest) and immediately revoke dependent referral grants, so an
+        // older grant cannot remain authorised via an earlier consent event.
+        $result = $this->consent->revokeAllActiveFor($request->user(), $purpose, $case->id, $purpose);
+        if ($result['events'] === []) {
             return response()->json(['error' => ['code' => 'consent.no_active_consent'], 'request_id' => $request->attributes->get('request_id')], 404);
         }
 
-        $this->consent->revoke($event);
-
-        return response()->json(['data' => ['id' => $event->id, 'revoked' => true]])
+        return response()->json(['data' => ['revoked_events' => $result['events'], 'revoked_grants' => $result['grants']]])
             ->header('Cache-Control', 'private, no-store');
     }
 }

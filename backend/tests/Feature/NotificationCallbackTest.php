@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Operations\Contracts\NotificationSender;
+use App\Jobs\ProcessOutboxEvent;
 use App\Models\OutboxEvent;
 use App\Models\PatientCase;
 use App\Models\User;
@@ -194,5 +196,112 @@ final class NotificationCallbackTest extends TestCase
             'HTTP_X_CALLBACK_TIMESTAMP' => $timestamp,
             'HTTP_X_CALLBACK_SIGNATURE' => $signature,
         ], $body);
+    }
+
+    public function test_worker_does_not_regress_terminal_state_after_callback_during_send(): void
+    {
+        // End-to-end race: a fast provider callback arrives during send() and
+        // promotes the delivery to 'delivered'. After send() returns, the worker
+        // must NOT regress it back to 'sent'.
+        $patient = User::factory()->create(['role' => 'patient', 'locale' => 'fa', 'phone' => '09121234567', 'phone_hash' => hash('sha256', 'race')]);
+        $case = PatientCase::query()->create([
+            'public_reference' => 'RD-'.strtoupper(Str::random(8)), 'patient_user_id' => $patient->id,
+            'service_type' => 'guidance_referral', 'status' => 'submitted', 'patient_mobile' => '09121234567',
+            'patient_mobile_hash' => hash('sha256', 'race'), 'budget_band' => 'call', 'version' => 1,
+        ]);
+        $event = OutboxEvent::query()->create([
+            'event_type' => 'case.submitted', 'aggregate_type' => PatientCase::class, 'aggregate_id' => $case->id,
+            'recipient_locale' => 'fa', 'payload' => ['template_key' => 'case_submitted'], 'deduplication_key' => 'race-1', 'available_at' => now(),
+        ]);
+
+        $self = $this;
+        $sender = new class($self, self::SECRET) implements NotificationSender
+        {
+            public function __construct(private readonly object $test, private readonly string $secret) {}
+
+            public function send(string $mobile, string $template, string $locale, array $parameters, string $idempotencyKey): string
+            {
+                // Simulate a fast provider callback arriving during send(): the
+                // delivery row was pre-populated with provider_reference = outbox id,
+                // and the callback promotes it to 'delivered'.
+                $outboxId = $idempotencyKey;
+                $reference = $outboxId;
+                $body = json_encode(['reference' => $reference, 'status' => 'delivered'], JSON_THROW_ON_ERROR);
+                $timestamp = (string) time();
+                $signature = hash_hmac('sha256', $timestamp.'.'.$body, $this->secret);
+                $this->test->call('POST', '/api/v1/notifications/callback', [], [], [], [
+                    'CONTENT_TYPE' => 'application/json',
+                    'HTTP_X_CALLBACK_TIMESTAMP' => $timestamp,
+                    'HTTP_X_CALLBACK_SIGNATURE' => $signature,
+                ], $body);
+
+                // The provider response returns a different reference.
+                return 'real-provider-ref';
+            }
+        };
+        $this->app->instance(NotificationSender::class, $sender);
+
+        (new ProcessOutboxEvent($event->id))->handle($sender);
+
+        // The delivery must remain 'delivered' — the worker must not regress it.
+        $this->assertDatabaseHas('notification_deliveries', [
+            'outbox_event_id' => $event->id,
+            'status' => 'delivered',
+        ]);
+        $this->assertDatabaseMissing('notification_deliveries', [
+            'outbox_event_id' => $event->id,
+            'status' => 'sent',
+        ]);
+        $this->assertTrue(OutboxEvent::query()->whereKey($event->id)->whereNotNull('processed_at')->exists());
+    }
+
+    public function test_worker_does_not_regress_failed_state_after_callback_during_send(): void
+    {
+        $patient = User::factory()->create(['role' => 'patient', 'locale' => 'fa', 'phone' => '09121234567', 'phone_hash' => hash('sha256', 'race2')]);
+        $case = PatientCase::query()->create([
+            'public_reference' => 'RD-'.strtoupper(Str::random(8)), 'patient_user_id' => $patient->id,
+            'service_type' => 'guidance_referral', 'status' => 'submitted', 'patient_mobile' => '09121234567',
+            'patient_mobile_hash' => hash('sha256', 'race2'), 'budget_band' => 'call', 'version' => 1,
+        ]);
+        $event = OutboxEvent::query()->create([
+            'event_type' => 'case.submitted', 'aggregate_type' => PatientCase::class, 'aggregate_id' => $case->id,
+            'recipient_locale' => 'fa', 'payload' => ['template_key' => 'case_submitted'], 'deduplication_key' => 'race-2', 'available_at' => now(),
+        ]);
+
+        $self = $this;
+        $sender = new class($self, self::SECRET) implements NotificationSender
+        {
+            public function __construct(private readonly object $test, private readonly string $secret) {}
+
+            public function send(string $mobile, string $template, string $locale, array $parameters, string $idempotencyKey): string
+            {
+                $reference = $idempotencyKey;
+                $body = json_encode(['reference' => $reference, 'status' => 'failed', 'failure_code' => 'REJECTED'], JSON_THROW_ON_ERROR);
+                $timestamp = (string) time();
+                $signature = hash_hmac('sha256', $timestamp.'.'.$body, $this->secret);
+                $this->test->call('POST', '/api/v1/notifications/callback', [], [], [], [
+                    'CONTENT_TYPE' => 'application/json',
+                    'HTTP_X_CALLBACK_TIMESTAMP' => $timestamp,
+                    'HTTP_X_CALLBACK_SIGNATURE' => $signature,
+                ], $body);
+
+                return 'real-provider-ref-2';
+            }
+        };
+        $this->app->instance(NotificationSender::class, $sender);
+
+        (new ProcessOutboxEvent($event->id))->handle($sender);
+
+        // The delivery must remain 'failed' with the failure code — the worker
+        // must not regress it to 'sent' nor clear the failure_code.
+        $this->assertDatabaseHas('notification_deliveries', [
+            'outbox_event_id' => $event->id,
+            'status' => 'failed',
+            'failure_code' => 'REJECTED',
+        ]);
+        $this->assertDatabaseMissing('notification_deliveries', [
+            'outbox_event_id' => $event->id,
+            'status' => 'sent',
+        ]);
     }
 }

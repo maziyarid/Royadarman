@@ -7,6 +7,7 @@ use App\Models\PolicyVersion;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 final class ConsentService
 {
@@ -72,6 +73,52 @@ final class ConsentService
         $event->update(['revoked_at' => now()]);
 
         return $event->refresh();
+    }
+
+    /**
+     * Revoke every active consent event for the given subject/case/purpose and
+     * immediately revoke dependent referral grants so a patient revocation cannot
+     * leave an older grant authorised via an earlier consent event.
+     *
+     * @return array{events: list<string>, grants: list<string>}
+     */
+    public function revokeAllActiveFor(User $subject, string $purpose, string $caseId, ?string $policyKey = null): array
+    {
+        return DB::transaction(function () use ($subject, $purpose, $caseId, $policyKey): array {
+            $query = ConsentEvent::query()
+                ->where('subject_user_id', $subject->id)
+                ->where('purpose', $purpose)
+                ->where('case_id', $caseId)
+                ->where('decision', 'accepted')
+                ->whereNull('revoked_at')
+                ->when($policyKey !== null, function (Builder $q) use ($policyKey): void {
+                    $q->whereHas('policyVersion', fn (Builder $pq) => $pq->where('policy_key', $policyKey));
+                })
+                ->lockForUpdate();
+
+            $eventIds = (clone $query)->pluck('id')->all();
+            if ($eventIds === []) {
+                return ['events' => [], 'grants' => []];
+            }
+
+            $query->update(['revoked_at' => now()]);
+
+            // Revoke dependent referral grants linked to any of these consent
+            // events so clinic access disappears immediately.
+            $grantIds = DB::table('referral_grants')
+                ->whereIn('consent_event_id', $eventIds)
+                ->whereNull('revoked_at')
+                ->lockForUpdate()
+                ->pluck('id')
+                ->all();
+            if ($grantIds !== []) {
+                DB::table('referral_grants')
+                    ->whereIn('id', $grantIds)
+                    ->update(['revoked_at' => now(), 'updated_at' => now()]);
+            }
+
+            return ['events' => $eventIds, 'grants' => $grantIds];
+        });
     }
 
     public function latestActiveFor(User $subject, string $purpose, ?string $caseId = null, ?string $policyKey = null): ?ConsentEvent

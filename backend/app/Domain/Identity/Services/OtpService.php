@@ -10,6 +10,7 @@ use App\Support\DigitNormalizer;
 use App\Support\PhoneHasher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 final class OtpService
@@ -39,10 +40,23 @@ final class OtpService
 
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $challenge = DB::transaction(function () use ($mobile, $locale, $phoneHash, $ipHash, $code): OtpChallenge {
+            // Acquire a durable serialization slot keyed by phone_hash + purpose.
+            // The slot row always exists (created on first use), so locking it
+            // serialises concurrent issuance transactions even when no existing
+            // active challenge row exists to lockForUpdate. This makes the
+            // one-active-challenge-per-identity invariant structurally race-safe.
+            DB::table('otp_issuance_locks')
+                ->insertOrIgnore(['id' => (string) Str::ulid(), 'phone_hash' => $phoneHash, 'purpose' => 'login', 'created_at' => now(), 'updated_at' => now()]);
+            DB::table('otp_issuance_locks')
+                ->where('phone_hash', $phoneHash)
+                ->where('purpose', 'login')
+                ->lockForUpdate()
+                ->first();
+
             // Atomically supersede all prior active challenges for this phone+
             // purpose before the new challenge becomes usable, so only one active
-            // challenge can exist per identity at a time. The lock + update is
-            // serialised against concurrent issuance.
+            // challenge can exist per identity at a time, serialised against
+            // concurrent issuance by the durable lock slot above.
             OtpChallenge::query()
                 ->where('phone_hash', $phoneHash)
                 ->where('purpose', 'login')
