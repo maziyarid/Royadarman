@@ -61,9 +61,11 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
-          # Inject the CI test lookup key so the preflight gate passes (it
-          # refuses to start with an empty phone-hash key).
-          sed -i 's/^ROYADARMAN_PHONE_HASH_KEY=.*/ROYADARMAN_PHONE_HASH_KEY=ci-test-phone-lookup-key-do-not-use-in-production/' .env
+          # The template intentionally has NO active ROYADARMAN_PHONE_HASH_KEY
+          # assignment (it is a commented required variable). Append the CI-only
+          # test key directly so the preflight gate passes. This value never
+          # enters production configuration.
+          echo "ROYADARMAN_PHONE_HASH_KEY=ci-test-phone-lookup-key-do-not-use-in-production" >> .env
           php artisan config:clear
 
       - name: Migrate clean test database (SQLite :memory:)
@@ -152,7 +154,7 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
-          sed -i 's/^ROYADARMAN_PHONE_HASH_KEY=.*/ROYADARMAN_PHONE_HASH_KEY=ci-test-phone-lookup-key-do-not-use-in-production/' .env
+          echo "ROYADARMAN_PHONE_HASH_KEY=ci-test-phone-lookup-key-do-not-use-in-production" >> .env
           php artisan config:clear
 
       - name: Locale parity feature test
