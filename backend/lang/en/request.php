@@ -1,0 +1,31 @@
+<?php
+
+return [
+    'title' => 'Start a new care request',
+    'intro' => 'Tell the coordination team what you need. Your request is assigned to an active coordinator only after you review and accept the current coordination consent.',
+    'disabled_title' => 'New requests are not open yet',
+    'disabled_text' => 'The workspace is available for review, but live patient intake remains disabled until the remaining operational launch gates are completed.',
+    'service_type' => 'Service',
+    'services' => [
+        'opg_review' => 'Preliminary OPG review',
+        'home_dentistry' => 'Home dentistry coordination',
+        'referral' => 'Clinic referral and coordination',
+    ],
+    'name' => 'Name',
+    'tehran_area' => 'Tehran area',
+    'areas' => ['north' => 'North', 'central' => 'Central', 'east' => 'East', 'west' => 'West', 'south' => 'South'],
+    'contact_time' => 'Preferred contact time',
+    'times' => ['any' => 'Any time', 'morning' => 'Morning', 'midday' => 'Midday', 'evening' => 'Evening', 'night' => 'Night'],
+    'reason' => 'What do you need help with?',
+    'budget' => 'Budget preference',
+    'budgets' => ['economic' => 'Economical', 'balanced' => 'Balanced', 'flexible' => 'Flexible', 'call' => 'Discuss with me'],
+    'consent_title' => 'Coordination consent',
+    'consent_loading' => 'Loading the current approved consent text…',
+    'consent_unavailable' => 'The approved consent text is unavailable in this language. Submission is blocked.',
+    'accept' => 'I have read and accept the coordination consent shown above.',
+    'submit' => 'Create and submit request',
+    'working' => 'Submitting…',
+    'success' => 'Your request was submitted and assigned for coordination.',
+    'error' => 'The request could not be submitted. No partial submission has been accepted.',
+    'back' => 'Back to my panel',
+];
