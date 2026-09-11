@@ -17,7 +17,7 @@ return new class extends Migration
             ->first();
 
         if ($duplicate !== null) {
-            throw new \LogicException(
+            throw new LogicException(
                 'Cannot enforce unique notification provider references per channel while duplicate non-null references exist. '
                 .'Reconcile the affected delivery records before retrying this migration.'
             );

@@ -60,6 +60,7 @@ final class CaseController extends Controller
                 'source_language' => $data['source_language'],
                 'budget_input_unit' => $data['budget_input_unit'],
                 'currency' => 'IRR',
+                'version' => 1,
             ]);
 
             return ['status' => 201, 'body' => ['data' => $this->resource($case)]];

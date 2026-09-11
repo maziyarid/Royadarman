@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\ProcessOutboxEvent;
 use App\Models\PatientCase;
 use App\Models\PolicyVersion;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -17,6 +19,7 @@ class CoordinatorBootstrapTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Queue::fake([ProcessOutboxEvent::class]);
         config()->set('royadarman.intake_enabled', true);
     }
 

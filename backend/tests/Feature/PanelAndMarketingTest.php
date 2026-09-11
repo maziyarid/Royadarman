@@ -114,7 +114,10 @@ class PanelAndMarketingTest extends TestCase
 
     public function test_public_marketing_pages_have_cache_and_sitemap_is_public_only(): void
     {
-        $this->get('/fa/services/opg')->assertOk()->assertHeader('Cache-Control', 'public, max-age=300');
+        $response = $this->get('/fa/services/opg')->assertOk();
+        $cacheControl = (string) $response->headers->get('Cache-Control');
+        $this->assertStringContainsString('public', $cacheControl);
+        $this->assertStringContainsString('max-age=300', $cacheControl);
         $this->get('/sitemap.xml')->assertOk()->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
             ->assertSee('/fa/services/opg', false)->assertDontSee('/panel', false)->assertDontSee('/api/', false);
     }

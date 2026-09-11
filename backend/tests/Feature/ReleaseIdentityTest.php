@@ -26,6 +26,7 @@ final class ReleaseIdentityTest extends TestCase
         $this->assertArrayHasKey('composer_lock_sha256', $payload);
         $this->assertArrayHasKey('built_at', $payload);
         $this->assertArrayHasKey('commit', $payload);
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{40}$/', (string) $payload['commit']);
         $this->assertNotNull($payload['composer_lock_sha256']);
     }
 

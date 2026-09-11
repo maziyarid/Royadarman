@@ -17,7 +17,7 @@ return new class extends Migration
     public function down(): void
     {
         if (DB::table('case_assignments')->whereNull('assigned_by_user_id')->exists()) {
-            throw new \LogicException(
+            throw new LogicException(
                 'Cannot roll back system case-assignment support while assignments with no human actor exist. '
                 .'Preserving NULL assigned_by_user_id values is required to retain truthful audit provenance.'
             );

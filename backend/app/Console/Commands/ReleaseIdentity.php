@@ -28,6 +28,7 @@ final class ReleaseIdentity extends Command
 
         if ($this->option('write')) {
             $path = storage_path('app/release-identity.json');
+            File::ensureDirectoryExists(dirname($path));
             File::put($path, json_encode($identity, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL);
             $this->info("Release identity written to {$path}.");
         }
@@ -47,8 +48,11 @@ final class ReleaseIdentity extends Command
         if (is_string($envCommit) && $envCommit !== '') {
             return $envCommit;
         }
-        $path = base_path('.git');
-        if (File::exists($path.DIRECTORY_SEPARATOR.'HEAD')) {
+        $gitPaths = [base_path('.git'), dirname(base_path()).DIRECTORY_SEPARATOR.'.git'];
+        foreach ($gitPaths as $path) {
+            if (! File::exists($path.DIRECTORY_SEPARATOR.'HEAD')) {
+                continue;
+            }
             $head = trim((string) File::get($path.DIRECTORY_SEPARATOR.'HEAD'));
             if (str_starts_with($head, 'ref:')) {
                 $refPath = $path.DIRECTORY_SEPARATOR.trim(substr($head, 4));

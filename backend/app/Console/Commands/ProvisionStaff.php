@@ -39,14 +39,17 @@ final class ProvisionStaff extends Command
 
         if (! preg_match('/^09\d{9}$/', $mobile)) {
             $this->error('Invalid Iranian mobile number.');
+
             return self::FAILURE;
         }
         if (! $role instanceof UserRole) {
             $this->error('Invalid staff role.');
+
             return self::FAILURE;
         }
         if (! in_array($locale, ['fa', 'ar', 'en'], true)) {
             $this->error('Invalid locale.');
+
             return self::FAILURE;
         }
 
@@ -57,12 +60,14 @@ final class ProvisionStaff extends Command
             $hasCases = DB::table('patient_cases')->where('patient_user_id', $user->id)->exists();
             if ($hasCases) {
                 $this->error('Refusing to convert a patient identity with existing cases into a staff identity. Use a separate staff mobile number.');
+
                 return self::FAILURE;
             }
         }
 
         if ($user && $user->role->isStaff() && $user->role !== $role && ! (bool) $this->option('force-role-change')) {
             $this->error('Staff identity already has role '.$user->role->value.'. Use --force-role-change for an intentional role change.');
+
             return self::FAILURE;
         }
 
@@ -89,6 +94,7 @@ final class ProvisionStaff extends Command
         $needsMfa = $created || ! $user->totp_secret || (bool) $this->option('replace-mfa');
         if (! $needsMfa) {
             $this->info('Staff identity is active and already has MFA configured. No secret was displayed or changed.');
+
             return self::SUCCESS;
         }
 
