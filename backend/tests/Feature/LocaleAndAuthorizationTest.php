@@ -13,19 +13,20 @@ class LocaleAndAuthorizationTest extends TestCase
 
     public function test_each_public_locale_is_server_rendered_with_correct_direction(): void
     {
-        $this->get('/fa/')->assertOk()->assertSee('<html lang="fa" dir="rtl">', false);
+        $this->get('/')->assertOk()->assertSee('<html lang="fa" dir="rtl">', false);
         $this->get('/ar/')->assertOk()->assertSee('<html lang="ar" dir="rtl">', false);
         $this->get('/en/')->assertOk()->assertSee('<html lang="en" dir="ltr">', false);
     }
 
-    public function test_root_redirects_to_persian_default(): void
+    public function test_persian_prefix_permanently_redirects_to_root(): void
     {
-        $this->get('/')->assertRedirect('/fa/');
+        $this->get('/fa/')->assertRedirect('/');
+        $this->get('/fa/services/opg')->assertRedirect('/services/opg');
     }
 
     public function test_home_page_is_nonblank_and_has_skip_link_and_main_landmark(): void
     {
-        $response = $this->get('/fa/')->assertOk();
+        $response = $this->get('/')->assertOk();
         $body = $response->getContent();
         $this->assertNotEmpty($body);
         $this->assertStringContainsString('class="skip-link"', $body);
@@ -43,15 +44,15 @@ class LocaleAndAuthorizationTest extends TestCase
 
     public function test_locale_switching_links_present_and_point_to_each_locale(): void
     {
-        $body = $this->get('/fa/')->assertOk()->getContent();
-        $this->assertStringContainsString('href="/fa/"', $body);
+        $body = $this->get('/')->assertOk()->getContent();
+        $this->assertStringContainsString('href="/"', $body);
         $this->assertStringContainsString('href="/ar/"', $body);
         $this->assertStringContainsString('href="/en/"', $body);
     }
 
     public function test_intake_disabled_state_is_honestly_represented_as_coming_soon(): void
     {
-        $body = $this->get('/fa/')->assertOk()->getContent();
+        $body = $this->get('/')->assertOk()->getContent();
         $this->assertStringContainsString('launch-state', $body);
         $this->assertStringContainsString('هنوز فعال نشده', $body);
         $this->assertStringNotContainsString('action="/api/v1/cases/draft"', $body);
@@ -60,14 +61,14 @@ class LocaleAndAuthorizationTest extends TestCase
 
     public function test_faq_section_uses_progressive_enhancement_details_elements(): void
     {
-        $body = $this->get('/fa/')->assertOk()->getContent();
+        $body = $this->get('/')->assertOk()->getContent();
         $this->assertStringContainsString('id="faq"', $body);
         $this->assertStringContainsString('<details><summary>', $body);
     }
 
     public function test_assets_referenced_are_local_and_not_external_cdn(): void
     {
-        $body = $this->get('/fa/')->assertOk()->getContent();
+        $body = $this->get('/')->assertOk()->getContent();
         $this->assertStringContainsString('href="/assets/site.css', $body);
         $this->assertStringContainsString('src="/assets/site.js', $body);
         // Assets must be same-origin relative paths, never loaded from a CDN.
