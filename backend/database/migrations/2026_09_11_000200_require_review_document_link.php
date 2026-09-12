@@ -8,19 +8,41 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // An OPG clinical review must be traceable to the exact approved document
-        // reviewed. Make the FK non-nullable now that every review path requires it.
-        // Existing deployed rows (if any) would need backfilling before applying;
-        // a fresh deployment has none.
+        // An OPG clinical review must remain traceable to the exact approved
+        // document reviewed. The preceding migration temporarily uses
+        // ON DELETE SET NULL while this column is nullable, so replace that
+        // foreign-key action before enforcing the non-null invariant.
+        Schema::table('review_revisions', function (Blueprint $table): void {
+            $table->dropForeign(['clinical_document_id']);
+        });
+
         Schema::table('review_revisions', function (Blueprint $table): void {
             $table->foreignUlid('clinical_document_id')->nullable(false)->change();
+        });
+
+        Schema::table('review_revisions', function (Blueprint $table): void {
+            $table->foreign('clinical_document_id')
+                ->references('id')
+                ->on('clinical_documents')
+                ->restrictOnDelete();
         });
     }
 
     public function down(): void
     {
         Schema::table('review_revisions', function (Blueprint $table): void {
+            $table->dropForeign(['clinical_document_id']);
+        });
+
+        Schema::table('review_revisions', function (Blueprint $table): void {
             $table->foreignUlid('clinical_document_id')->nullable()->change();
+        });
+
+        Schema::table('review_revisions', function (Blueprint $table): void {
+            $table->foreign('clinical_document_id')
+                ->references('id')
+                ->on('clinical_documents')
+                ->nullOnDelete();
         });
     }
 };
