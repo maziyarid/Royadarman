@@ -10,12 +10,19 @@ use App\Http\Middleware\EnsureActiveUser;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/fa/', 302);
 Route::get('/up', fn () => response()->json(['status' => 'ok']));
 Route::get('/sitemap.xml', [PublicPageController::class, 'sitemap'])->name('public.sitemap');
 
+// Persian is the canonical, unprefixed public site.
+Route::get('/', [PublicPageController::class, 'homePersian'])->name('public.home.fa');
+Route::get('/services/opg', [PublicPageController::class, 'opgPersian'])->name('public.opg.fa');
+Route::get('/services/home-dentistry', [PublicPageController::class, 'homeDentistryPersian'])->name('public.home-dentistry.fa');
+Route::get('/referrals', [PublicPageController::class, 'referralsPersian'])->name('public.referrals.fa');
+Route::get('/contact', [PublicPageController::class, 'contactPersian'])->name('public.contact.fa');
+
+// Arabic and English remain explicitly prefixed.
 Route::prefix('{locale}')
-    ->whereIn('locale', ['fa', 'ar', 'en'])
+    ->whereIn('locale', ['ar', 'en'])
     ->middleware(SetLocale::class)
     ->group(function (): void {
         Route::get('/', [PublicPageController::class, 'home'])->name('public.home');
@@ -23,6 +30,13 @@ Route::prefix('{locale}')
         Route::get('/services/home-dentistry', [PublicPageController::class, 'homeDentistry'])->name('public.home-dentistry');
         Route::get('/referrals', [PublicPageController::class, 'referrals'])->name('public.referrals');
         Route::get('/contact', [PublicPageController::class, 'contact'])->name('public.contact');
+    });
+
+// Authentication and private panels keep locale-prefixed URLs, including Persian.
+Route::prefix('{locale}')
+    ->whereIn('locale', ['fa', 'ar', 'en'])
+    ->middleware(SetLocale::class)
+    ->group(function (): void {
         Route::get('/login', fn (string $locale) => auth()->check()
             ? redirect()->route('panel', ['locale' => $locale])
             : response()->view('auth.login', ['locale' => $locale])->header('Cache-Control', 'private, no-store'))
@@ -52,3 +66,8 @@ Route::prefix('{locale}')
             });
         });
     });
+
+// Preserve old indexed/shared Persian URLs, but permanently canonicalise them to root.
+Route::get('/fa/{path?}', [PublicPageController::class, 'redirectPersianPrefix'])
+    ->where('path', '.*')
+    ->name('public.fa-redirect');
