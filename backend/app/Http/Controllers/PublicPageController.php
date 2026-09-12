@@ -3,10 +3,57 @@
 namespace App\Http\Controllers;
 
 use App\Models\MarketingPage;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 final class PublicPageController extends Controller
 {
+
+    public function homePersian(): Response
+    {
+        app()->setLocale('fa');
+
+        return $this->home('fa');
+    }
+
+    public function opgPersian(): Response
+    {
+        app()->setLocale('fa');
+
+        return $this->opg('fa');
+    }
+
+    public function homeDentistryPersian(): Response
+    {
+        app()->setLocale('fa');
+
+        return $this->homeDentistry('fa');
+    }
+
+    public function referralsPersian(): Response
+    {
+        app()->setLocale('fa');
+
+        return $this->referrals('fa');
+    }
+
+    public function contactPersian(): Response
+    {
+        app()->setLocale('fa');
+
+        return $this->contact('fa');
+    }
+
+    public function redirectPersianPrefix(Request $request, ?string $path = null): RedirectResponse
+    {
+        $target = '/'.ltrim((string) $path, '/');
+        $target = $target === '/' ? '/' : rtrim($target, '/');
+        $query = $request->getQueryString();
+
+        return redirect()->to(url($target).($query ? '?'.$query : ''), 301);
+    }
+
     public function home(string $locale): Response
     {
         $page = $this->published('home', $locale);
@@ -42,7 +89,9 @@ final class PublicPageController extends Controller
         $urls = [];
         foreach (['fa', 'ar', 'en'] as $locale) {
             foreach (['public.home', 'public.opg', 'public.home-dentistry', 'public.referrals', 'public.contact'] as $route) {
-                $urls[] = route($route, ['locale' => $locale]);
+                $urls[] = $locale === 'fa'
+                    ? route($route.'.fa')
+                    : route($route, ['locale' => $locale]);
             }
         }
 
