@@ -7,9 +7,9 @@
     <meta name="description" content="{{ __('ui.meta_description') }}">
     <meta name="robots" content="index,follow,max-image-preview:large">
     <title>{{ __('ui.meta_title') }}</title>
-    <link rel="canonical" href="{{ url('/'.app()->getLocale().'/') }}">
-    @foreach(['fa','ar','en'] as $language)<link rel="alternate" hreflang="{{ $language }}" href="{{ url('/'.$language.'/') }}">@endforeach
-    <link rel="alternate" hreflang="x-default" href="{{ url('/fa/') }}">
+    <link rel="canonical" href="{{ app()->getLocale() === 'fa' ? url('/') : url('/'.app()->getLocale().'/') }}">
+    @foreach(['fa','ar','en'] as $language)<link rel="alternate" hreflang="{{ $language }}" href="{{ $language === 'fa' ? url('/') : url('/'.$language.'/') }}">@endforeach
+    <link rel="alternate" hreflang="x-default" href="{{ url('/') }}">
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/assets/site.css?v=20260908">
     <script src="/assets/site.js?v=20260908" defer></script>
@@ -18,13 +18,13 @@
 <a class="skip-link" href="#main">{{ __('ui.skip') }}</a>
 <header class="site-header">
     <div class="shell header-row">
-        <a class="brand" href="/{{ app()->getLocale() }}/" aria-label="{{ __('ui.meta_title') }}">
+        <a class="brand" href="{{ app()->getLocale() === 'fa' ? '/' : '/'.app()->getLocale().'/' }}" aria-label="{{ __('ui.meta_title') }}">
             <img src="/assets/brand-mark.svg" alt="" width="54" height="54">
             <span><strong>{{ app()->getLocale() === 'en' ? 'Royadarman' : 'رویا درمان' }}</strong><small>{{ __('ui.brand_subtitle') }}</small></span>
         </a>
         <nav aria-label="{{ __('ui.nav.services') }}"><a href="#services">{{ __('ui.nav.services') }}</a><a href="#path">{{ __('ui.nav.path') }}</a><a href="#trust">{{ __('ui.nav.trust') }}</a><a href="#faq">{{ __('ui.nav.questions') }}</a></nav>
         <div class="header-actions">
-            <details class="language"><summary>{{ strtoupper(app()->getLocale()) }}<span aria-hidden="true">⌄</span></summary><div>@foreach(['fa' => 'فارسی','ar' => 'العربية','en' => 'English'] as $code => $label)<a lang="{{ $code }}" dir="{{ $code === 'en' ? 'ltr' : 'rtl' }}" hreflang="{{ $code }}" href="/{{ $code }}/" @if($code === app()->getLocale()) aria-current="page" @endif>{{ $label }}</a>@endforeach</div></details>
+            <details class="language"><summary>{{ strtoupper(app()->getLocale()) }}<span aria-hidden="true">⌄</span></summary><div>@foreach(['fa' => 'فارسی','ar' => 'العربية','en' => 'English'] as $code => $label)<a lang="{{ $code }}" dir="{{ $code === 'en' ? 'ltr' : 'rtl' }}" hreflang="{{ $code }}" href="{{ $code === 'fa' ? '/' : '/'.$code.'/' }}" @if($code === app()->getLocale()) aria-current="page" @endif>{{ $label }}</a>@endforeach</div></details>
             <a class="button primary desktop-cta" href="#start">{{ __('ui.cta') }}</a>
         </div>
     </div>
