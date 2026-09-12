@@ -114,12 +114,12 @@ class PanelAndMarketingTest extends TestCase
 
     public function test_public_marketing_pages_have_cache_and_sitemap_is_public_only(): void
     {
-        $response = $this->get('/fa/services/opg')->assertOk();
+        $response = $this->get('/services/opg')->assertOk();
         $cacheControl = (string) $response->headers->get('Cache-Control');
         $this->assertStringContainsString('public', $cacheControl);
         $this->assertStringContainsString('max-age=300', $cacheControl);
         $this->get('/sitemap.xml')->assertOk()->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
-            ->assertSee('/fa/services/opg', false)->assertDontSee('/panel', false)->assertDontSee('/api/', false);
+            ->assertSee('/services/opg', false)->assertDontSee('/fa/services/opg', false)->assertDontSee('/panel', false)->assertDontSee('/api/', false);
     }
 
     private function makeCase(User $patient, string $reference): PatientCase
