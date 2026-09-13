@@ -30,6 +30,11 @@ final class DemoPanelAccessController extends Controller
 
         Auth::login($user);
         $request->session()->regenerate();
+        $request->session()->put([
+            'panel_demo' => true,
+            'panel_demo_user_id' => (string) $user->id,
+            'panel_demo_role' => $role,
+        ]);
         $user->forceFill(['last_authenticated_at' => now()])->save();
 
         AuditEvent::query()->create([
