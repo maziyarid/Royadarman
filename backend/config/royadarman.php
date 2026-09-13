@@ -5,6 +5,7 @@ return [
     'phone_hash_key' => env('ROYADARMAN_PHONE_HASH_KEY'),
     'supported_locales' => ['fa', 'ar', 'en'],
     'display_timezone' => 'Asia/Tehran',
+    'panel_demo_access' => filter_var(env('PANEL_DEMO_ACCESS', false), FILTER_VALIDATE_BOOL),
 
     'tehran_areas' => [
         'north',

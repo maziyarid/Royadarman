@@ -1,8 +1,8 @@
 @extends('admin.layout')
 
 @section('content')
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin:20px 0">
-    <h2 style="margin:0;font-size:20px">{{ $post->exists ? __('ui.admin.edit') : __('ui.admin.new_post') }}</h2>
+<div class="heading-row">
+    <h2>{{ $post->exists ? __('ui.admin.edit') : __('ui.admin.new_post') }}</h2>
     @if($post->exists)
         <a href="{{ route('admin.cms.posts.index') }}" class="btn ghost">{{ __('ui.admin.posts') }}</a>
     @endif
@@ -30,9 +30,9 @@
                 <label>{{ __('ui.admin.published_at') }}</label>
                 <input type="date" name="published_at" value="{{ $post->published_at?->format('Y-m-d') }}">
             </div>
-            <div class="field" style="flex-direction:row;align-items:center;gap:8px;padding-top:22px">
+            <div class="checkbox-row">
                 <input type="checkbox" name="is_featured" value="1" id="featured" @checked($post->is_featured)>
-                <label for="featured" style="font-size:14px;color:var(--ink)">{{ __('ui.admin.featured') }}</label>
+                <label for="featured">{{ __('ui.admin.featured') }}</label>
             </div>
         </div>
     </div>
@@ -57,16 +57,16 @@
                         <input type="text" name="translations[{{ $locale }}][slug]" value="{{ $tr?->slug }}" required>
                     </div>
                 </div>
-                <div class="field" style="margin-top:12px">
+                <div class="field table-spaced">
                     <label>{{ __('ui.admin.excerpt') }} ({{ $locale }})</label>
-                    <textarea name="translations[{{ $locale }}][excerpt]" style="min-height:80px">{{ $tr?->excerpt }}</textarea>
+                    <textarea class="textarea-sm" name="translations[{{ $locale }}][excerpt]">{{ $tr?->excerpt }}</textarea>
                 </div>
-                <div class="field" style="margin-top:12px">
+                <div class="field table-spaced">
                     <label>{{ __('ui.admin.body') }} ({{ $locale }})</label>
                     <div class="rte-toolbar" data-rte-toolbar="{{ $locale }}" role="toolbar" aria-label="{{ __('ui.admin.body') }}">
-                        <button type="button" data-cmd="bold" title="Bold" aria-label="Bold" style="font-weight:700">B</button>
-                        <button type="button" data-cmd="italic" title="Italic" aria-label="Italic" style="font-style:italic">I</button>
-                        <button type="button" data-cmd="underline" title="Underline" aria-label="Underline" style="text-decoration:underline">U</button>
+                        <button class="rte-bold" type="button" data-cmd="bold" title="Bold" aria-label="Bold">B</button>
+                        <button class="rte-italic" type="button" data-cmd="italic" title="Italic" aria-label="Italic">I</button>
+                        <button class="rte-underline" type="button" data-cmd="underline" title="Underline" aria-label="Underline">U</button>
                         <span class="rte-sep"></span>
                         <button type="button" data-cmd-block="h2" title="Heading 2" aria-label="Heading 2">H2</button>
                         <button type="button" data-cmd-block="h3" title="Heading 3" aria-label="Heading 3">H3</button>
@@ -77,8 +77,8 @@
                         <button type="button" data-cmd="formatBlock" data-value="blockquote" title="Quote" aria-label="Quote">❝</button>
                         <button type="button" data-rte-link="{{ $locale }}" title="Insert link" aria-label="Insert link">🔗</button>
                     </div>
-                    <div class="rte-editor" contenteditable="true" data-rte-editor="{{ $locale }}" role="textbox" aria-multiline="true" style="min-height:280px"></div>
-                    <textarea name="translations[{{ $locale }}][body]" required data-rte-source="{{ $locale }}" style="display:none">{{ $tr?->body }}</textarea>
+                    <div class="rte-editor editor-min" contenteditable="true" data-rte-editor="{{ $locale }}" role="textbox" aria-multiline="true"></div>
+                    <textarea class="editor-hidden-source" name="translations[{{ $locale }}][body]" required data-rte-source="{{ $locale }}">{{ $tr?->body }}</textarea>
                 </div>
                 <input type="hidden" name="translations[{{ $locale }}][locale]" value="{{ $locale }}">
             </div>
@@ -87,11 +87,11 @@
 
     @if($categories->isNotEmpty())
     <div class="card">
-        <h3 style="margin:0 0 12px;font-size:15px">{{ __('ui.admin.categories') }}</h3>
+        <h3 class="section-title">{{ __('ui.admin.categories') }}</h3>
         <div class="grid grid-2">
             @foreach($categories as $cat)
                 @php $ct = $cat->translations->firstWhere('locale', 'fa') ?? $cat->translations->first(); @endphp
-                <label style="display:flex;align-items:center;gap:8px;font-size:14px">
+                <label class="check">
                     <input type="checkbox" name="categories[]" value="{{ $cat->id }}" @checked($post->categories->contains($cat->id))>
                     {{ $ct?->title ?? $cat->id }}
                 </label>
@@ -102,11 +102,11 @@
 
     @if($tags->isNotEmpty())
     <div class="card">
-        <h3 style="margin:0 0 12px;font-size:15px">{{ __('ui.admin.tags') }}</h3>
+        <h3 class="section-title">{{ __('ui.admin.tags') }}</h3>
         <div class="grid grid-2">
             @foreach($tags as $tag)
                 @php $tt = $tag->translations->firstWhere('locale', 'fa') ?? $tag->translations->first(); @endphp
-                <label style="display:flex;align-items:center;gap:8px;font-size:14px">
+                <label class="check">
                     <input type="checkbox" name="tags[]" value="{{ $tag->id }}" @checked($post->tags->contains($tag->id))>
                     {{ $tt?->title ?? $tag->id }}
                 </label>
@@ -115,7 +115,7 @@
     </div>
     @endif
 
-    <div style="display:flex;gap:10px;margin:20px 0">
+    <div class="actions">
         <button type="submit" class="btn primary">{{ __('ui.admin.save') }}</button>
         @if($post->exists)
             @php
@@ -134,7 +134,7 @@
 
 @if($post->exists && $post->revisions->isNotEmpty())
 <div class="card">
-    <h3 style="margin:0 0 12px;font-size:15px">{{ __('ui.admin.revisions') }}</h3>
+    <h3 class="section-title">{{ __('ui.admin.revisions') }}</h3>
     <table>
         <thead><tr><th scope="col">{{ __('ui.admin.locale') }}</th><th scope="col">{{ __('ui.admin.author') }}</th><th scope="col">{{ __('ui.admin.updated') }}</th></tr></thead>
         <tbody>
@@ -146,50 +146,4 @@
 </div>
 @endif
 
-<script>
-const rteInit = () => {
-    document.querySelectorAll('[data-rte-editor]').forEach(ed => {
-        const locale = ed.dataset.rteEditor;
-        const source = document.querySelector('[data-rte-source="' + locale + '"]');
-        if (!source) return;
-        ed.innerHTML = source.value || '<p><br></p>';
-
-        const toolbar = document.querySelector('[data-rte-toolbar="' + locale + '"]');
-        if (toolbar) {
-            toolbar.querySelectorAll('button').forEach(btn => {
-                btn.addEventListener('mousedown', e => e.preventDefault());
-                btn.addEventListener('click', () => {
-                    ed.focus();
-                    if (btn.dataset.rteLink !== undefined) {
-                        const url = prompt('URL:', 'https://');
-                        if (url) document.execCommand('createLink', false, url);
-                        return;
-                    }
-                    if (btn.dataset.cmdBlock) {
-                        document.execCommand('formatBlock', false, btn.dataset.cmdBlock);
-                        return;
-                    }
-                    const cmd = btn.dataset.cmd;
-                    if (cmd === 'formatBlock' && btn.dataset.value) {
-                        document.execCommand('formatBlock', false, btn.dataset.value);
-                        return;
-                    }
-                    if (cmd) document.execCommand(cmd, false, null);
-                    source.value = ed.innerHTML;
-                });
-            });
-        }
-
-        ed.addEventListener('input', () => source.value = ed.innerHTML);
-        ed.addEventListener('blur', () => source.value = ed.innerHTML);
-    });
-};
-rteInit();
-document.querySelector('form')?.addEventListener('submit', () => {
-    document.querySelectorAll('[data-rte-editor]').forEach(ed => {
-        const source = document.querySelector('[data-rte-source="' + ed.dataset.rteEditor + '"]');
-        if (source) source.value = ed.innerHTML;
-    });
-}, {capture:true});
-</script>
 @endsection

@@ -37,13 +37,19 @@ class PatientRequestPageTest extends TestCase
         config()->set('royadarman.intake_enabled', true);
         $patient = User::factory()->create(['role' => 'patient', 'is_active' => true]);
 
-        $this->actingAs($patient)
+        $response = $this->actingAs($patient)
             ->get('/en/panel/cases/new')
             ->assertOk()
             ->assertSee('id="request-form"', false)
-            ->assertSee('/api/v1/policies/case_coordination', false)
+            ->assertSee('/assets/patient-request.js', false)
             ->assertSee('guidance_referral', false)
-            ->assertSee('Idempotency-Key', false)
-            ->assertSee('content_hash:policy.content_hash', false);
+            ->assertDontSee('<script>', false)
+            ->assertDontSee('<style>', false);
+
+        $script = file_get_contents(public_path('assets/patient-request.js'));
+        $this->assertIsString($script);
+        $this->assertStringContainsString('/api/v1/policies/case_coordination', $script);
+        $this->assertStringContainsString('Idempotency-Key', $script);
+        $this->assertStringContainsString('content_hash:policy.content_hash', $script);
     }
 }

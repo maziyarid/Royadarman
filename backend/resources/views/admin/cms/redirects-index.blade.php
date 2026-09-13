@@ -1,6 +1,6 @@
 @extends('admin.layout')
 @section('content')
-<h2 style="margin:8px 0">{{ __('ui.admin.redirects') }}</h2>
+<h2 class="section-title">{{ __('ui.admin.redirects') }}</h2>
 
 <div class="card">
     <form method="POST" action="{{ route('admin.cms.redirects.store') }}" class="filters">@csrf
@@ -20,7 +20,7 @@
         <tbody>
         @foreach($redirects as $r)
             <tr><td>{{ $r->source_path }}</td><td>{{ $r->destination_url }}</td><td><span class="badge {{ $r->status_code === 301 ? 'published' : 'in_review' }}">{{ $r->status_code }}</span></td><td class="muted">{{ $r->hit_count }}</td>
-            <td class="row-actions"><form method="POST" action="{{ route('admin.cms.redirects.destroy', $r) }}">@csrf @method('DELETE')<button class="btn sm danger" type="submit" onclick="return confirm('{{ __('ui.admin.delete_confirm') }}')">{{ __('ui.admin.delete') }}</button></form></td></tr>
+            <td class="row-actions"><form method="POST" action="{{ route('admin.cms.redirects.destroy', $r) }}">@csrf @method('DELETE')<button class="btn sm danger" type="submit" data-confirm="{{ __('ui.admin.delete_confirm') }}">{{ __('ui.admin.delete') }}</button></form></td></tr>
         @endforeach
         </tbody>
     </table>

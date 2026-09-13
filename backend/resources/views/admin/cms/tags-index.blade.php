@@ -1,6 +1,6 @@
 @extends('admin.layout')
 @section('content')
-<h2 style="margin:8px 0">{{ __('ui.admin.tags') }}</h2>
+<h2 class="section-title">{{ __('ui.admin.tags') }}</h2>
 
 <form class="filters" method="GET">
     <div class="field"><label>{{ __('ui.admin.search') }}</label><input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="{{ __('ui.admin.search_placeholder') }}"></div>
@@ -29,7 +29,7 @@
                 <td>{{ $fa?->name ?? '#'.$tag->id }}</td>
                 <td>{{ $fa?->slug ?? '' }}</td>
                 <td class="row-actions">
-                    <form method="POST" action="{{ route('admin.cms.tags.destroy', $tag) }}">@csrf @method('DELETE')<button class="btn sm danger" type="submit" onclick="return confirm('{{ __('ui.admin.delete_confirm') }}')">{{ __('ui.admin.delete') }}</button></form>
+                    <form method="POST" action="{{ route('admin.cms.tags.destroy', $tag) }}">@csrf @method('DELETE')<button class="btn sm danger" type="submit" data-confirm="{{ __('ui.admin.delete_confirm') }}">{{ __('ui.admin.delete') }}</button></form>
                 </td>
             </tr>
         @endforeach

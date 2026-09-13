@@ -1,7 +1,7 @@
 @extends('admin.layout')
 @section('content')
 @php $tr = $post->translations->firstWhere('locale', 'fa') @endphp
-<h2 style="margin:8px 0">{{ __('ui.admin.seo') }} — {{ $tr?->title ?? '#'.$post->id }}</h2>
+<h2 class="section-title">{{ __('ui.admin.seo') }} — {{ $tr?->title ?? '#'.$post->id }}</h2>
 <form method="POST" action="{{ route('admin.cms.seo.update', $post) }}">@csrf @method('PATCH')
     <div class="tabs">@foreach($locales as $i => $loc)<button type="button" class="@if($i===0) active @endif" data-tab="{{ $loc }}">{{ strtoupper($loc) }}</button>@endforeach</div>
     @foreach($locales as $loc)

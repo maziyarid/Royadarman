@@ -1,0 +1,14 @@
+(() => {
+  const root=document.querySelector('[data-patient-request]'); if(!root) return;
+  const locale=root.dataset.locale, csrf=document.querySelector('meta[name="csrf-token"]')?.content||'';
+  const form=document.getElementById('request-form'); if(!form) return;
+  const service=document.getElementById('service_type'), areaWrap=document.getElementById('area-wrap'), area=document.getElementById('tehran_area'), accept=document.getElementById('accept'), submit=document.getElementById('submit'), consentText=document.getElementById('consent-text'), message=document.getElementById('message'); let policy=null;
+  const key=()=>crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random()}`;
+  const headers=id=>{const h={'Accept':'application/json','Content-Type':'application/json','X-CSRF-TOKEN':csrf,'X-Locale':locale};if(id)h['Idempotency-Key']=id;return h};
+  const errorText=p=>p?.error?.message||p?.error?.code||root.dataset.error;
+  const show=(text,kind='error')=>{message.className=`notice ${kind}`;message.textContent=text};
+  service.addEventListener('change',()=>{const home=service.value==='home_dentistry';areaWrap.hidden=!home;area.required=home;if(!home)area.value=''});
+  fetch('/api/v1/policies/case_coordination',{headers:{'Accept':'application/json','X-Locale':locale}}).then(async r=>{const d=await r.json();if(!r.ok||!d.data)throw new Error(errorText(d));policy=d.data;consentText.textContent=policy.content;accept.disabled=false}).catch(()=>{consentText.textContent=root.dataset.consentUnavailable;accept.disabled=true;submit.disabled=true});
+  accept.addEventListener('change',()=>submit.disabled=!accept.checked||!policy);
+  form.addEventListener('submit',async e=>{e.preventDefault();if(!policy||!accept.checked)return;submit.disabled=true;submit.textContent=root.dataset.working;message.className='';message.textContent='';try{const dr=await fetch('/api/v1/cases/draft',{method:'POST',headers:headers(key()),body:JSON.stringify({service_type:service.value,name:document.getElementById('name').value||null,tehran_area:area.value||null,preferred_contact_time:document.getElementById('contact_time').value,contact_reason:document.getElementById('reason').value||null,budget_band:document.getElementById('budget').value,budget_input_unit:'toman',source_language:locale})});const dp=await dr.json();if(!dr.ok||!dp.data)throw new Error(errorText(dp));const draft=dp.data;const sr=await fetch(`/api/v1/cases/${encodeURIComponent(draft.id)}/submit`,{method:'POST',headers:headers(key()),body:JSON.stringify({version:draft.version,policy_version:policy.version,content_hash:policy.content_hash})});const sp=await sr.json();if(!sr.ok||!sp.data)throw new Error(errorText(sp));show(root.dataset.success,'success');window.location.assign(`/${encodeURIComponent(locale)}/panel/cases/${encodeURIComponent(draft.id)}`)}catch(error){show(error?.message||root.dataset.error);submit.disabled=false;submit.textContent=root.dataset.submit}});
+})();

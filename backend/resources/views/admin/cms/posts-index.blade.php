@@ -1,8 +1,8 @@
 @extends('admin.layout')
 
 @section('content')
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin:20px 0">
-    <h2 style="margin:0;font-size:20px">{{ __('ui.admin.posts') }}</h2>
+<div class="heading-row">
+    <h2>{{ __('ui.admin.posts') }}</h2>
     <a href="{{ route('admin.cms.posts.create') }}" class="btn primary">+ {{ __('ui.admin.new_post') }}</a>
 </div>
 
@@ -28,7 +28,7 @@
     <button type="submit" class="btn primary">{{ __('ui.admin.search') }}</button>
 </form>
 
-<div class="card" style="padding:0;overflow:hidden">
+<div class="card" >
     @if($posts->isEmpty())
         <div class="empty">{{ __('ui.admin.empty') }}</div>
     @else
@@ -50,7 +50,7 @@
                     @else
                         <form method="POST" action="{{ route('admin.cms.posts.publish', $post) }}">@csrf<button class="btn sm primary" type="submit">{{ __('ui.admin.publish') }}</button></form>
                     @endif
-                    <form method="POST" action="{{ route('admin.cms.posts.destroy', $post) }}" onsubmit="return confirm('{{ __('ui.admin.delete_confirm') }}')">@csrf@method('DELETE')<button class="btn sm danger" type="submit">{{ __('ui.admin.delete') }}</button></form>
+                    <form method="POST" action="{{ route('admin.cms.posts.destroy', $post) }}" data-confirm="{{ __('ui.admin.delete_confirm') }}">@csrf@method('DELETE')<button class="btn sm danger" type="submit">{{ __('ui.admin.delete') }}</button></form>
                 </td>
             </tr>
         @endforeach

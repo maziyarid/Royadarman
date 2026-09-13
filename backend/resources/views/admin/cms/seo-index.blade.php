@@ -1,6 +1,6 @@
 @extends('admin.layout')
 @section('content')
-<h2 style="margin:8px 0">{{ __('ui.admin.seo') }}</h2>
+<h2 class="section-title">{{ __('ui.admin.seo') }}</h2>
 
 <form class="filters" method="GET">
     <div class="field"><label>{{ __('ui.admin.entity_type') }}</label><input type="text" name="entity_type" value="{{ $filters['entity_type'] ?? '' }}" placeholder="App\Models\Cms\Post"></div>

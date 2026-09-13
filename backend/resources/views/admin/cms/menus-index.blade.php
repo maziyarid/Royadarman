@@ -1,6 +1,6 @@
 @extends('admin.layout')
 @section('content')
-<h2 style="margin:8px 0">{{ __('ui.admin.menus') }}</h2>
+<h2 class="section-title">{{ __('ui.admin.menus') }}</h2>
 
 <div class="card">
     <form method="POST" action="{{ route('admin.cms.menus.store') }}" class="filters">@csrf
@@ -26,17 +26,17 @@
             <button class="btn primary" type="submit">{{ __('ui.admin.add_item') }}</button>
         </form>
         @if($menu->items->isNotEmpty())
-        <table style="margin-top:12px">
+        <table class="table-spaced">
             <thead><tr><th scope="col">{{ __('ui.admin.label') }}</th><th scope="col">URL</th><th scope="col">{{ __('ui.admin.actions') }}</th></tr></thead>
             <tbody>@foreach($menu->items as $i)@php $l = $i->translations->firstWhere('locale','fa') @endphp
                 <tr><td>{{ $l?->label ?? '#'.$i->id }}</td><td class="muted">{{ $i->url ?? '—' }}</td>
-                <td class="row-actions"><form method="POST" action="{{ route('admin.cms.menus.items.destroy', [$menu, $i]) }}">@csrf @method('DELETE')<button class="btn sm danger" type="submit" onclick="return confirm('{{ __('ui.admin.delete_confirm') }}')">{{ __('ui.admin.delete') }}</button></form></td></tr>
+                <td class="row-actions"><form method="POST" action="{{ route('admin.cms.menus.items.destroy', [$menu, $i]) }}">@csrf @method('DELETE')<button class="btn sm danger" type="submit" data-confirm="{{ __('ui.admin.delete_confirm') }}">{{ __('ui.admin.delete') }}</button></form></td></tr>
             @endforeach</tbody>
         </table>
         @else
         <div class="empty">{{ __('ui.admin.empty') }}</div>
         @endif
-        <form method="POST" action="{{ route('admin.cms.menus.destroy', $menu) }}" style="margin-top:10px">@csrf @method('DELETE')<button class="btn sm danger" type="submit" onclick="return confirm('{{ __('ui.admin.delete_confirm') }}')">{{ __('ui.admin.delete_menu') }}</button></form>
+        <form method="POST" action="{{ route('admin.cms.menus.destroy', $menu) }}" class="form-spaced">@csrf @method('DELETE')<button class="btn sm danger" type="submit" data-confirm="{{ __('ui.admin.delete_confirm') }}">{{ __('ui.admin.delete_menu') }}</button></form>
     </div>
 @endforeach
 {{ $menus->links() }}

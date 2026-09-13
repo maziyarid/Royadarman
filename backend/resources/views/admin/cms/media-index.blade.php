@@ -1,6 +1,6 @@
 @extends('admin.layout')
 @section('content')
-<h2 style="margin:8px 0">{{ __('ui.admin.media') }}</h2>
+<h2 class="section-title">{{ __('ui.admin.media') }}</h2>
 
 <div class="card">
     <form method="POST" action="{{ route('admin.cms.media.store') }}" enctype="multipart/form-data" class="filters">@csrf
@@ -27,7 +27,7 @@
                 <td class="muted">@if($m->width && $m->height){{ $m->width }}×{{ $m->height }}@else—@endif</td>
                 <td>{{ number_format($m->byte_size / 1024, 1) }} KB</td>
                 <td class="row-actions">
-                    <form method="POST" action="{{ route('admin.cms.media.destroy', $m) }}">@csrf @method('DELETE')<button class="btn sm danger" type="submit" onclick="return confirm('{{ __('ui.admin.delete_confirm') }}')">{{ __('ui.admin.delete') }}</button></form>
+                    <form method="POST" action="{{ route('admin.cms.media.destroy', $m) }}">@csrf @method('DELETE')<button class="btn sm danger" type="submit" data-confirm="{{ __('ui.admin.delete_confirm') }}">{{ __('ui.admin.delete') }}</button></form>
                 </td>
             </tr>
         @endforeach

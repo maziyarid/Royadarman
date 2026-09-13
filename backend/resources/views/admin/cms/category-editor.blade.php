@@ -1,10 +1,10 @@
 @extends('admin.layout')
 @section('content')
-<h2 style="margin:8px 0">{{ isset($category) && $category->exists ? __('ui.admin.edit') : __('ui.admin.new_category') }}</h2>
+<h2 class="section-title">{{ isset($category) && $category->exists ? __('ui.admin.edit') : __('ui.admin.new_category') }}</h2>
 <form method="POST" action="{{ isset($category) && $category->exists ? route('admin.cms.categories.update', $category) : route('admin.cms.categories.store') }}">
     @csrf
     @if(isset($category) && $category->exists) @method('PATCH') @endif
-    <div class="field" style="max-width:400px;margin-bottom:14px">
+    <div class="field compact-copy">
         <label>{{ __('ui.admin.parent') }}</label>
         <select name="parent_id">
             <option value="">{{ __('ui.admin.none') }}</option>
@@ -24,7 +24,7 @@
                 <div class="field"><label>{{ __('ui.admin.name') }} ({{ $loc }})</label><input type="text" name="translations[{{ $loc }}][name]" value="{{ old("translations.$loc.name", $tr?->name ?? '') }}"></div>
                 <div class="field"><label>{{ __('ui.admin.slug') }} ({{ $loc }})</label><input type="text" name="translations[{{ $loc }}][slug]" value="{{ old("translations.$loc.slug", $tr?->slug ?? '') }}"></div>
             </div>
-            <div class="field"><label>{{ __('ui.admin.excerpt') }} ({{ $loc }})</label><textarea name="translations[{{ $loc }}][description]" style="min-height:100px">{{ old("translations.$loc.description", $tr?->description ?? '') }}</textarea></div>
+            <div class="field"><label>{{ __('ui.admin.excerpt') }} ({{ $loc }})</label><textarea name="translations[{{ $loc }}][description]" class="textarea-sm">{{ old("translations.$loc.description", $tr?->description ?? '') }}</textarea></div>
             <input type="hidden" name="translations[{{ $loc }}][locale]" value="{{ $loc }}">
         </div>
     @endforeach

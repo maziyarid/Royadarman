@@ -1,6 +1,6 @@
 @extends('admin.layout')
 @section('content')
-<h2 style="margin:8px 0">{{ __('ui.admin.categories') }}</h2>
+<h2 class="section-title">{{ __('ui.admin.categories') }}</h2>
 <a class="btn primary" href="{{ route('admin.cms.categories.create') }}">{{ __('ui.admin.new_category') }}</a>
 
 <form class="filters" method="GET">
@@ -24,7 +24,7 @@
                 <td>@if($cat->parent && ($p = $cat->parent->translations->firstWhere('locale', 'fa'))) {{ $p->name }} @else <span class="muted">{{ __('ui.admin.none') }}</span> @endif</td>
                 <td class="row-actions">
                     <a class="btn sm" href="{{ route('admin.cms.categories.edit', $cat) }}">{{ __('ui.admin.edit') }}</a>
-                    <form method="POST" action="{{ route('admin.cms.categories.destroy', $cat) }}">@csrf @method('DELETE')<button class="btn sm danger" type="submit" onclick="return confirm('{{ __('ui.admin.delete_confirm') }}')">{{ __('ui.admin.delete') }}</button></form>
+                    <form method="POST" action="{{ route('admin.cms.categories.destroy', $cat) }}">@csrf @method('DELETE')<button class="btn sm danger" type="submit" data-confirm="{{ __('ui.admin.delete_confirm') }}">{{ __('ui.admin.delete') }}</button></form>
                 </td>
             </tr>
         @endforeach

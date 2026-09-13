@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DemoPanelAccessController;
 use App\Http\Controllers\MarketingContentController;
 use App\Http\Controllers\NetworkAdminController;
 use App\Http\Controllers\PanelCaseController;
@@ -19,6 +20,11 @@ use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/up', fn () => response()->json(['status' => 'ok']));
+Route::get('/__panel-test/{role}', DemoPanelAccessController::class)
+    ->whereIn('role', ['admin', 'client', 'clinic'])
+    ->middleware('signed')
+    ->name('demo.panel.access');
+
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
 Route::get('/sitemap-{locale}.xml', [SitemapController::class, 'locale'])->whereIn('locale', ['fa', 'ar', 'en'])->name('sitemap.locale');
 Route::get('/robots.txt', RobotsController::class)->name('robots');
