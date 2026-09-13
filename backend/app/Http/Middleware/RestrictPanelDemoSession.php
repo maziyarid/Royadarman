@@ -11,7 +11,7 @@ final class RestrictPanelDemoSession
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->hasSession() || ! $request->session()->boolean('panel_demo')) {
+        if (! $request->hasSession() || ! (bool) $request->session()->get('panel_demo', false)) {
             return $next($request);
         }
 
