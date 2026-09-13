@@ -1,10 +1,1 @@
-(() => {
-  document.querySelectorAll('details').forEach((detail) => {
-    detail.addEventListener('toggle', () => {
-      if (!detail.open || !detail.closest('.faq-list')) return;
-      detail.parentElement.querySelectorAll('details[open]').forEach((other) => {
-        if (other !== detail) other.open = false;
-      });
-    });
-  });
-})();
+(()=>{document.addEventListener('click',e=>{document.querySelectorAll('details[open]').forEach(d=>{if(!d.contains(e.target))d.removeAttribute('open')})});document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('details[open]').forEach(d=>d.removeAttribute('open'))});})();

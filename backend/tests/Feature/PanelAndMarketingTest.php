@@ -119,6 +119,8 @@ class PanelAndMarketingTest extends TestCase
         $this->assertStringContainsString('public', $cacheControl);
         $this->assertStringContainsString('max-age=300', $cacheControl);
         $this->get('/sitemap.xml')->assertOk()->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
+            ->assertSee('/sitemap-fa.xml', false)->assertDontSee('/panel', false)->assertDontSee('/api/', false);
+        $this->get('/sitemap-fa.xml')->assertOk()->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
             ->assertSee('/services/opg', false)->assertDontSee('/fa/services/opg', false)->assertDontSee('/panel', false)->assertDontSee('/api/', false);
     }
 

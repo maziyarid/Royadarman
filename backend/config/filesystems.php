@@ -36,6 +36,14 @@ return [
             'throw' => true,
             'report' => true,
         ],
+        'public-cms' => [
+            'driver' => 'local',
+            'root' => env('ROYADARMAN_CMS_ROOT', storage_path('app/public/cms')),
+            'url' => env('APP_URL').'/storage/cms',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
     ],
 
     'links' => [
