@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureStaffAccess;
 use App\Http\Middleware\RequestId;
+use App\Http\Middleware\RestrictPanelDemoSession;
 use App\Support\DomainException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -21,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(RequestId::class);
+        $middleware->web(append: [
+            RestrictPanelDemoSession::class,
+        ]);
         $middleware->alias([
             'staff' => EnsureStaffAccess::class,
         ]);
