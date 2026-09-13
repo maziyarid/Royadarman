@@ -19,6 +19,7 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="APP_KEY" value="base64:cm95YWRhcm1hbi10ZXN0LWtleS0wMDAwMDAwMDAwMDA="/>
         <env name="ROYADARMAN_PHONE_HASH_KEY" value="test-phone-lookup-key-do-not-use-in-production"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
