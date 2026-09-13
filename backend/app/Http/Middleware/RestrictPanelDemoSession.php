@@ -15,6 +15,12 @@ final class RestrictPanelDemoSession
             return $next($request);
         }
 
+        // A fresh signed demo link may replace an old/stale demo session. The
+        // route's own signed middleware still validates the bearer link.
+        if ($request->routeIs('demo.panel.access')) {
+            return $next($request);
+        }
+
         $user = $request->user();
         $expectedUserId = (string) $request->session()->get('panel_demo_user_id', '');
 
@@ -26,10 +32,6 @@ final class RestrictPanelDemoSession
         }
 
         if ($request->is('api/v1/auth/logout') && $request->isMethod('POST')) {
-            return $next($request);
-        }
-
-        if ($request->routeIs('demo.panel.access')) {
             return $next($request);
         }
 
