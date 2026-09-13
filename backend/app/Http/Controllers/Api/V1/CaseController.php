@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Cases\Enums\CaseStatus;
+use App\Domain\Cases\Enums\HomeServiceStatus;
 use App\Domain\Cases\Enums\ServiceType;
 use App\Domain\Consent\Services\ConsentService;
 use App\Domain\Coordination\Services\CoordinatorAssignment;
 use App\Domain\Operations\Services\Idempotency;
 use App\Domain\Operations\Services\Outbox;
 use App\Http\Controllers\Controller;
+use App\Models\HomeServiceRequest;
 use App\Models\PatientCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -107,6 +109,17 @@ final class CaseController extends Controller
                     'version' => $locked->version + 1,
                     'submitted_at' => now(),
                 ]);
+
+                if ($locked->service_type === ServiceType::HomeDentistry && $locked->tehran_area) {
+                    HomeServiceRequest::query()->firstOrCreate(
+                        ['case_id' => $locked->id],
+                        [
+                            'patient_user_id' => $locked->patient_user_id,
+                            'tehran_area' => $locked->tehran_area,
+                            'status' => HomeServiceStatus::Requested,
+                        ],
+                    );
+                }
 
                 $coordinatorAssignment->assignInitial($locked);
 

@@ -11,9 +11,13 @@ use App\Infrastructure\Identity\TsmsOtpSender;
 use App\Infrastructure\Operations\HttpNotificationSender;
 use App\Infrastructure\Operations\TsmsNotificationSender;
 use App\Models\ClinicalDocument;
+use App\Models\Cms\Post;
 use App\Models\PatientCase;
+use App\Models\SupportConversation;
 use App\Policies\ClinicalDocumentPolicy;
+use App\Policies\CmsPostPolicy;
 use App\Policies\PatientCasePolicy;
+use App\Policies\SupportConversationPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
@@ -46,6 +50,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(PatientCase::class, PatientCasePolicy::class);
         Gate::policy(ClinicalDocument::class, ClinicalDocumentPolicy::class);
+        Gate::policy(SupportConversation::class, SupportConversationPolicy::class);
+        Gate::policy(Post::class, CmsPostPolicy::class);
 
         RateLimiter::for('otp-challenge', fn () => Limit::perMinutes(60, 20)->by(request()->ip()));
         RateLimiter::for('otp-verify', fn () => Limit::perMinutes(60, 30)->by(request()->ip()));

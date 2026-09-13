@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureStaffAccess;
 use App\Http\Middleware\RequestId;
 use App\Support\DomainException;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -20,8 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(RequestId::class);
+        $middleware->alias([
+            'staff' => EnsureStaffAccess::class,
+        ]);
         $middleware->redirectGuestsTo(
-            fn (Request $request) => $request->is('api/*') ? null : '/fa/',
+            fn (Request $request) => $request->is('api/*') ? null : '/fa/login',
         );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -30,6 +34,10 @@ return Application::configure(basePath: dirname(__DIR__))
         );
 
         $exceptions->render(function (ValidationException $exception, Request $request) {
+            if (! $request->is('api/*') && ! $request->expectsJson()) {
+                return null;
+            }
+
             return response()->json([
                 'error' => [
                     'code' => 'error.validation',
@@ -41,6 +49,10 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
+            if (! $request->is('api/*') && ! $request->expectsJson()) {
+                return null;
+            }
+
             return response()->json([
                 'error' => ['code' => 'error.unauthenticated', 'message' => __('Unauthenticated.')],
                 'request_id' => $request->attributes->get('request_id'),

@@ -7,6 +7,7 @@ use App\Domain\Identity\Enums\UserRole;
 use App\Models\OtpChallenge;
 use App\Models\User;
 use App\Support\DigitNormalizer;
+use App\Support\DomainException;
 use App\Support\PhoneHasher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -25,6 +26,10 @@ final class OtpService
         }
 
         $phoneHash = $this->phoneHasher->hash($mobile);
+        if (! config('royadarman.intake_enabled') && ! User::query()->where('phone_hash', $phoneHash)->exists()) {
+            throw new DomainException(503, 'intake_not_enabled', trans('auth_ui.existing_only', [], $locale));
+        }
+
         $ipHash = hash_hmac('sha256', $ip, (string) config('app.key'));
         if (OtpChallenge::query()->where('phone_hash', $phoneHash)->where('created_at', '>=', now()->subHour())->count() >= 10) {
             abort(429);
@@ -96,10 +101,17 @@ final class OtpService
                 throw ValidationException::withMessages(['code' => __('ui.errors.otp_invalid')]);
             }
 
-            $user = User::query()->firstOrCreate(
-                ['phone_hash' => $challenge->phone_hash],
-                ['phone' => $challenge->phone, 'role' => UserRole::Patient, 'locale' => $challenge->locale, 'is_active' => true]
-            );
+            $user = User::query()->where('phone_hash', $challenge->phone_hash)->first();
+            if (! $user && ! config('royadarman.intake_enabled')) {
+                throw new DomainException(503, 'intake_not_enabled', trans('auth_ui.existing_only', [], $challenge->locale));
+            }
+            $user ??= User::query()->create([
+                'phone' => $challenge->phone,
+                'phone_hash' => $challenge->phone_hash,
+                'role' => UserRole::Patient,
+                'locale' => $challenge->locale,
+                'is_active' => true,
+            ]);
             if (! $user->is_active) {
                 abort(403);
             }

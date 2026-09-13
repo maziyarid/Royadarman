@@ -45,25 +45,25 @@ class LocaleAndAuthorizationTest extends TestCase
     public function test_locale_switching_links_present_and_point_to_each_locale(): void
     {
         $body = $this->get('/')->assertOk()->getContent();
-        $this->assertStringContainsString('href="/"', $body);
-        $this->assertStringContainsString('href="/ar/"', $body);
-        $this->assertStringContainsString('href="/en/"', $body);
+        $this->assertStringContainsString('href="http://localhost"', $body);
+        $this->assertStringContainsString('href="http://localhost/ar"', $body);
+        $this->assertStringContainsString('href="http://localhost/en"', $body);
     }
 
-    public function test_intake_disabled_state_is_honestly_represented_as_coming_soon(): void
+    public function test_intake_disabled_state_is_honestly_represented_in_secure_login(): void
     {
-        $body = $this->get('/')->assertOk()->getContent();
-        $this->assertStringContainsString('launch-state', $body);
-        $this->assertStringContainsString('هنوز فعال نشده', $body);
-        $this->assertStringNotContainsString('action="/api/v1/cases/draft"', $body);
-        $this->assertStringNotContainsString('<form', $body);
+        config()->set('royadarman.intake_enabled', false);
+        $body = $this->get('/fa/login')->assertOk()->getContent();
+        $this->assertStringContainsString('پذیرش بیمار جدید فعلا غیرفعال است', $body);
+        $this->assertStringContainsString('id="challenge-form"', $body);
+        $this->assertStringContainsString('id="verify-form"', $body);
     }
 
-    public function test_faq_section_uses_progressive_enhancement_details_elements(): void
+    public function test_faq_page_uses_progressive_enhancement_details_elements(): void
     {
-        $body = $this->get('/')->assertOk()->getContent();
-        $this->assertStringContainsString('id="faq"', $body);
+        $body = $this->get('/faq')->assertOk()->getContent();
         $this->assertStringContainsString('<details><summary>', $body);
+        $this->assertStringContainsString('آیا رویا درمان یک کلینیک یا مطب است؟', $body);
     }
 
     public function test_assets_referenced_are_local_and_not_external_cdn(): void
@@ -76,6 +76,16 @@ class LocaleAndAuthorizationTest extends TestCase
         $this->assertStringNotContainsString('href="/https://', $body);
         $this->assertStringNotContainsString('unpkg.com', $body);
         $this->assertStringNotContainsString('cdnjs.cloudflare', $body);
+    }
+
+    public function test_public_information_architecture_is_multi_page(): void
+    {
+        foreach (['/services', '/services/opg', '/services/home-dentistry', '/referrals', '/how-it-works', '/about', '/contact', '/privacy', '/faq'] as $path) {
+            $this->get($path)->assertOk();
+        }
+        foreach (['/ar/services', '/en/services', '/ar/about', '/en/about', '/ar/privacy', '/en/privacy'] as $path) {
+            $this->get($path)->assertOk();
+        }
     }
 
     public function test_owner_has_no_implicit_patient_case_access(): void
@@ -94,5 +104,25 @@ class LocaleAndAuthorizationTest extends TestCase
         $other = User::factory()->create(['role' => 'patient']);
         $case = PatientCase::query()->create(['public_reference' => 'RD-PRIVATE2', 'patient_user_id' => $patient->id, 'service_type' => 'guidance_referral', 'status' => 'submitted', 'patient_mobile' => '09121234567', 'patient_mobile_hash' => hash('sha256', 'other'), 'budget_band' => 'call']);
         $this->actingAs($other)->getJson('/api/v1/cases/'.$case->id)->assertNotFound();
+    }
+
+    public function test_validation_messages_are_localised_per_locale(): void
+    {
+        $payload = ['locale' => 'fa'];
+
+        $fa = $this->postJson('/api/v1/auth/otp/challenge', $payload, ['X-Locale' => 'fa'])
+            ->assertStatus(422)
+            ->json('error.details.mobile.0');
+        $this->assertStringContainsString('شماره همراه', $fa);
+
+        $ar = $this->postJson('/api/v1/auth/otp/challenge', $payload, ['X-Locale' => 'ar'])
+            ->assertStatus(422)
+            ->json('error.details.mobile.0');
+        $this->assertStringContainsString('رقم الهاتف', $ar);
+
+        $en = $this->postJson('/api/v1/auth/otp/challenge', $payload, ['X-Locale' => 'en'])
+            ->assertStatus(422)
+            ->json('error.details.mobile.0');
+        $this->assertStringContainsString('mobile number', $en);
     }
 }

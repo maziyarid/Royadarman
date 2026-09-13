@@ -28,6 +28,12 @@ class OtpInvariantTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config()->set('royadarman.intake_enabled', true);
+    }
+
     private function serviceWithCapture(): array
     {
         $sender = new CapturingOtpSenderForInvariants;
