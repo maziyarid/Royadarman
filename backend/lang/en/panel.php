@@ -5,6 +5,8 @@ return [
     'back_home' => 'Public site',
     'logout' => 'Sign out',
     'marketing' => 'Marketing CMS',
+    'demo_label' => 'TEST',
+    'demo_notice' => 'Read-only synthetic demonstration data',
     'roles' => [
         'patient' => ['title' => 'My care requests', 'subtitle' => 'Your own requests, documents and progress only.'],
         'coordinator' => ['title' => 'Coordination workspace', 'subtitle' => 'Operational cases explicitly assigned to you.'],
