@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 final class DemoPanelAccessTest extends TestCase
@@ -160,6 +161,98 @@ final class DemoPanelAccessTest extends TestCase
         $this->assertSame('owner', $existing->getRawOriginal('role'));
         $this->assertSame(1, DB::table('users')->where('email', 'demo-owner@royadarman.invalid')->count());
         $this->assertSame(0, DB::table('patient_cases')->count());
+    }
+
+    public function test_demo_session_is_read_only_and_cannot_reach_privileged_web_or_api_routes(): void
+    {
+        config()->set('royadarman.panel_demo_access', true);
+        config()->set('royadarman.intake_enabled', false);
+        $this->artisan('royadarman:panel-demo:seed')->assertSuccessful();
+
+        $url = URL::temporarySignedRoute('demo.panel.access', now()->addMinute(), ['role' => 'admin', 'locale' => 'fa']);
+        $this->get($url)->assertRedirect('/fa/panel');
+
+        $this->get('/fa/panel')
+            ->assertOk()
+            ->assertSee('TEST')
+            ->assertDontSee('/admin/cms/posts', false)
+            ->assertDontSee('/fa/panel/marketing', false)
+            ->assertDontSee('/fa/panel/network', false);
+
+        $this->get('/admin/cms/posts')->assertForbidden();
+        $this->getJson('/api/v1/me')->assertForbidden();
+        $this->postJson('/api/v1/support', ['message' => 'should never be processed'])->assertForbidden();
+
+        $this->postJson('/api/v1/auth/logout')->assertOk()->assertJsonPath('data.logged_out', true);
+        $this->assertGuest();
+    }
+
+    public function test_turning_off_demo_access_invalidates_an_existing_demo_session(): void
+    {
+        config()->set('royadarman.panel_demo_access', true);
+        config()->set('royadarman.intake_enabled', false);
+        $this->artisan('royadarman:panel-demo:seed')->assertSuccessful();
+
+        $url = URL::temporarySignedRoute('demo.panel.access', now()->addMinute(), ['role' => 'client']);
+        $this->get($url)->assertRedirect('/fa/panel');
+        $this->assertAuthenticated();
+
+        config()->set('royadarman.panel_demo_access', false);
+        $this->get('/fa/panel')->assertForbidden();
+        $this->assertGuest();
+    }
+
+    public function test_demo_panels_hide_non_test_cases_even_when_a_demo_user_is_accidentally_assigned(): void
+    {
+        config()->set('royadarman.panel_demo_access', true);
+        config()->set('royadarman.intake_enabled', false);
+        $this->artisan('royadarman:panel-demo:seed')->assertSuccessful();
+
+        $coordinator = User::query()->where('email', 'demo-coordinator@royadarman.invalid')->firstOrFail();
+        $caseId = (string) Str::ulid();
+        DB::table('patient_cases')->insert([
+            'id' => $caseId,
+            'public_reference' => 'REAL-CASE-MUST-NOT-LEAK',
+            'patient_user_id' => null,
+            'service_type' => 'guidance_referral',
+            'status' => 'in_coordination',
+            'priority' => 'normal',
+            'patient_name' => null,
+            'patient_mobile' => encrypt('09120000000'),
+            'patient_mobile_hash' => hash('sha256', '09120000000'),
+            'tehran_area' => 'central',
+            'preferred_contact_time' => null,
+            'contact_reason' => null,
+            'budget_band' => 'unknown',
+            'current_coordinator_id' => $coordinator->id,
+            'submitted_at' => now(),
+            'closed_at' => null,
+            'version' => 1,
+            'source_language' => 'fa',
+            'currency' => 'IRR',
+            'budget_input_unit' => 'toman',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('case_assignments')->insert([
+            'id' => (string) Str::ulid(),
+            'case_id' => $caseId,
+            'assignee_user_id' => $coordinator->id,
+            'assigned_by_user_id' => $coordinator->id,
+            'purpose' => 'coordination',
+            'assigned_at' => now(),
+            'released_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $url = URL::temporarySignedRoute('demo.panel.access', now()->addMinute(), ['role' => 'coordinator']);
+        $this->get($url)->assertRedirect('/fa/panel');
+        $this->get('/fa/panel')
+            ->assertOk()
+            ->assertSee('TEST-DEMO-OPG-001')
+            ->assertSee('TEST-DEMO-REF-001')
+            ->assertDontSee('REAL-CASE-MUST-NOT-LEAK');
     }
 
     public function test_demo_link_command_is_gated_and_validates_bounds(): void
