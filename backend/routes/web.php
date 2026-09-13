@@ -17,11 +17,12 @@ use App\Http\Controllers\Web\RobotsController;
 use App\Http\Controllers\Web\SitemapController;
 use App\Http\Middleware\EnsureActiveUser;
 use App\Http\Middleware\SetLocale;
+use App\Support\PanelDemoRegistry;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/up', fn () => response()->json(['status' => 'ok']));
 Route::get('/__panel-test/{role}', DemoPanelAccessController::class)
-    ->whereIn('role', ['admin', 'client', 'clinic'])
+    ->whereIn('role', PanelDemoRegistry::aliases())
     ->middleware('signed')
     ->name('demo.panel.access');
 
