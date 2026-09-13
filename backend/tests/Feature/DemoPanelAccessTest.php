@@ -141,6 +141,27 @@ final class DemoPanelAccessTest extends TestCase
         )->count());
     }
 
+    public function test_demo_seeder_fails_closed_on_reserved_identity_collision_without_overwriting_credentials(): void
+    {
+        config()->set('royadarman.panel_demo_access', true);
+        config()->set('royadarman.intake_enabled', false);
+
+        $existing = User::factory()->create([
+            'email' => 'demo-owner@royadarman.invalid',
+            'role' => 'owner',
+            'is_active' => true,
+        ]);
+        $originalPassword = $existing->getRawOriginal('password');
+
+        $this->artisan('royadarman:panel-demo:seed')->assertFailed();
+
+        $existing->refresh();
+        $this->assertSame($originalPassword, $existing->getRawOriginal('password'));
+        $this->assertSame('owner', $existing->getRawOriginal('role'));
+        $this->assertSame(1, DB::table('users')->where('email', 'demo-owner@royadarman.invalid')->count());
+        $this->assertSame(0, DB::table('patient_cases')->count());
+    }
+
     public function test_demo_link_command_is_gated_and_validates_bounds(): void
     {
         config()->set('royadarman.panel_demo_access', false);
