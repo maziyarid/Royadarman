@@ -114,16 +114,24 @@ final class DemoPanelAccessTest extends TestCase
             'email',
             array_column(PanelDemoRegistry::identities(), 'email'),
         )->count());
-        $this->assertDatabaseHas('clinics', ['name' => 'TEST Demo Clinic', 'is_active' => true]);
-        $this->assertSame(2, DB::table('patient_cases')->whereIn('public_reference', [
-            'TEST-DEMO-OPG-001',
-            'TEST-DEMO-REF-001',
-        ])->count());
-        $this->assertSame(3, DB::table('case_assignments')->count());
+        $this->assertDatabaseHas('clinics', [
+            'synthetic_demo_key' => PanelDemoRegistry::CLINIC_DEMO_KEY,
+            'name' => PanelDemoRegistry::CLINIC_DISPLAY_NAME,
+            'is_active' => true,
+        ]);
+        $this->assertSame(1, DB::table('clinics')->where('synthetic_demo_key', PanelDemoRegistry::CLINIC_DEMO_KEY)->count());
+        $this->assertSame(3, DB::table('patient_cases')->whereIn('public_reference', PanelDemoRegistry::caseReferences())->count());
+        $this->assertSame(4, DB::table('case_assignments')->count());
+        $this->assertDatabaseHas('patient_cases', ['public_reference' => PanelDemoRegistry::HOME_CASE_REFERENCE, 'service_type' => 'home_dentistry']);
+        $this->assertDatabaseHas('home_service_requests', ['tehran_area' => 'central', 'status' => 'coordinator_review']);
+        $this->assertDatabaseHas('support_conversations', ['subject' => PanelDemoRegistry::SUPPORT_SUBJECT]);
+        $this->assertSame(2, DB::table('support_messages')->count());
         $this->assertSame(1, DB::table('review_revisions')->count());
+        $this->assertSame(1, DB::table('clinical_documents')->where('storage_key', PanelDemoRegistry::DOCUMENT_STORAGE_KEY)->count());
         $this->assertSame(1, DB::table('referral_proposals')->count());
         $this->assertSame(1, DB::table('referral_grants')->count());
         $this->assertSame(1, DB::table('consent_events')->where('purpose', 'referral_sharing')->count());
+        $this->assertSame(1, DB::table('audit_events')->where('action', PanelDemoRegistry::AUDIT_SEED_ACTION)->count());
     }
 
     public function test_demo_seeder_refuses_to_run_when_access_is_disabled_or_intake_is_enabled(): void
@@ -174,7 +182,7 @@ final class DemoPanelAccessTest extends TestCase
 
         $this->get('/fa/panel')
             ->assertOk()
-            ->assertSee('TEST')
+            ->assertSee(__('panel.demo_label'), false)
             ->assertDontSee('/admin/cms/posts', false)
             ->assertDontSee('/fa/panel/marketing', false)
             ->assertDontSee('/fa/panel/network', false);
@@ -250,9 +258,99 @@ final class DemoPanelAccessTest extends TestCase
         $this->get($url)->assertRedirect('/fa/panel');
         $this->get('/fa/panel')
             ->assertOk()
+            ->assertSee('TEST')
             ->assertSee('TEST-DEMO-OPG-001')
             ->assertSee('TEST-DEMO-REF-001')
+            ->assertSee('TEST-DEMO-HOME-001')
             ->assertDontSee('REAL-CASE-MUST-NOT-LEAK');
+    }
+
+    public function test_demo_seeder_fails_closed_on_clinic_name_collision_without_demo_key(): void
+    {
+        config()->set('royadarman.panel_demo_access', true);
+        config()->set('royadarman.intake_enabled', false);
+
+        $clinicId = (string) Str::ulid();
+        DB::table('clinics')->insert([
+            'id' => $clinicId,
+            'name' => PanelDemoRegistry::CLINIC_DISPLAY_NAME,
+            'city' => 'Isfahan',
+            'area_code' => 'real-clinic',
+            'synthetic_demo_key' => null,
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->artisan('royadarman:panel-demo:seed')->assertFailed();
+
+        $this->assertDatabaseHas('clinics', [
+            'id' => $clinicId,
+            'city' => 'Isfahan',
+            'area_code' => 'real-clinic',
+            'synthetic_demo_key' => null,
+        ]);
+        $this->assertSame(1, DB::table('clinics')->count());
+        $this->assertSame(0, DB::table('patient_cases')->count());
+        $this->assertSame(0, DB::table('clinic_memberships')->count());
+    }
+
+    public function test_demo_session_can_open_test_cases_but_not_real_cases(): void
+    {
+        config()->set('royadarman.panel_demo_access', true);
+        config()->set('royadarman.intake_enabled', false);
+        $this->artisan('royadarman:panel-demo:seed')->assertSuccessful();
+
+        $coordinator = User::query()->where('email', 'demo-coordinator@royadarman.invalid')->firstOrFail();
+        $opg = DB::table('patient_cases')->where('public_reference', PanelDemoRegistry::OPG_CASE_REFERENCE)->first();
+        $realId = (string) Str::ulid();
+        DB::table('patient_cases')->insert([
+            'id' => $realId,
+            'public_reference' => 'REAL-CASE-MUST-NOT-LEAK',
+            'patient_user_id' => null,
+            'service_type' => 'guidance_referral',
+            'status' => 'in_coordination',
+            'priority' => 'normal',
+            'patient_name' => null,
+            'patient_mobile' => encrypt('09120000000'),
+            'patient_mobile_hash' => hash('sha256', '09120000000'),
+            'tehran_area' => 'central',
+            'preferred_contact_time' => null,
+            'contact_reason' => null,
+            'budget_band' => 'unknown',
+            'current_coordinator_id' => $coordinator->id,
+            'submitted_at' => now(),
+            'closed_at' => null,
+            'version' => 1,
+            'source_language' => 'fa',
+            'currency' => 'IRR',
+            'budget_input_unit' => 'toman',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('case_assignments')->insert([
+            'id' => (string) Str::ulid(),
+            'case_id' => $realId,
+            'assignee_user_id' => $coordinator->id,
+            'assigned_by_user_id' => $coordinator->id,
+            'purpose' => 'coordination',
+            'assigned_at' => now(),
+            'released_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $url = URL::temporarySignedRoute('demo.panel.access', now()->addMinute(), ['role' => 'coordinator', 'locale' => 'fa']);
+        $this->get($url)->assertRedirect('/fa/panel');
+
+        $this->get('/fa/panel/cases/'.$opg->id)
+            ->assertOk()
+            ->assertSee(PanelDemoRegistry::OPG_CASE_REFERENCE)
+            ->assertSee(__('panel.demo_notice'), false)
+            ->assertDontSee('data-submit-case', false)
+            ->assertDontSee('id="status-form"', false);
+
+        $this->get('/fa/panel/cases/'.$realId)->assertForbidden();
     }
 
     public function test_demo_link_command_is_gated_and_validates_bounds(): void
@@ -264,5 +362,118 @@ final class DemoPanelAccessTest extends TestCase
         $this->artisan('royadarman:panel-demo:links', ['--minutes' => '0'])->assertFailed();
         $this->artisan('royadarman:panel-demo:links', ['--minutes' => '15', '--locale' => 'de'])->assertFailed();
         $this->artisan('royadarman:panel-demo:links', ['--minutes' => '15', '--locale' => 'fa'])->assertSuccessful();
+    }
+
+    public function test_demo_session_can_read_support_home_profile_and_dashboard_but_cannot_mutate(): void
+    {
+        config()->set('royadarman.panel_demo_access', true);
+        config()->set('royadarman.intake_enabled', false);
+        $this->artisan('royadarman:panel-demo:seed')->assertSuccessful();
+
+        $url = URL::temporarySignedRoute('demo.panel.access', now()->addMinute(), ['role' => 'client', 'locale' => 'en']);
+        $this->get($url)->assertRedirect('/en/panel');
+
+        $conversation = DB::table('support_conversations')->where('subject', PanelDemoRegistry::SUPPORT_SUBJECT)->first();
+        $home = DB::table('home_service_requests')->first();
+
+        $this->get('/en/panel/support')
+            ->assertOk()
+            ->assertSee(PanelDemoRegistry::SUPPORT_SUBJECT)
+            ->assertSee(__('panel.demo_mutations_disabled'), false)
+            ->assertDontSee('id="new-thread"', false);
+
+        $this->get('/en/panel/support/'.$conversation->id)
+            ->assertOk()
+            ->assertSee(PanelDemoRegistry::SUPPORT_SUBJECT)
+            ->assertDontSee('name="message"', false);
+
+        $this->post('/en/panel/support', [
+            '_token' => csrf_token(),
+            'category' => 'general',
+            'message' => 'should never persist',
+        ])->assertForbidden();
+
+        $this->get('/en/panel/home-service')
+            ->assertOk()
+            ->assertSee(PanelDemoRegistry::HOME_CASE_REFERENCE);
+
+        $this->get('/en/panel/home-service/'.$home->id)
+            ->assertOk()
+            ->assertSee(__('panel.home.tehran_only'), false)
+            ->assertSee(__('panel.demo_mutations_disabled'), false);
+
+        $this->post('/en/panel/home-service/'.$home->id.'/confirm', [
+            '_token' => csrf_token(),
+            'version' => 1,
+        ])->assertForbidden();
+
+        $this->get('/en/panel/profile')
+            ->assertOk()
+            ->assertSee(__('panel.nav.profile'), false)
+            ->assertDontSee('name="locale"', false);
+
+        $this->get('/en/dashboard')
+            ->assertOk()
+            ->assertSee(PanelDemoRegistry::OPG_CASE_REFERENCE)
+            ->assertSee(PanelDemoRegistry::HOME_CASE_REFERENCE);
+
+        $this->get('/en/panel/cases/new')->assertForbidden();
+        $this->get('/en/panel/marketing')->assertForbidden();
+        $this->get('/en/panel/network')->assertForbidden();
+    }
+
+    public function test_demo_owner_dashboard_does_not_count_live_cases_or_clinics(): void
+    {
+        config()->set('royadarman.panel_demo_access', true);
+        config()->set('royadarman.intake_enabled', false);
+        $this->artisan('royadarman:panel-demo:seed')->assertSuccessful();
+
+        DB::table('patient_cases')->insert([
+            'id' => (string) Str::ulid(),
+            'public_reference' => 'LIVE-OWNER-MUST-NOT-COUNT',
+            'patient_user_id' => null,
+            'service_type' => 'guidance_referral',
+            'status' => 'submitted',
+            'priority' => 'normal',
+            'patient_name' => null,
+            'patient_mobile' => encrypt('09120000000'),
+            'patient_mobile_hash' => hash('sha256', '09120000000'),
+            'tehran_area' => 'central',
+            'preferred_contact_time' => null,
+            'contact_reason' => null,
+            'budget_band' => 'unknown',
+            'current_coordinator_id' => null,
+            'submitted_at' => now(),
+            'closed_at' => null,
+            'version' => 1,
+            'source_language' => 'fa',
+            'currency' => 'IRR',
+            'budget_input_unit' => 'toman',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('clinics')->insert([
+            'id' => (string) Str::ulid(),
+            'name' => 'Live Partner Clinic',
+            'city' => 'Tehran',
+            'area_code' => 'live',
+            'synthetic_demo_key' => null,
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $url = URL::temporarySignedRoute('demo.panel.access', now()->addMinute(), ['role' => 'admin', 'locale' => 'en']);
+        $this->get($url)->assertRedirect('/en/panel');
+
+        $this->get('/en/dashboard')
+            ->assertOk()
+            ->assertDontSee('LIVE-OWNER-MUST-NOT-COUNT')
+            ->assertDontSee('Live Partner Clinic');
+        $this->get('/en/panel')
+            ->assertOk()
+            ->assertDontSee('LIVE-OWNER-MUST-NOT-COUNT')
+            ->assertDontSee('/en/panel/marketing', false)
+            ->assertDontSee('/en/panel/network', false);
     }
 }

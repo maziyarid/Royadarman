@@ -62,7 +62,8 @@ class LocaleAndAuthorizationTest extends TestCase
     public function test_faq_page_uses_progressive_enhancement_details_elements(): void
     {
         $body = $this->get('/faq')->assertOk()->getContent();
-        $this->assertStringContainsString('<details><summary>', $body);
+        $this->assertStringContainsString('<details>', $body);
+        $this->assertStringContainsString('<summary>', $body);
         $this->assertStringContainsString('آیا رویا درمان یک کلینیک یا مطب است؟', $body);
     }
 

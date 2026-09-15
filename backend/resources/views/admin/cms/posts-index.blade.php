@@ -15,14 +15,14 @@
         <label>{{ __('ui.admin.filter_type') }}</label>
         <select name="type">
             <option value="">{{ __('ui.admin.all') }}</option>
-            @foreach($types as $t)<option value="{{ $t->value }}" @selected(($filters['type'] ?? '') === $t->value)>{{ $t->value }}</option>@endforeach
+            @foreach($types as $t)<option value="{{ $t->value }}" @selected(($filters['type'] ?? '') === $t->value)>{{ __('ui.admin.post_types.'.$t->value) }}</option>@endforeach
         </select>
     </div>
     <div class="field">
         <label>{{ __('ui.admin.filter_status') }}</label>
         <select name="status">
             <option value="">{{ __('ui.admin.all') }}</option>
-            @foreach($statuses as $s)<option value="{{ $s->value }}" @selected(($filters['status'] ?? '') === $s->value)>{{ $s->value }}</option>@endforeach
+            @foreach($statuses as $s)<option value="{{ $s->value }}" @selected(($filters['status'] ?? '') === $s->value)>{{ __('ui.admin.post_statuses.'.$s->value) }}</option>@endforeach
         </select>
     </div>
     <button type="submit" class="btn primary">{{ __('ui.admin.search') }}</button>
@@ -39,8 +39,8 @@
             @php $tr = $post->translations->firstWhere('locale', app()->getLocale()) ?? $post->translations->first(); @endphp
             <tr>
                 <td><strong>{{ $tr?->title ?? '—' }}</strong><br><small class="muted">/{{ $tr?->locale }}/{{ $tr?->slug }}</small></td>
-                <td>{{ $post->type->value }}</td>
-                <td><span class="badge {{ $post->status->value }}">{{ $post->status->value }}</span></td>
+                <td>{{ __('ui.admin.post_types.'.$post->type->value) }}</td>
+                <td><span class="badge {{ $post->status->value }}">{{ __('ui.admin.post_statuses.'.$post->status->value) }}</span></td>
                 <td class="muted">{{ $post->author?->name ?? '—' }}</td>
                 <td class="muted">{{ $post->updated_at?->format('Y-m-d') }}</td>
                 <td class="row-actions">

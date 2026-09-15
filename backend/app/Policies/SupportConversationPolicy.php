@@ -15,8 +15,11 @@ final class SupportConversationPolicy
         }
 
         if ($user->role === UserRole::Coordinator) {
-            return $conversation->assignee_user_id !== null
-                && (int) $conversation->assignee_user_id === (int) $user->id;
+            if ($conversation->assignee_user_id === null) {
+                return true;
+            }
+
+            return (int) $conversation->assignee_user_id === (int) $user->id;
         }
 
         if ($user->role === UserRole::Owner || $user->role === UserRole::TechnicalAdministrator) {
@@ -59,5 +62,19 @@ final class SupportConversationPolicy
         }
 
         return $user->role === UserRole::Owner;
+    }
+
+    public function assign(User $user, SupportConversation $conversation): bool
+    {
+        if ($user->role === UserRole::Owner) {
+            return true;
+        }
+
+        if ($user->role === UserRole::Coordinator) {
+            return $conversation->assignee_user_id === null
+                || (int) $conversation->assignee_user_id === (int) $user->id;
+        }
+
+        return false;
     }
 }

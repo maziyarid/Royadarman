@@ -18,22 +18,26 @@
         </include>
     </source>
     <php>
-        <env name="APP_ENV" value="testing"/>
-        <env name="APP_KEY" value="base64:cm95YWRhcm1hbi10ZXN0LWtleS0wMDAwMDAwMDAwMDA="/>
-        <env name="ROYADARMAN_PHONE_HASH_KEY" value="test-phone-lookup-key-do-not-use-in-production"/>
-        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
-        <env name="BCRYPT_ROUNDS" value="4"/>
-        <env name="BROADCAST_CONNECTION" value="null"/>
-        <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
-        <env name="DB_URL" value=""/>
-        <env name="MAIL_MAILER" value="array"/>
-        <env name="QUEUE_CONNECTION" value="sync"/>
-        <env name="SESSION_DRIVER" value="array"/>
-        <env name="PULSE_ENABLED" value="false"/>
-        <env name="TELESCOPE_ENABLED" value="false"/>
-        <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!-- force=true so a production-tree checkout cannot leak APP_URL, release identity, or DB credentials into tests. -->
+        <env name="APP_ENV" value="testing" force="true"/>
+        <env name="APP_URL" value="http://localhost" force="true"/>
+        <env name="APP_KEY" value="base64:cm95YWRhcm1hbi10ZXN0LWtleS0wMDAwMDAwMDAwMDA=" force="true"/>
+        <env name="ROYADARMAN_PHONE_HASH_KEY" value="test-phone-lookup-key-do-not-use-in-production" force="true"/>
+        <env name="ROYADARMAN_RELEASE_COMMIT" value="" force="true"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file" force="true"/>
+        <env name="BCRYPT_ROUNDS" value="4" force="true"/>
+        <env name="BROADCAST_CONNECTION" value="null" force="true"/>
+        <env name="CACHE_STORE" value="array" force="true"/>
+        <env name="DB_CONNECTION" value="sqlite" force="true"/>
+        <env name="DB_DATABASE" value=":memory:" force="true"/>
+        <env name="DB_URL" value="" force="true"/>
+        <env name="MAIL_MAILER" value="array" force="true"/>
+        <env name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <env name="SESSION_DRIVER" value="array" force="true"/>
+        <env name="PULSE_ENABLED" value="false" force="true"/>
+        <env name="TELESCOPE_ENABLED" value="false" force="true"/>
+        <env name="NIGHTWATCH_ENABLED" value="false" force="true"/>
+        <env name="INTAKE_ENABLED" value="false" force="true"/>
+        <env name="PANEL_DEMO_ACCESS" value="false" force="true"/>
     </php>
 </phpunit>
-

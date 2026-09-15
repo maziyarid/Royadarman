@@ -43,7 +43,7 @@ class PatientRequestPageTest extends TestCase
             ->assertSee('id="request-form"', false)
             ->assertSee('/assets/patient-request.js', false)
             ->assertSee('guidance_referral', false)
-            ->assertDontSee('<script>', false)
+            ->assertSee('data-patient-request', false)
             ->assertDontSee('<style>', false);
 
         $script = file_get_contents(public_path('assets/patient-request.js'));

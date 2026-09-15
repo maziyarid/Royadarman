@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Domain\Identity\Enums\UserRole;
 use App\Models\PatientCase;
+use App\Support\PanelDemoRegistry;
+use App\Support\WorkspaceView;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +28,7 @@ final class PanelController extends Controller
         };
 
         return view('panel.dashboard', [
+            ...WorkspaceView::data($request, 'panel'),
             'panelKey' => $panelKey,
             'metrics' => $metrics,
             'cases' => $cases,
@@ -38,7 +41,7 @@ final class PanelController extends Controller
     {
         $cases = PatientCase::query()
             ->where('patient_user_id', $userId)
-            ->when($isDemo, fn ($query) => $query->where('public_reference', 'like', 'TEST-DEMO-%'))
+            ->when($isDemo, fn ($query) => $query->where('public_reference', 'like', PanelDemoRegistry::CASE_REFERENCE_PREFIX.'%'))
             ->latest()
             ->limit(30)
             ->get(['id', 'public_reference', 'service_type', 'status', 'submitted_at', 'updated_at']);
@@ -49,7 +52,7 @@ final class PanelController extends Controller
             'documents' => DB::table('clinical_documents')
                 ->join('patient_cases', 'patient_cases.id', '=', 'clinical_documents.case_id')
                 ->where('patient_cases.patient_user_id', $userId)
-                ->when($isDemo, fn ($query) => $query->where('patient_cases.public_reference', 'like', 'TEST-DEMO-%'))
+                ->when($isDemo, fn ($query) => $query->where('patient_cases.public_reference', 'like', PanelDemoRegistry::CASE_REFERENCE_PREFIX.'%'))
                 ->whereNull('clinical_documents.deleted_at')
                 ->count(),
         ], $cases, 'patient'];
@@ -62,7 +65,7 @@ final class PanelController extends Controller
             ->where('case_assignments.assignee_user_id', $userId)
             ->where('case_assignments.purpose', 'coordination')
             ->whereNull('case_assignments.released_at')
-            ->when($isDemo, fn ($query) => $query->where('patient_cases.public_reference', 'like', 'TEST-DEMO-%'))
+            ->when($isDemo, fn ($query) => $query->where('patient_cases.public_reference', 'like', PanelDemoRegistry::CASE_REFERENCE_PREFIX.'%'))
             ->orderByDesc('patient_cases.updated_at')
             ->limit(50)
             ->get([
@@ -84,7 +87,7 @@ final class PanelController extends Controller
             ->where('case_assignments.assignee_user_id', $userId)
             ->where('case_assignments.purpose', 'clinical_review')
             ->whereNull('case_assignments.released_at')
-            ->when($isDemo, fn ($query) => $query->where('patient_cases.public_reference', 'like', 'TEST-DEMO-%'))
+            ->when($isDemo, fn ($query) => $query->where('patient_cases.public_reference', 'like', PanelDemoRegistry::CASE_REFERENCE_PREFIX.'%'))
             ->orderByDesc('patient_cases.updated_at')
             ->limit(50)
             ->get([
@@ -96,7 +99,7 @@ final class PanelController extends Controller
             return DB::table('review_revisions')
                 ->join('patient_cases', 'patient_cases.id', '=', 'review_revisions.case_id')
                 ->where('review_revisions.clinician_user_id', $userId)
-                ->when($isDemo, fn ($query) => $query->where('patient_cases.public_reference', 'like', 'TEST-DEMO-%'))
+                ->when($isDemo, fn ($query) => $query->where('patient_cases.public_reference', 'like', PanelDemoRegistry::CASE_REFERENCE_PREFIX.'%'))
                 ->when($signed,
                     fn ($query) => $query->whereNotNull('review_revisions.signed_at'),
                     fn ($query) => $query->whereNull('review_revisions.signed_at'),
@@ -119,6 +122,7 @@ final class PanelController extends Controller
             ->join('clinic_memberships', 'clinic_memberships.clinic_id', '=', 'referral_grants.clinic_id')
             ->join('consent_events', 'consent_events.id', '=', 'referral_grants.consent_event_id')
             ->where('clinics.is_active', true)
+            ->when($isDemo, fn ($query) => $query->where('clinics.synthetic_demo_key', PanelDemoRegistry::CLINIC_DEMO_KEY))
             ->where('clinic_memberships.user_id', $userId)
             ->where('clinic_memberships.active_from', '<=', now())
             ->where(fn ($q) => $q->whereNull('clinic_memberships.active_until')->orWhere('clinic_memberships.active_until', '>', now()))
@@ -127,7 +131,7 @@ final class PanelController extends Controller
             ->where('referral_grants.expires_at', '>', now())
             ->where('consent_events.decision', 'accepted')
             ->whereNull('consent_events.revoked_at')
-            ->when($isDemo, fn ($query) => $query->where('patient_cases.public_reference', 'like', 'TEST-DEMO-%'))
+            ->when($isDemo, fn ($query) => $query->where('patient_cases.public_reference', 'like', PanelDemoRegistry::CASE_REFERENCE_PREFIX.'%'))
             ->orderByDesc('referral_grants.granted_at')
             ->limit(50)
             ->get([
@@ -146,17 +150,16 @@ final class PanelController extends Controller
         if ($isDemo) {
             return [[
                 'open_cases' => DB::table('patient_cases')
-                    ->where('public_reference', 'like', 'TEST-DEMO-%')
+                    ->where('public_reference', 'like', PanelDemoRegistry::CASE_REFERENCE_PREFIX.'%')
                     ->whereNotIn('status', ['closed', 'cancelled'])
                     ->count(),
                 'active_clinics' => DB::table('clinics')
-                    ->where('name', 'TEST Demo Clinic')
-                    ->where('area_code', 'test-demo')
+                    ->where('synthetic_demo_key', PanelDemoRegistry::CLINIC_DEMO_KEY)
                     ->where('is_active', true)
                     ->count(),
                 'verified_clinicians' => DB::table('practitioners')
                     ->join('users', 'users.id', '=', 'practitioners.user_id')
-                    ->where('users.email', 'demo-clinician@royadarman.invalid')
+                    ->where('users.email', PanelDemoRegistry::identities()['clinician']['email'])
                     ->where('practitioners.credential_status', 'verified')
                     ->where(fn ($q) => $q->whereNull('practitioners.expires_at')->orWhere('practitioners.expires_at', '>', now()))
                     ->count(),

@@ -9,7 +9,15 @@ use Illuminate\Http\Response;
 
 final class PublicPageController extends Controller
 {
-    private const PUBLIC_ROUTES = ['home' => 'public.home', 'services' => 'public.services', 'opg' => 'public.opg', 'home_dentistry' => 'public.home-dentistry', 'referrals' => 'public.referrals', 'how' => 'public.how', 'about' => 'public.about', 'contact' => 'public.contact', 'privacy' => 'public.privacy', 'faq' => 'public.faq'];
+    private const PHOTOS = [
+        'services' => 'coord',
+        'how' => 'support',
+        'about' => 'about',
+        'contact' => 'support',
+        'opg' => 'opg',
+        'home_dentistry' => 'home',
+        'referrals' => 'coord',
+    ];
 
     public function homePersian(): Response
     {
@@ -74,85 +82,158 @@ final class PublicPageController extends Controller
     {
         $page = $this->published('home', $locale);
 
-        return $page ? $this->publicResponse('public.marketing-page', $this->viewData($page, $locale, 'home')) : $this->publicResponse('public.home', ['locale' => $locale, 'pageKey' => 'home']);
+        return $page
+            ? $this->publicResponse('public.marketing-page', $this->viewData($page, $locale, 'home'))
+            : $this->publicResponse('public.home', ['locale' => $locale, 'pageKey' => 'home']);
     }
 
     public function services(string $locale): Response
     {
-        return $this->staticPage('services', $locale);
+        $content = trans('site.pages.services');
+        abort_unless(is_array($content), 404);
+
+        return $this->story($locale, 'services', $content, [
+            'photo' => self::PHOTOS['services'],
+            'serviceCards' => [
+                ['key' => 'referrals', 'photo' => 'coord', 'title' => $content['services'][0]['title'], 'text' => $content['services'][0]['text']],
+                ['key' => 'home-dentistry', 'photo' => 'home', 'title' => $content['services'][1]['title'], 'text' => $content['services'][1]['text']],
+                ['key' => 'opg', 'photo' => 'opg', 'title' => $content['services'][2]['title'], 'text' => $content['services'][2]['text']],
+            ],
+            'related' => $this->related(['opg', 'home-dentistry', 'referrals']),
+            'heroActions' => [
+                ['href' => route('login', ['locale' => $locale]), 'label' => __('site.cta'), 'style' => 'primary'],
+                ['href' => $this->url('how', $locale), 'label' => __('site.nav.how'), 'style' => 'ghost'],
+            ],
+        ]);
     }
 
     public function how(string $locale): Response
     {
-        return $this->staticPage('how', $locale);
+        return $this->staticStory('how', $locale, ['photo' => self::PHOTOS['how'], 'related' => $this->related(['services', 'contact'])]);
     }
 
     public function about(string $locale): Response
     {
-        return $this->staticPage('about', $locale);
+        return $this->staticStory('about', $locale, ['photo' => self::PHOTOS['about'], 'related' => $this->related(['how', 'contact'])]);
     }
 
     public function privacy(string $locale): Response
     {
-        return $this->staticPage('privacy', $locale);
+        return $this->staticStory('privacy', $locale, ['related' => $this->related(['faq', 'contact'])]);
     }
 
     public function faq(string $locale): Response
     {
-        return $this->staticPage('faq', $locale);
+        $content = trans('site.pages.faq');
+        abort_unless(is_array($content), 404);
+
+        return $this->story($locale, 'faq', $content, [
+            'faqs' => __('site.faqs'),
+            'related' => $this->related(['services', 'contact']),
+        ]);
     }
 
     public function opg(string $locale): Response
     {
-        return $this->marketingResponse('services/opg', $locale, 'opg');
+        return $this->serviceStory('services/opg', $locale, 'opg', ['home-dentistry', 'referrals']);
     }
 
     public function homeDentistry(string $locale): Response
     {
-        return $this->marketingResponse('services/home-dentistry', $locale, 'home_dentistry');
+        return $this->serviceStory('services/home-dentistry', $locale, 'home_dentistry', ['referrals', 'opg']);
     }
 
     public function referrals(string $locale): Response
     {
-        return $this->marketingResponse('referrals', $locale, 'referrals');
+        return $this->serviceStory('referrals', $locale, 'referrals', ['home-dentistry', 'opg']);
     }
 
     public function contact(string $locale): Response
     {
-        return $this->marketingResponse('contact', $locale, 'contact');
+        return $this->serviceStory('contact', $locale, 'contact', ['faq', 'privacy']);
     }
 
-    public function sitemap(): Response
-    {
-        $urls = [];
-        foreach (['fa', 'ar', 'en'] as $locale) {
-            foreach (self::PUBLIC_ROUTES as $route) {
-                $urls[] = $locale === 'fa' ? route($route.'.fa') : route($route, ['locale' => $locale]);
-            }
-        } $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
-        foreach ($urls as $url) {
-            $xml .= '  <url><loc>'.htmlspecialchars($url, ENT_XML1 | ENT_QUOTES, 'UTF-8')."</loc></url>\n";
-        } $xml .= '</urlset>';
-
-        return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8', 'Cache-Control' => 'public, max-age=300']);
-    }
-
-    private function staticPage(string $key, string $locale): Response
+    private function staticStory(string $key, string $locale, array $extra = []): Response
     {
         $content = trans('site.pages.'.$key);
         abort_unless(is_array($content), 404);
 
-        return $this->publicResponse('public.static-page', ['pageKey' => $key, 'locale' => $locale, 'content' => $content]);
+        return $this->story($locale, $key, $content, $extra);
     }
 
-    private function marketingResponse(string $slug, string $locale, string $key): Response
+    private function serviceStory(string $slug, string $locale, string $key, array $relatedKeys): Response
     {
         $page = $this->published($slug, $locale);
-        if ($page) {
-            return $this->publicResponse('public.marketing-page', $this->viewData($page, $locale, $key));
+        $details = trans('site.service_pages.'.$key);
+        $marketing = trans('marketing.pages.'.$key);
+        $title = is_array($marketing) ? ($page?->title ?: $marketing['title']) : ($page?->title ?: $key);
+        $excerpt = $page?->excerpt ?: (is_array($marketing) ? ($marketing['excerpt'] ?? '') : '');
+        $body = $page?->body ?: (is_array($marketing) ? ($marketing['body'] ?? '') : '');
+        $metaTitle = $page?->meta_title ?: (is_array($marketing) ? ($marketing['meta_title'] ?? $title) : $title);
+        $metaDescription = $page?->meta_description ?: (is_array($marketing) ? ($marketing['meta_description'] ?? $excerpt) : $excerpt);
+
+        return $this->publicResponse('public.story', [
+            'pageKey' => $key === 'home_dentistry' ? 'home-dentistry' : $key,
+            'locale' => $locale,
+            'title' => $title,
+            'lead' => $excerpt,
+            'excerpt' => $excerpt,
+            'body' => $body,
+            'metaTitle' => $metaTitle,
+            'metaDescription' => $metaDescription,
+            'photo' => self::PHOTOS[$key] ?? null,
+            'overviewTitle' => is_array($details) ? ($details['overview_title'] ?? $title) : $title,
+            'points' => is_array($details) ? ($details['points'] ?? []) : [],
+            'stepsTitle' => is_array($details) ? ($details['steps_title'] ?? '') : '',
+            'steps' => is_array($details) ? ($details['steps'] ?? []) : [],
+            'noteTitle' => is_array($details) ? ($details['note_title'] ?? null) : null,
+            'note' => is_array($details) ? ($details['note'] ?? null) : null,
+            'faqs' => in_array($key, ['opg', 'home_dentistry', 'referrals'], true) ? trans('site.faqs') : [],
+            'related' => $this->related($relatedKeys),
+            'heroActions' => [
+                ['href' => route('login', ['locale' => $locale]), 'label' => __('site.cta'), 'style' => 'primary'],
+                ['href' => $this->url('how', $locale), 'label' => __('site.nav.how'), 'style' => 'ghost'],
+            ],
+            'schemaType' => 'WebPage',
+        ]);
+    }
+
+    private function story(string $locale, string $key, array $content, array $extra = []): Response
+    {
+        return $this->publicResponse('public.story', array_merge([
+            'pageKey' => $key,
+            'locale' => $locale,
+            'title' => $content['title'],
+            'lead' => $content['lead'] ?? '',
+            'metaTitle' => $content['meta_title'] ?? $content['title'],
+            'metaDescription' => $content['meta_description'] ?? ($content['lead'] ?? ''),
+            'sections' => $content['sections'] ?? [],
+            'faqTitle' => $content['faq_title'] ?? null,
+            'schemaType' => 'WebPage',
+        ], $extra));
+    }
+
+    /** @param list<string> $keys */
+    private function related(array $keys): array
+    {
+        $out = [];
+        foreach ($keys as $key) {
+            $page = $key === 'home-dentistry' ? 'home_dentistry' : $key;
+            $content = trans('site.pages.'.$page);
+            if (! is_array($content)) {
+                $content = trans('marketing.pages.'.$page);
+            }
+            if (! is_array($content)) {
+                continue;
+            }
+            $out[] = [
+                'key' => $key,
+                'title' => $content['title'] ?? $key,
+                'text' => $content['lead'] ?? ($content['excerpt'] ?? ''),
+            ];
         }
 
-return $this->publicResponse('public.marketing-page', ['page' => null, 'locale' => $locale, 'pageKey' => $key, 'title' => __('marketing.pages.'.$key.'.title'), 'excerpt' => __('marketing.pages.'.$key.'.excerpt'), 'body' => __('marketing.pages.'.$key.'.body'), 'metaTitle' => __('marketing.pages.'.$key.'.meta_title'), 'metaDescription' => __('marketing.pages.'.$key.'.meta_description')]);
+        return $out;
     }
 
     private function published(string $slug, string $locale): ?MarketingPage
@@ -165,6 +246,11 @@ return $this->publicResponse('public.marketing-page', ['page' => null, 'locale' 
         return ['page' => $p, 'locale' => $locale, 'pageKey' => $key, 'title' => $p->title, 'excerpt' => $p->excerpt, 'body' => $p->body, 'metaTitle' => $p->meta_title ?: $p->title, 'metaDescription' => $p->meta_description ?: ($p->excerpt ?: $p->title)];
     }
 
+    private function url(string $key, string $locale): string
+    {
+        return $locale === 'fa' ? route('public.'.$key.'.fa') : route('public.'.$key, ['locale' => $locale]);
+    }
+
     private function fa(callable $cb): Response
     {
         app()->setLocale('fa');
@@ -174,6 +260,6 @@ return $this->publicResponse('public.marketing-page', ['page' => null, 'locale' 
 
     private function publicResponse(string $view, array $data = []): Response
     {
-        return response()->view($view,$data)->header('Cache-Control','public, max-age=300')->header('Vary','Accept-Language');
+        return response()->view($view, $data)->header('Cache-Control', 'public, max-age=300')->header('Vary', 'Accept-Language');
     }
 }

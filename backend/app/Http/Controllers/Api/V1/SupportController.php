@@ -207,7 +207,7 @@ final class SupportController extends Controller
     {
         $user = $request->user();
         abort_unless(in_array($user->role, [UserRole::Coordinator, UserRole::Owner], true), 403);
-        abort_unless($user->can('changeStatus', $conversation), 403);
+        abort_unless($user->can('assign', $conversation), 403);
 
         $data = $request->validate([
             'assignee_user_id' => ['required', 'exists:users,id'],

@@ -1,20 +1,67 @@
-<!doctype html>
-<html lang="{{ app()->getLocale() }}" dir="{{ in_array(app()->getLocale(), ['fa','ar'], true) ? 'rtl' : 'ltr' }}">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="csrf-token" content="{{ csrf_token() }}"><title>{{ __('panel.roles.'.$panelKey.'.title') }} · Royadarman</title><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/assets/workspace.css?v=20260913"><script src="/assets/workspace.js?v=20260913" defer></script></head>
-<body class="workspace-body">
-<div class="app-shell" data-workspace>
-<aside class="app-sidebar">
-<div class="app-brand"><img src="/assets/brand-mark.svg" alt=""><div><strong>{{ __('panel.brand') }}</strong><span class="app-role">{{ __('panel.roles.'.$panelKey.'.title') }}@if($isDemo) · {{ __('panel.demo_label') }}@endif</span></div></div>
-<nav class="app-nav" aria-label="Workspace"><a class="active" href="{{ route('panel',['locale'=>app()->getLocale()]) }}">{{ __('panel.roles.'.$panelKey.'.title') }}</a>
-@if(!$isDemo && $panelKey === 'patient')<a href="{{ route('patient.request.create',['locale'=>app()->getLocale()]) }}">{{ __('request.title') }}</a>@endif
-@if($canManageMarketing)<a href="{{ route('admin.cms.posts.index') }}">{{ __('ui.admin.title') }}</a><a href="{{ route('marketing.index',['locale'=>app()->getLocale()]) }}">{{ __('panel.marketing') }}</a><a href="{{ route('network.index',['locale'=>app()->getLocale()]) }}">{{ __('network.title') }}</a>@endif
-@if(!$isDemo)<div class="nav-sep"></div><a href="{{ app()->getLocale()==='fa' ? route('public.home.fa') : route('public.home',['locale'=>app()->getLocale()]) }}">{{ __('panel.back_home') }}</a>@endif</nav>
-<div class="app-sidebar-foot"><button class="btn" type="button" data-logout data-locale="{{ app()->getLocale() }}" data-home="{{ app()->getLocale()==='fa' ? route('public.home.fa') : route('public.home',['locale'=>app()->getLocale()]) }}">{{ __('panel.logout') }}</button></div>
-</aside>
-<div class="app-main"><header class="app-topbar"><button class="btn mobile-nav" type="button" data-mobile-nav>☰</button><h1>{{ __('panel.roles.'.$panelKey.'.title') }}</h1><div class="app-top-actions">@if(!$isDemo && $panelKey==='patient')<a class="btn primary" href="{{ route('patient.request.create',['locale'=>app()->getLocale()]) }}">{{ __('request.title') }}</a>@endif</div></header>
-<main class="app-content"><section class="hero-panel"><h1>{{ __('panel.roles.'.$panelKey.'.title') }}</h1><p>{{ __('panel.roles.'.$panelKey.'.subtitle') }}</p>@if($isDemo)<p class="notice"><strong>{{ __('panel.demo_label') }}</strong> · {{ __('panel.demo_notice') }}</p>@endif</section>
-<section class="metric-grid" aria-label="Summary">@foreach($metrics as $key=>$value)<article class="metric"><strong>{{ number_format((int)$value) }}</strong><span>{{ __('panel.metrics.'.$key) }}</span></article>@endforeach</section>
-@if($cases->isNotEmpty())<section class="card"><div class="card-head"><span>{{ __('panel.roles.'.$panelKey.'.title') }}</span><span class="muted">{{ $cases->count() }}</span></div><div class="table-wrap"><table><thead><tr><th>{{ __('panel.table.reference') }}</th><th>{{ __('panel.table.service') }}</th><th>{{ __('panel.table.status') }}</th><th>{{ __('panel.table.updated') }}</th></tr></thead><tbody>@foreach($cases as $case)@php($service=$case->service_type instanceof \BackedEnum?$case->service_type->value:$case->service_type)@php($status=$case->status instanceof \BackedEnum?$case->status->value:$case->status)<tr><td>@if($isDemo)<bdi>{{ $case->public_reference }}</bdi>@else<a class="case-link" href="{{ route('panel.case',['locale'=>app()->getLocale(),'case'=>$case->id]) }}"><bdi>{{ $case->public_reference }}</bdi></a>@endif</td><td><span class="badge">{{ $service }}</span></td><td><span class="badge {{ $status }}">{{ $status }}</span></td><td><bdi>{{ $case->updated_at }}</bdi></td></tr>@endforeach</tbody></table></div></section>@else<section class="card"><div class="empty">{{ __('panel.empty') }}</div></section>@endif
-@if(in_array($panelKey,['owner','tech_admin'],true))<p class="notice">{{ __('panel.roles.'.$panelKey.'.subtitle') }}</p>@endif
-</main></div></div>
-</body></html>
+@extends('panel.layout')
+@section('title', __('panel.roles.'.$panelKey.'.title'))
+@section('heading', __('panel.roles.'.$panelKey.'.title'))
+@section('actions')
+    @if(!$isDemo && $panelKey === 'patient')
+        <a class="btn primary" href="{{ route('patient.request.create', ['locale' => app()->getLocale()]) }}">{{ __('request.title') }}</a>
+    @endif
+@endsection
+@section('content')
+<section class="hero-panel">
+    <h1>{{ __('panel.roles.'.$panelKey.'.title') }}</h1>
+    <p>{{ __('panel.roles.'.$panelKey.'.subtitle') }}</p>
+</section>
+<section class="metric-grid" aria-label="{{ __('panel.table.status') }}">
+    @foreach($metrics as $key => $value)
+        <article class="metric">
+            <strong>{{ number_format((int) $value) }}</strong>
+            <span>{{ __('panel.metrics.'.$key) }}</span>
+        </article>
+    @endforeach
+</section>
+@if($cases->isNotEmpty())
+    <section class="card">
+        <div class="card-head">
+            <span>{{ __('panel.table.reference') }}</span>
+            <span class="muted">{{ $cases->count() }}</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{{ __('panel.table.reference') }}</th>
+                        <th scope="col">{{ __('panel.table.service') }}</th>
+                        <th scope="col">{{ __('panel.table.status') }}</th>
+                        <th scope="col">{{ __('panel.table.updated') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($cases as $case)
+                        @php
+                            $service = $case->service_type instanceof \BackedEnum ? $case->service_type->value : $case->service_type;
+                            $status = $case->status instanceof \BackedEnum ? $case->status->value : $case->status;
+                        @endphp
+                        <tr>
+                            <td>
+                                <a class="case-link" href="{{ route('panel.case', ['locale' => app()->getLocale(), 'case' => $case->id]) }}">
+                                    <bdi>{{ $case->public_reference }}</bdi>
+                                </a>
+                            </td>
+                            <td><span class="badge">{{ __('ui.dashboard.service.'.$service) }}</span></td>
+                            <td><span class="badge {{ $status }}">{{ __('ui.dashboard.status.'.$status) }}</span></td>
+                            <td><bdi>{{ $case->updated_at }}</bdi></td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </section>
+@else
+    <section class="card">
+        <div class="empty">{{ __('panel.empty') }}</div>
+    </section>
+@endif
+@if(in_array($panelKey, ['owner', 'tech_admin'], true))
+    <p class="notice">{{ __('panel.roles.'.$panelKey.'.subtitle') }}</p>
+@endif
+@endsection

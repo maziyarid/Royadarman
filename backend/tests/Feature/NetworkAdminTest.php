@@ -61,4 +61,43 @@ class NetworkAdminTest extends TestCase
             'credential_status' => 'verified',
         ]);
     }
+
+    public function test_network_admin_cannot_mutate_the_synthetic_demo_clinic_or_identities(): void
+    {
+        config()->set('royadarman.panel_demo_access', true);
+        config()->set('royadarman.intake_enabled', false);
+        $this->artisan('royadarman:panel-demo:seed')->assertSuccessful();
+
+        $owner = User::factory()->create(['role' => 'owner', 'is_active' => true, 'locale' => 'en']);
+        $clinicId = DB::table('clinics')->where('synthetic_demo_key', 'royadarman.panel-demo.clinic')->value('id');
+        $demoClinicianId = DB::table('users')->where('email', 'demo-clinician@royadarman.invalid')->value('id');
+        $membershipId = DB::table('clinic_memberships')->where('clinic_id', $clinicId)->value('id');
+
+        $this->actingAs($owner)->put('/en/panel/network/clinics/'.$clinicId, [
+            'name' => 'Hijacked Clinic',
+            'city' => 'Tehran',
+            'area_code' => 'hack',
+            'is_active' => 0,
+        ])->assertForbidden();
+
+        $this->actingAs($owner)->post('/en/panel/network/practitioners/'.$demoClinicianId, [
+            'licence_number' => 'HACK-1',
+            'credential_status' => 'revoked',
+        ])->assertForbidden();
+
+        $this->actingAs($owner)->post('/en/panel/network/memberships', [
+            'clinic_id' => $clinicId,
+            'user_id' => $demoClinicianId,
+            'membership_role' => 'contact',
+        ])->assertForbidden();
+
+        $this->actingAs($owner)->delete('/en/panel/network/memberships/'.$membershipId)->assertForbidden();
+
+        $this->assertDatabaseHas('clinics', [
+            'id' => $clinicId,
+            'name' => 'TEST Demo Clinic',
+            'synthetic_demo_key' => 'royadarman.panel-demo.clinic',
+            'is_active' => 1,
+        ]);
+    }
 }

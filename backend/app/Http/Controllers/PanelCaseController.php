@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Domain\Identity\Enums\UserRole;
 use App\Models\PatientCase;
+use App\Support\PanelDemoRegistry;
+use App\Support\WorkspaceView;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +16,11 @@ final class PanelCaseController extends Controller
     {
         abort_unless($request->user()?->can('view', $case), 404);
         $role = $request->user()->role;
+        $isDemo = (bool) $request->session()->get('panel_demo', false);
+
+        if ($isDemo && ! PanelDemoRegistry::isDemoCaseReference((string) $case->public_reference)) {
+            abort(403, 'Demo sessions cannot open non-test cases.');
+        }
 
         $data = match ($role) {
             UserRole::Patient => $this->patientData($case),
@@ -24,9 +31,11 @@ final class PanelCaseController extends Controller
         };
 
         return view('panel.case', [
+            ...WorkspaceView::data($request, 'panel'),
             'case' => $case,
             'roleKey' => $role->value,
             'locale' => $locale,
+            'isDemo' => $isDemo,
             'allowedStatuses' => $role === UserRole::Coordinator ? $case->status->allowedTargets() : [],
             ...$data,
         ]);

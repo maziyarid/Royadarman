@@ -2,23 +2,29 @@
 
 namespace App\Console\Commands;
 
+use App\Domain\Documents\Enums\DocumentStatus;
 use App\Models\AuditEvent;
 use App\Models\CaseAssignment;
 use App\Models\Clinic;
+use App\Models\ClinicalDocument;
 use App\Models\ClinicMembership;
 use App\Models\ConsentEvent;
+use App\Models\HomeServiceRequest;
 use App\Models\PatientCase;
 use App\Models\PolicyVersion;
 use App\Models\Practitioner;
 use App\Models\ReferralGrant;
 use App\Models\ReferralProposal;
 use App\Models\ReviewRevision;
+use App\Models\SupportConversation;
+use App\Models\SupportMessage;
 use App\Models\User;
 use App\Support\PanelDemoRegistry;
 use App\Support\PhoneHasher;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use RuntimeException;
 use Throwable;
 
 final class SeedPanelDemo extends Command
@@ -59,7 +65,7 @@ final class SeedPanelDemo extends Command
 
                     if ($existing !== null) {
                         if (! $this->isSafeExistingDemoIdentity($existing, $identity['role']->value)) {
-                            throw new \RuntimeException(
+                            throw new RuntimeException(
                                 'Reserved demo identity collision for '.$identity['email'].'. Existing credentials or role were not modified.',
                             );
                         }
@@ -88,10 +94,7 @@ final class SeedPanelDemo extends Command
                     ]);
                 }
 
-                $clinic = Clinic::query()->updateOrCreate(
-                    ['name' => 'TEST Demo Clinic'],
-                    ['city' => 'Tehran', 'area_code' => 'test-demo', 'is_active' => true],
-                );
+                $clinic = $this->resolveSyntheticDemoClinic();
 
                 ClinicMembership::query()->updateOrCreate(
                     ['clinic_id' => $clinic->id, 'user_id' => $users['clinic']->id],
@@ -131,7 +134,7 @@ final class SeedPanelDemo extends Command
                 ];
 
                 $clinicalCase = PatientCase::query()->updateOrCreate(
-                    ['public_reference' => 'TEST-DEMO-OPG-001'],
+                    ['public_reference' => PanelDemoRegistry::OPG_CASE_REFERENCE],
                     [
                         ...$commonCase,
                         'service_type' => 'opg_review',
@@ -140,7 +143,7 @@ final class SeedPanelDemo extends Command
                 );
 
                 $referralCase = PatientCase::query()->updateOrCreate(
-                    ['public_reference' => 'TEST-DEMO-REF-001'],
+                    ['public_reference' => PanelDemoRegistry::REFERRAL_CASE_REFERENCE],
                     [
                         ...$commonCase,
                         'service_type' => 'guidance_referral',
@@ -148,7 +151,16 @@ final class SeedPanelDemo extends Command
                     ],
                 );
 
-                foreach ([$clinicalCase, $referralCase] as $case) {
+                $homeCase = PatientCase::query()->updateOrCreate(
+                    ['public_reference' => PanelDemoRegistry::HOME_CASE_REFERENCE],
+                    [
+                        ...$commonCase,
+                        'service_type' => 'home_dentistry',
+                        'status' => 'home_visit_proposed',
+                    ],
+                );
+
+                foreach ([$clinicalCase, $referralCase, $homeCase] as $case) {
                     CaseAssignment::query()->updateOrCreate(
                         [
                             'case_id' => $case->id,
@@ -176,17 +188,36 @@ final class SeedPanelDemo extends Command
                     ],
                 );
 
+                $document = ClinicalDocument::query()->updateOrCreate(
+                    ['storage_key' => PanelDemoRegistry::DOCUMENT_STORAGE_KEY],
+                    [
+                        'case_id' => $clinicalCase->id,
+                        'uploaded_by_user_id' => $users['client']->id,
+                        'original_name' => 'TEST-DEMO-NO-IMAGE.txt',
+                        'storage_disk' => 'local',
+                        'detected_mime' => 'text/plain',
+                        'byte_size' => 0,
+                        'sha256' => hash('sha256', 'royadarman-panel-demo-no-image'),
+                        'status' => DocumentStatus::Rejected,
+                        'scan_provider' => 'panel-demo',
+                        'scan_error_code' => 'demo.synthetic_no_image',
+                        'approved_at' => null,
+                        'deleted_at' => null,
+                    ],
+                );
+
                 ReviewRevision::query()->updateOrCreate(
                     ['case_id' => $clinicalCase->id, 'revision_number' => 1],
                     [
                         'clinician_user_id' => $users['clinician']->id,
+                        'clinical_document_id' => $document->id,
                         'supersedes_id' => null,
                         'source_language' => 'fa',
                         'image_adequacy' => 'TEST synthetic review: image adequacy not clinically assessed.',
                         'observations' => 'TEST synthetic demonstration content only.',
                         'limitations' => 'No real image or patient data is attached to this record.',
-                        'options' => 'TEST workflow placeholder; not medical advice.',
-                        'recommended_next_step' => 'TEST workflow placeholder; no clinical recommendation.',
+                        'options' => 'TEST synthetic demonstration: no treatment options are offered because no real image exists.',
+                        'recommended_next_step' => 'TEST synthetic demonstration: this record is not a clinical recommendation.',
                         'budget_band' => 'test',
                         'signed_at' => null,
                     ],
@@ -246,19 +277,76 @@ final class SeedPanelDemo extends Command
                     ],
                 );
 
-                AuditEvent::query()->create([
-                    'actor_user_id' => $users['admin']->id,
-                    'action' => 'demo.panel.seeded',
-                    'resource_type' => 'panel_demo',
-                    'resource_id' => null,
-                    'result' => 'success',
-                    'context' => [
-                        'identity_count' => count($users),
-                        'case_references' => ['TEST-DEMO-OPG-001', 'TEST-DEMO-REF-001'],
+                HomeServiceRequest::query()->updateOrCreate(
+                    ['case_id' => $homeCase->id],
+                    [
+                        'patient_user_id' => $users['client']->id,
+                        'tehran_area' => 'central',
+                        'status' => 'coordinator_review',
+                        'version' => 1,
                     ],
-                    'correlation_id' => (string) Str::ulid(),
-                    'created_at' => now(),
-                ]);
+                );
+
+                $conversation = SupportConversation::query()->updateOrCreate(
+                    [
+                        'patient_user_id' => $users['client']->id,
+                        'subject' => PanelDemoRegistry::SUPPORT_SUBJECT,
+                    ],
+                    [
+                        'case_id' => $referralCase->id,
+                        'category' => 'coordination',
+                        'status' => 'open',
+                        'priority' => 'normal',
+                        'assignee_user_id' => $users['coordinator']->id,
+                        'opened_at' => now()->subHours(6),
+                        'source_language' => 'fa',
+                    ],
+                );
+
+                SupportMessage::query()->updateOrCreate(
+                    [
+                        'conversation_id' => $conversation->id,
+                        'author_user_id' => $users['client']->id,
+                    ],
+                    [
+                        'is_internal' => false,
+                        'body' => 'TEST synthetic patient message. No real medical history.',
+                        'source_language' => 'fa',
+                        'created_at' => now()->subHours(6),
+                    ],
+                );
+
+                SupportMessage::query()->updateOrCreate(
+                    [
+                        'conversation_id' => $conversation->id,
+                        'author_user_id' => $users['coordinator']->id,
+                    ],
+                    [
+                        'is_internal' => false,
+                        'body' => 'TEST synthetic coordinator reply. The desk has the request; this is not clinical advice.',
+                        'source_language' => 'fa',
+                        'created_at' => now()->subHours(5),
+                    ],
+                );
+
+                AuditEvent::query()->firstOrCreate(
+                    [
+                        'action' => PanelDemoRegistry::AUDIT_SEED_ACTION,
+                        'resource_type' => PanelDemoRegistry::AUDIT_RESOURCE_TYPE,
+                        'resource_id' => PanelDemoRegistry::CLINIC_DEMO_KEY,
+                    ],
+                    [
+                        'actor_user_id' => $users['admin']->id,
+                        'result' => 'success',
+                        'context' => [
+                            'identity_count' => count($users),
+                            'case_references' => PanelDemoRegistry::caseReferences(),
+                            'clinic_demo_key' => PanelDemoRegistry::CLINIC_DEMO_KEY,
+                        ],
+                        'correlation_id' => (string) Str::ulid(),
+                        'created_at' => now(),
+                    ],
+                );
             });
         } catch (Throwable $exception) {
             $this->error($exception->getMessage());
@@ -269,6 +357,48 @@ final class SeedPanelDemo extends Command
         $this->info('Synthetic TEST panel demo data is ready. No passwords, OTP secrets, real patient data, diagnoses or medical images were created.');
 
         return self::SUCCESS;
+    }
+
+    private function resolveSyntheticDemoClinic(): Clinic
+    {
+        $clinic = Clinic::query()
+            ->where('synthetic_demo_key', PanelDemoRegistry::CLINIC_DEMO_KEY)
+            ->lockForUpdate()
+            ->first();
+
+        if ($clinic !== null) {
+            $clinic->forceFill([
+                'name' => PanelDemoRegistry::CLINIC_DISPLAY_NAME,
+                'city' => 'Tehran',
+                'area_code' => PanelDemoRegistry::CLINIC_AREA_CODE,
+                'is_active' => true,
+            ])->save();
+
+            return $clinic;
+        }
+
+        $nameCollision = Clinic::query()
+            ->where('name', PanelDemoRegistry::CLINIC_DISPLAY_NAME)
+            ->where(function ($query): void {
+                $query->whereNull('synthetic_demo_key')
+                    ->orWhere('synthetic_demo_key', '!=', PanelDemoRegistry::CLINIC_DEMO_KEY);
+            })
+            ->lockForUpdate()
+            ->first();
+
+        if ($nameCollision !== null) {
+            throw new RuntimeException(
+                'Reserved demo clinic name collision. Existing clinic "'.PanelDemoRegistry::CLINIC_DISPLAY_NAME.'" is not the synthetic demo clinic and was not modified.',
+            );
+        }
+
+        return Clinic::query()->create([
+            'name' => PanelDemoRegistry::CLINIC_DISPLAY_NAME,
+            'city' => 'Tehran',
+            'area_code' => PanelDemoRegistry::CLINIC_AREA_CODE,
+            'synthetic_demo_key' => PanelDemoRegistry::CLINIC_DEMO_KEY,
+            'is_active' => true,
+        ]);
     }
 
     private function isSafeExistingDemoIdentity(User $user, string $expectedRole): bool

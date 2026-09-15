@@ -9,7 +9,7 @@
     @foreach($alternates as $lang=>$href)<link rel="alternate" hreflang="{{ $lang }}" href="{{ $href }}">@endforeach
     <link rel="alternate" hreflang="x-default" href="{{ $alternates['fa'] }}">
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/assets/font.css?v=20260912"><link rel="stylesheet" href="/assets/site.css?v=20260912">
+    <link rel="stylesheet" href="/assets/font.css?v=20260915"><link rel="stylesheet" href="/assets/site.css?v=20260915">
 </head>
 <body>
 @include('public.partials.header')

@@ -13,4 +13,23 @@ return [
     'patient_name' => 'نام بیمار', 'patient_mobile' => 'شماره همراه بیمار', 'area' => 'محدوده', 'contact_time' => 'زمان ترجیحی تماس',
     'contact_reason' => 'موضوع تماس', 'budget' => 'بازه بودجه', 'grant_expires' => 'پایان اعتبار دسترسی', 'success' => 'با موفقیت ذخیره شد.',
     'error' => 'انجام این اقدام ممکن نشد.',
+    'submit' => 'ارسال با رضایت',
+    'submit_help' => 'متن دقیق سیاست هماهنگی پیش از ارسال نشان داده می‌شود.',
+    'assignments' => 'واگذاری‌ها',
+    'drafts' => 'پیش‌نویس بررسی',
+    'doc_status' => [
+        'uploaded' => 'بارگذاری‌شده',
+        'quarantined' => 'قرنطینه',
+        'scanning' => 'در حال اسکن',
+        'approved' => 'تأییدشده',
+        'rejected' => 'ردشده',
+        'failed' => 'اسکن ناموفق',
+        'deleted' => 'حذف‌شده',
+    ],
+    'referral_status' => [
+        'proposed' => 'پیشنهادشده',
+        'accepted' => 'پذیرفته',
+        'declined' => 'ردشده',
+        'withdrawn' => 'پس‌گرفته',
+    ],
 ];

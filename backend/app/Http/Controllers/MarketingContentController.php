@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Domain\Identity\Enums\UserRole;
 use App\Models\MarketingPage;
 use App\Models\MarketingPageRevision;
+use App\Support\WorkspaceView;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ final class MarketingContentController extends Controller
         $this->authorizeOwner($request);
 
         return view('panel.marketing.index', [
+            ...WorkspaceView::data($request, 'marketing'),
             'pages' => MarketingPage::query()->orderBy('slug')->orderBy('locale')->get(),
             'allowedSlugs' => self::ALLOWED_SLUGS,
             'locale' => $locale,
@@ -32,6 +34,7 @@ final class MarketingContentController extends Controller
         $this->authorizeOwner($request);
 
         return view('panel.marketing.edit', [
+            ...WorkspaceView::data($request, 'marketing'),
             'page' => new MarketingPage(['locale' => $locale, 'status' => 'draft', 'version' => 0]),
             'allowedSlugs' => self::ALLOWED_SLUGS,
             'locale' => $locale,
@@ -59,7 +62,7 @@ final class MarketingContentController extends Controller
         });
 
         return redirect()->route('marketing.edit', ['locale' => $locale, 'page' => $page->id])
-            ->with('status', 'saved');
+            ->with('status', __('panel.cms.saved'));
     }
 
     public function edit(Request $request, string $locale, MarketingPage $page): View
@@ -67,6 +70,7 @@ final class MarketingContentController extends Controller
         $this->authorizeOwner($request);
 
         return view('panel.marketing.edit', [
+            ...WorkspaceView::data($request, 'marketing'),
             'page' => $page,
             'allowedSlugs' => self::ALLOWED_SLUGS,
             'locale' => $locale,
@@ -100,7 +104,7 @@ final class MarketingContentController extends Controller
         });
 
         return redirect()->route('marketing.edit', ['locale' => $locale, 'page' => $page->id])
-            ->with('status', 'saved');
+            ->with('status', __('panel.cms.saved'));
     }
 
     public function publish(Request $request, string $locale, MarketingPage $page): RedirectResponse
@@ -123,7 +127,7 @@ final class MarketingContentController extends Controller
         });
 
         return redirect()->route('marketing.edit', ['locale' => $locale, 'page' => $page->id])
-            ->with('status', 'published');
+            ->with('status', __('panel.cms.published'));
     }
 
     private function validated(Request $request, ?MarketingPage $page): array

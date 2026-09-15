@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\File;
 
 final class ReleaseIdentity extends Command
 {
-    protected $signature = 'royadarman:release-identity {--write}';
+    protected $signature = 'royadarman:release-identity {--write} {--path= : Override the JSON output path (tests must never write the production file)}';
 
     protected $description = 'Emit or write the deployed release identity (commit, build time, composer.lock hash) for traceability.';
 
@@ -27,7 +27,7 @@ final class ReleaseIdentity extends Command
         ];
 
         if ($this->option('write')) {
-            $path = storage_path('app/release-identity.json');
+            $path = $this->resolvePath();
             File::ensureDirectoryExists(dirname($path));
             File::put($path, json_encode($identity, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL);
             $this->info("Release identity written to {$path}.");
@@ -36,6 +36,16 @@ final class ReleaseIdentity extends Command
         $this->line(json_encode($identity, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
         return self::SUCCESS;
+    }
+
+    private function resolvePath(): string
+    {
+        $override = $this->option('path');
+        if (is_string($override) && $override !== '') {
+            return $override;
+        }
+
+        return storage_path('app/release-identity.json');
     }
 
     private function resolveCommit(): ?string

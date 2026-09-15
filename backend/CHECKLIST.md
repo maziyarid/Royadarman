@@ -86,3 +86,13 @@ distinction).
 - [ ] Confirm named coordinator coverage and licensed clinical lead/credential records.
 - [ ] Run EICAR and forced-timeout scanner drills in an operator-approved maintenance window.
 - [ ] After the above, seed the approved policies/providers, run an end-to-end case rehearsal, then set `INTAKE_ENABLED=true`.
+
+## Panel demo (unreleased branch, 2026-09-14)
+
+- [x] Fixed six-role TEST identity registry and signed demo access.
+- [x] Demo sessions restricted to read-only role panels (and TEST-DEMO case pages).
+- [x] **P1** Immutable `clinics.synthetic_demo_key`; seeder fails closed on a reserved-name collision with a live clinic.
+- [x] Idempotent `demo.panel.seeded` audit row.
+- [x] phpunit forces `APP_URL=http://localhost` and never writes production `release-identity.json`.
+- [ ] Merge PR #8 to `main` after the regression suite is green on PHP >= 8.3.
+- [ ] On deploy, regenerate `storage/app/release-identity.json` with `royadarman:release-identity --write`.

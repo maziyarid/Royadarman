@@ -13,4 +13,23 @@ return [
     'patient_name' => 'Patient name', 'patient_mobile' => 'Patient mobile', 'area' => 'Area', 'contact_time' => 'Preferred contact time',
     'contact_reason' => 'Contact reason', 'budget' => 'Budget band', 'grant_expires' => 'Grant expires', 'success' => 'Saved successfully.',
     'error' => 'The action could not be completed.',
+    'submit' => 'Submit with consent',
+    'submit_help' => 'The exact approved coordination policy is shown before submission.',
+    'assignments' => 'Assignments',
+    'drafts' => 'Draft reviews',
+    'doc_status' => [
+        'uploaded' => 'Uploaded',
+        'quarantined' => 'In quarantine',
+        'scanning' => 'Scanning',
+        'approved' => 'Approved',
+        'rejected' => 'Rejected',
+        'failed' => 'Scanner failed',
+        'deleted' => 'Removed',
+    ],
+    'referral_status' => [
+        'proposed' => 'Proposed',
+        'accepted' => 'Accepted',
+        'declined' => 'Declined',
+        'withdrawn' => 'Withdrawn',
+    ],
 ];

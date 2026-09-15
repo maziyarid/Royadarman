@@ -13,4 +13,23 @@ return [
     'patient_name' => 'اسم المريض', 'patient_mobile' => 'هاتف المريض', 'area' => 'المنطقة', 'contact_time' => 'وقت التواصل المفضل',
     'contact_reason' => 'سبب التواصل', 'budget' => 'فئة الميزانية', 'grant_expires' => 'انتهاء التفويض', 'success' => 'تم الحفظ بنجاح.',
     'error' => 'تعذر إكمال الإجراء.',
+    'submit' => 'إرسال مع الموافقة',
+    'submit_help' => 'يُعرض نص سياسة التنسيق المعتمد قبل الإرسال.',
+    'assignments' => 'الإسنادات',
+    'drafts' => 'مسودات المراجعة',
+    'doc_status' => [
+        'uploaded' => 'مرفوع',
+        'quarantined' => 'في الحجر',
+        'scanning' => 'قيد الفحص',
+        'approved' => 'معتمد',
+        'rejected' => 'مرفوض',
+        'failed' => 'فشل الفحص',
+        'deleted' => 'محذوف',
+    ],
+    'referral_status' => [
+        'proposed' => 'مقترح',
+        'accepted' => 'مقبول',
+        'declined' => 'مرفوض',
+        'withdrawn' => 'مسحوب',
+    ],
 ];

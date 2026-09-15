@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\PanelDemoRegistry;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +18,11 @@ class Clinic extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    public function isSyntheticDemo(): bool
+    {
+        return $this->synthetic_demo_key === PanelDemoRegistry::CLINIC_DEMO_KEY;
     }
 
     public function memberships(): HasMany

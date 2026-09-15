@@ -29,13 +29,10 @@ final class StructuredDataService
             ],
         ];
 
-        $author = $post->author;
-        if ($author) {
-            $schema['author'] = [
-                '@type' => 'Person',
-                'name' => $author->name,
-            ];
-        }
+        $schema['author'] = [
+            '@type' => 'Organization',
+            'name' => 'Royadarman',
+        ];
 
         if ($translation->excerpt) {
             $schema['description'] = $translation->excerpt;
