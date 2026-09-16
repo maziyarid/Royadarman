@@ -32,7 +32,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: mbstring, pdo, pdo_sqlite, sqlite3
+          extensions: mbstring, pdo, pdo_sqlite, sqlite3, gd, fileinfo
           coverage: none
 
       - name: Verify PHP runtime version
@@ -99,28 +99,32 @@ jobs:
         run: composer audit --locked || true
 
   frontend:
-    name: Frontend smoke
+    name: Frontend (backend Vite)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
 
-      - name: JS syntax check (handles spaces in path)
-        run: |
-          find "Front-end v1" -name "*.js" -not -path "*/node_modules/*" -print0 | while IFS= read -r -d '' f; do
-            node --check "$f"
-          done
+      - name: Install from lock
+        run: npm ci
 
-      - name: Ensure static preview declares Persian default with RTL
-        run: |
-          grep -q 'lang="fa"' "Front-end v1/v3-preview/index.html"
-          grep -q 'dir="rtl"' "Front-end v1/v3-preview/index.html"
+      - name: High-severity audit
+        run: npm audit --audit-level=high
+
+      - name: Build real frontend (backend/resources)
+        run: npm run build
 
       - name: Ensure no orphaned editor backup files
+        working-directory: .
         run: |
           set -e
           found=$(find . -not -path './.git/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' \( -name '*.bak' -o -name '*.bak.*' -o -name '*.orig' -o -name '*~' \) -print | grep . || true)
@@ -143,7 +147,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, pdo, pdo_sqlite, sqlite3
+          extensions: mbstring, pdo, pdo_sqlite, sqlite3, gd, fileinfo
           coverage: none
 
       - name: Install dependencies from lock
