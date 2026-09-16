@@ -1,5 +1,10 @@
 # Royadarman Architecture
 
+> **Canonical planning note (2026-09-16):** This file documents the implemented production architecture.
+> For the reconciled target architecture and execution order, see
+> `../docs/architecture/2026-09-16-canonical-architecture.md` and
+> `../docs/architecture/2026-09-16-implementation-plan.md`.
+
 ## Decision
 
 Keep AlmaLinux 9, cPanel, and Apache as the managed host, but replace WordPress as the case-management backend with Laravel 13 on PHP 8.3 and MariaDB 10.11. WordPress is not part of the clinical or patient trust boundary. Public pages are server-rendered Blade views; Node is not required at runtime.
