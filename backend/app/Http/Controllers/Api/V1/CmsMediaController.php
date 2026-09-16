@@ -31,7 +31,7 @@ final class CmsMediaController extends Controller
         abort_unless($this->canManage($request->user()), 403);
 
         $request->validate([
-            'file' => ['required', 'file', 'max:8192'],
+            'file' => ['required', 'file', 'max:'.$sanitizer->maxKilobytes()],
             'alt_text' => ['nullable', 'string', 'max:300'],
             'caption' => ['nullable', 'string', 'max:500'],
             'locale' => ['required', 'in:fa,ar,en'],
@@ -114,7 +114,7 @@ final class CmsMediaController extends Controller
     {
         return [
             'id' => $m->id,
-            'url' => Storage::disk($m->disk)->url($m->storage_key),
+            'url' => route('cms.media.serve', $m),
             'mime_type' => $m->mime_type,
             'byte_size' => $m->byte_size,
             'width' => $m->width,

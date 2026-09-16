@@ -16,6 +16,13 @@ final class CmsMediaSanitizer
         'image/webp' => 'webp',
     ];
 
+    public function maxKilobytes(): int
+    {
+        $bytes = (int) config('royadarman.cms.media.max_bytes', 8 * 1024 * 1024);
+
+        return max(1, (int) ceil($bytes / 1024));
+    }
+
     public function sanitize(UploadedFile $file): SanitizedCmsMedia
     {
         if (! $file->isValid()) {
@@ -40,6 +47,8 @@ final class CmsMediaSanitizer
         if ($detectedMime === null || ! array_key_exists($detectedMime, self::EXTENSION_BY_MIME)) {
             throw ValidationException::withMessages(['file' => __('ui.errors.cms_media_type')]);
         }
+
+        $this->assertSafeRasterHeader($path);
 
         [$binary, $width, $height] = $this->reencode($path, $detectedMime);
 
@@ -95,6 +104,26 @@ final class CmsMediaSanitizer
         return null;
     }
 
+    private function assertSafeRasterHeader(string $path): void
+    {
+        $info = @getimagesize($path);
+        if ($info === false || ! isset($info[0], $info[1])) {
+            throw ValidationException::withMessages(['file' => __('ui.errors.cms_media_malformed')]);
+        }
+
+        $this->assertWithinLimits((int) $info[0], (int) $info[1]);
+    }
+
+    private function assertWithinLimits(int $width, int $height): void
+    {
+        $maxEdge = (int) config('royadarman.cms.media.max_edge', 8000);
+        $maxPixels = (int) config('royadarman.cms.media.max_pixels', 40_000_000);
+
+        if ($width < 1 || $height < 1 || $width > $maxEdge || $height > $maxEdge || ($width * $height) > $maxPixels) {
+            throw ValidationException::withMessages(['file' => __('ui.errors.cms_media_dimensions')]);
+        }
+    }
+
     /** @return array{0: string, 1: int, 2: int} */
     private function reencode(string $path, string $mime): array
     {
@@ -109,14 +138,16 @@ final class CmsMediaSanitizer
             throw ValidationException::withMessages(['file' => __('ui.errors.cms_media_malformed')]);
         }
 
+        $source = $this->orientJpeg($source, $path, $mime);
+
         $width = imagesx($source);
         $height = imagesy($source);
-        $maxEdge = (int) config('royadarman.cms.media.max_edge', 8000);
-        $maxPixels = (int) config('royadarman.cms.media.max_pixels', 40_000_000);
 
-        if ($width < 1 || $height < 1 || $width > $maxEdge || $height > $maxEdge || ($width * $height) > $maxPixels) {
+        try {
+            $this->assertWithinLimits($width, $height);
+        } catch (ValidationException $exception) {
             imagedestroy($source);
-            throw ValidationException::withMessages(['file' => __('ui.errors.cms_media_dimensions')]);
+            throw $exception;
         }
 
         $canvas = imagecreatetruecolor($width, $height);
@@ -152,5 +183,48 @@ final class CmsMediaSanitizer
         }
 
         return [$binary, $width, $height];
+    }
+
+    private function orientJpeg(\GdImage $image, string $path, string $mime): \GdImage
+    {
+        if ($mime !== 'image/jpeg' || ! function_exists('exif_read_data')) {
+            return $image;
+        }
+
+        $exif = @exif_read_data($path);
+        if (! is_array($exif) || ! isset($exif['Orientation'])) {
+            return $image;
+        }
+
+        return match ((int) $exif['Orientation']) {
+            2 => $this->flip($image, IMG_FLIP_HORIZONTAL),
+            3 => $this->rotate($image, 180),
+            4 => $this->flip($image, IMG_FLIP_VERTICAL),
+            5 => $this->flip($this->rotate($image, -90), IMG_FLIP_HORIZONTAL),
+            6 => $this->rotate($image, -90),
+            7 => $this->flip($this->rotate($image, -90), IMG_FLIP_HORIZONTAL),
+            8 => $this->rotate($image, 90),
+            default => $image,
+        };
+    }
+
+    private function flip(\GdImage $image, int $mode): \GdImage
+    {
+        imageflip($image, $mode);
+
+        return $image;
+    }
+
+    private function rotate(\GdImage $image, float $angle): \GdImage
+    {
+        $rotated = imagerotate($image, $angle, 0);
+        if ($rotated === false) {
+            return $image;
+        }
+        if ($rotated !== $image) {
+            imagedestroy($image);
+        }
+
+        return $rotated;
     }
 }

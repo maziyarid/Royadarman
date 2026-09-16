@@ -203,6 +203,23 @@ final class CmsMediaSanitizerTest extends TestCase
         $this->assertSame(0, Media::query()->count());
     }
 
+    public function test_media_index_uses_application_serve_url(): void
+    {
+        $owner = User::factory()->create(['role' => 'owner']);
+        $this->actingAs($owner)->postJson('/api/v1/cms/media', [
+            'file' => UploadedFile::fake()->image('photo.jpg', 20, 20),
+            'locale' => 'en',
+        ])->assertCreated();
+
+        $media = Media::query()->first();
+        $this->assertNotNull($media);
+
+        $this->actingAs($owner)
+            ->getJson('/api/v1/cms/media')
+            ->assertOk()
+            ->assertJsonPath('data.0.url', route('cms.media.serve', $media));
+    }
+
     private function expectReject(UploadedFile $file): void
     {
         try {

@@ -358,7 +358,7 @@ final class AdminCmsController extends Controller
     {
         $this->guardManage($request);
         $request->validate([
-            'file' => ['required', 'file', 'max:8192'],
+            'file' => ['required', 'file', 'max:'.$this->mediaSanitizer->maxKilobytes()],
         ]);
 
         $sanitized = $this->mediaSanitizer->sanitize($request->file('file'));
