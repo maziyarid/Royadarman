@@ -6,6 +6,7 @@ use App\Http\Controllers\NetworkAdminController;
 use App\Http\Controllers\PanelCaseController;
 use App\Http\Controllers\PanelController;
 use App\Http\Controllers\PatientRequestController;
+use App\Http\Controllers\PresentationPortalController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\Web\Admin\AdminCmsController;
 use App\Http\Controllers\Web\BlogController;
@@ -33,6 +34,10 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.i
 Route::get('/sitemap-{locale}.xml', [SitemapController::class, 'locale'])->whereIn('locale', ['fa', 'ar', 'en'])->name('sitemap.locale');
 Route::get('/robots.txt', RobotsController::class)->name('robots');
 Route::get('/cms-media/{media}', [CmsMediaServeController::class, 'show'])->name('cms.media.serve');
+Route::get('/pres', [PresentationPortalController::class, 'show'])->name('public.pres');
+Route::post('/pres/reseed', [PresentationPortalController::class, 'reseed'])
+    ->middleware(['auth', EnsureActiveUser::class])
+    ->name('public.pres.reseed');
 
 Route::get('/', [PublicPageController::class, 'homePersian'])->name('public.home.fa');
 Route::get('/services', [PublicPageController::class, 'servicesPersian'])->name('public.services.fa');
@@ -167,7 +172,7 @@ Route::get('/services/{slug}', [PageController::class, 'showPersianService'])
     ->where('slug', '[a-z0-9\-]+')
     ->name('public.service.show.fa');
 Route::get('/{slug}', [PageController::class, 'showPersianPage'])
-    ->where('slug', '^(?!(?:fa|ar|en|admin|dashboard|up|sitemap|robots|cms-media)$)[a-z0-9\-]+$')
+    ->where('slug', '^(?!(?:fa|ar|en|admin|dashboard|up|sitemap|robots|cms-media|pres)$)[a-z0-9\-]+$')
     ->name('public.page.show.fa');
 Route::get('/{locale}/services/{slug}', [PageController::class, 'showService'])
     ->whereIn('locale', ['ar', 'en'])

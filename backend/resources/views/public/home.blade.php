@@ -16,9 +16,9 @@
 <meta property="og:image" content="{{ url('/assets/photos/tehran.jpg') }}">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/font.css?v=20260915">
-<link rel="stylesheet" href="/assets/site.css?v=20260915">
-<script src="/assets/site.js?v=20260915" defer></script>
+<link rel="stylesheet" href="/assets/font.css?v=20260916">
+<link rel="stylesheet" href="/assets/site.css?v=20260916">
+<script src="/assets/site.js?v=20260916" defer></script>
 @php($orgSchema=['@context'=>'https://schema.org','@type'=>'Organization','name'=>'Royadarman','url'=>route('public.home.fa'),'description'=>__('ui.meta_description')])
 <script type="application/ld+json">{!! json_encode($orgSchema, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
 </head>
@@ -28,39 +28,21 @@
 <section class="hero-home">
     <div class="shell hero-home-grid">
         <div>
+            <p class="hero-kicker">{{ __('site.home.hero_kicker') }}</p>
             <h1>{{ __('site.home.hero_title') }}</h1>
             <p class="hero-lead">{{ __('site.home.hero_text') }}</p>
+            <form class="need-search" method="get" action="{{ $pub('public.services') }}" role="search">
+                <label class="visually-hidden" for="need-q">{{ __('site.home.search_placeholder') }}</label>
+                <input id="need-q" name="q" type="search" autocomplete="off" placeholder="{{ __('site.home.search_placeholder') }}">
+                <button class="button primary" type="submit">{{ __('site.cta') }}</button>
+            </form>
             <div class="hero-actions">
-                <a class="button primary" href="{{ $pub('public.services') }}">{{ __('site.home.hero_primary') }}</a>
+                <a class="button primary" href="{{ route('login',['locale'=>$locale]) }}">{{ __('site.home.hero_primary') }}</a>
                 <a class="button ghost" href="{{ $pub('public.how') }}">{{ __('site.home.hero_secondary') }}</a>
             </div>
             <p class="boundary">{{ __('ui.boundary') }}</p>
         </div>
-        <aside class="care-map">
-            <div class="care-map-head">
-                <img src="/assets/brand-mark.svg" width="56" height="56" alt="">
-                <div>
-                    <strong>{{ __('site.home.map_title') }}</strong>
-                    <span>{{ __('site.home.map_subtitle') }}</span>
-                </div>
-            </div>
-            <ol>
-                @foreach(__('site.home.map_steps') as $i=>$step)
-                    <li>
-                        <span>{{ str_pad((string)($i+1),2,'0',STR_PAD_LEFT) }}</span>
-                        <div>
-                            <strong>{{ $step['title'] }}</strong>
-                            <small>{{ $step['text'] }}</small>
-                        </div>
-                    </li>
-                @endforeach
-            </ol>
-        </aside>
-    </div>
-</section>
-<section class="section">
-    <div class="shell">
-        <figure class="photo-frame">
+        <figure class="hero-photo">
             <picture>
                 <source srcset="/assets/photos/tehran.webp" type="image/webp">
                 <img src="/assets/photos/tehran.jpg" width="1600" height="880" alt="{{ __('site.home.photo_alt') }}" fetchpriority="high">
@@ -76,9 +58,9 @@
             <p>{{ __('site.home.services_intro') }}</p>
         </div>
         <div class="service-links">
-            <a class="service-link photo-card" href="{{ $pub('public.referrals') }}">
-                <img src="/assets/photos/coord.jpg" width="640" height="360" alt="" loading="lazy">
-                <span><strong>{{ __('site.home.services.referral.title') }}</strong><small>{{ __('site.home.services.referral.text') }}</small></span>
+            <a class="service-link photo-card" href="{{ $pub('public.opg') }}">
+                <img src="/assets/photos/opg.jpg" width="640" height="360" alt="" loading="lazy">
+                <span><strong>{{ __('site.home.services.opg.title') }}</strong><small>{{ __('site.home.services.opg.text') }}</small></span>
                 <b>←</b>
             </a>
             <a class="service-link photo-card" href="{{ $pub('public.home-dentistry') }}">
@@ -86,13 +68,30 @@
                 <span><strong>{{ __('site.home.services.home.title') }}</strong><small>{{ __('site.home.services.home.text') }}</small></span>
                 <b>←</b>
             </a>
-            <a class="service-link photo-card" href="{{ $pub('public.opg') }}">
-                <img src="/assets/photos/opg.jpg" width="640" height="360" alt="" loading="lazy">
-                <span><strong>{{ __('site.home.services.opg.title') }}</strong><small>{{ __('site.home.services.opg.text') }}</small></span>
+            <a class="service-link photo-card" href="{{ $pub('public.referrals') }}">
+                <img src="/assets/photos/coord.jpg" width="640" height="360" alt="" loading="lazy">
+                <span><strong>{{ __('site.home.services.referral.title') }}</strong><small>{{ __('site.home.services.referral.text') }}</small></span>
                 <b>←</b>
             </a>
         </div>
         <div class="center-action"><a class="text-link" href="{{ $pub('public.services') }}">{{ __('site.home.all_services') }} <span>←</span></a></div>
+    </div>
+</section>
+<section class="section">
+    <div class="shell split coverage-split">
+        <div>
+            <h2>{{ __('site.home.coverage_title') }}</h2>
+            <p>{{ __('site.home.coverage_text') }}</p>
+            <div class="coverage-chips">
+                @foreach(__('site.home.neighborhoods') as $area)
+                    <a href="{{ $pub('public.home-dentistry') }}" data-area="{{ $area }}">{{ $area }}</a>
+                @endforeach
+            </div>
+            <a class="button ghost" href="{{ $pub('public.home-dentistry') }}">{{ __('site.home.coverage_cta') }}</a>
+        </div>
+        <figure class="hero-photo">
+            <img src="/assets/photos/tehran.jpg" width="1200" height="660" alt="{{ __('site.home.photo_alt') }}" loading="lazy">
+        </figure>
     </div>
 </section>
 <section class="section lapis">

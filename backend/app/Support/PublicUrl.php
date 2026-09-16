@@ -11,8 +11,14 @@ final class PublicUrl
         $locale ??= app()->getLocale();
         $name = match ($key) {
             'blog.index', 'blog' => 'public.blog.index',
+            'pres' => 'public.pres',
             default => str_starts_with($key, 'public.') ? $key : 'public.'.$key,
         };
+        if ($name === 'public.pres') {
+            $url = url('/pres');
+
+            return $locale === 'fa' ? $url : $url.'?locale='.rawurlencode($locale);
+        }
         if ($locale === 'fa' && Route::has($name.'.fa')) {
             return route($name.'.fa');
         }
@@ -39,6 +45,7 @@ final class PublicUrl
             str_contains($name, 'contact') => 'contact',
             str_contains($name, 'privacy') => 'privacy',
             str_contains($name, 'faq') => 'faq',
+            str_contains($name, 'pres') => 'pres',
             default => 'home',
         };
     }
