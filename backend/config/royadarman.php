@@ -48,4 +48,12 @@ return [
     'retention' => [
         'document_days' => env('ROYADARMAN_DOCUMENT_RETENTION_DAYS'),
     ],
+    'cms' => [
+        'media' => [
+            'disk' => env('ROYADARMAN_CMS_DISK', 'public-cms'),
+            'max_bytes' => (int) env('ROYADARMAN_CMS_MEDIA_MAX_BYTES', 8 * 1024 * 1024),
+            'max_edge' => (int) env('ROYADARMAN_CMS_MEDIA_MAX_EDGE', 8000),
+            'max_pixels' => (int) env('ROYADARMAN_CMS_MEDIA_MAX_PIXELS', 40_000_000),
+        ],
+    ],
 ];

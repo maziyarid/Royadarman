@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\CMS\Services\CmsMediaSanitizer;
 use App\Http\Controllers\Controller;
 use App\Models\Cms\Media;
 use App\Models\Cms\MediaTranslation;
@@ -10,7 +11,6 @@ use App\Policies\CmsContentPolicy;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 final class CmsMediaController extends Controller
 {
@@ -26,34 +26,32 @@ final class CmsMediaController extends Controller
         ]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, CmsMediaSanitizer $sanitizer): JsonResponse
     {
         abort_unless($this->canManage($request->user()), 403);
 
         $request->validate([
-            'file' => ['required', 'file', 'max:10240', 'mimes:jpg,jpeg,png,webp,gif,svg'],
+            'file' => ['required', 'file', 'max:8192'],
             'alt_text' => ['nullable', 'string', 'max:300'],
             'caption' => ['nullable', 'string', 'max:500'],
             'locale' => ['required', 'in:fa,ar,en'],
         ]);
 
-        $file = $request->file('file');
-        $disk = 'public-cms';
-        $key = 'media/'.Str::ulid().'.'.$file->getClientOriginalExtension();
-        Storage::disk($disk)->putFileAs('media', $file, basename($key));
-
-        $dimensions = @getimagesize($file->getRealPath());
+        $sanitized = $sanitizer->sanitize($request->file('file'));
+        $disk = (string) config('royadarman.cms.media.disk', 'public-cms');
+        $key = 'media/'.$sanitized->filename;
+        Storage::disk($disk)->put($key, $sanitized->binary);
 
         $media = Media::query()->create([
             'uploaded_by_user_id' => $request->user()->id,
             'disk' => $disk,
             'storage_key' => $key,
-            'original_filename' => $file->getClientOriginalName(),
-            'mime_type' => $file->getMimeType(),
-            'byte_size' => $file->getSize(),
-            'sha256' => hash_file('sha256', $file->getRealPath()),
-            'width' => $dimensions ? $dimensions[0] : null,
-            'height' => $dimensions ? $dimensions[1] : null,
+            'original_filename' => $sanitized->originalFilename,
+            'mime_type' => $sanitized->mimeType,
+            'byte_size' => $sanitized->byteSize,
+            'sha256' => $sanitized->sha256,
+            'width' => $sanitized->width,
+            'height' => $sanitized->height,
             'alt_text' => $request->input('alt_text'),
             'caption' => $request->input('caption'),
         ]);
