@@ -139,6 +139,33 @@ final class SessionInventoryTest extends TestCase
         $this->assertSame(0, AuditEvent::query()->where('action', 'session.revoke_one')->count());
     }
 
+    public function test_security_change_reasons_are_audited_on_revoke_all(): void
+    {
+        $user = User::factory()->create(['role' => 'coordinator']);
+        $this->insertSession('old-device', $user->id, '1.1.1.1', 'Chrome');
+
+        $deleted = app(SessionInventoryService::class)->revokeAll($user, null, 'staff_role_change');
+        $this->assertSame(1, $deleted);
+        $this->assertSame(0, $this->sessionStore()->where('user_id', $user->id)->count());
+        $this->assertTrue(
+            AuditEvent::query()
+                ->where('action', 'session.revoke_all')
+                ->where('reason', 'staff_role_change')
+                ->where('resource_id', (string) $user->id)
+                ->exists()
+        );
+
+        $this->insertSession('pre-mfa', $user->id, '2.2.2.2', 'Firefox');
+        $deletedMfa = app(SessionInventoryService::class)->revokeAll($user, null, 'staff_mfa_replaced');
+        $this->assertSame(1, $deletedMfa);
+        $this->assertTrue(
+            AuditEvent::query()
+                ->where('action', 'session.revoke_all')
+                ->where('reason', 'staff_mfa_replaced')
+                ->exists()
+        );
+    }
+
     public function test_profile_page_shows_sessions_section_for_authenticated_user(): void
     {
         $user = User::factory()->create(['role' => 'patient', 'locale' => 'en']);
