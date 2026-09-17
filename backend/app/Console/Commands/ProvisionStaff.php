@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Domain\Identity\Enums\UserRole;
+use App\Domain\Identity\Services\SessionInventoryService;
 use App\Models\User;
 use App\Support\DigitNormalizer;
 use App\Support\PhoneHasher;
@@ -23,7 +24,7 @@ final class ProvisionStaff extends Command
 
     protected $description = 'Provision a Royadarman staff identity with TOTP MFA and one-time recovery codes.';
 
-    public function handle(PhoneHasher $phoneHasher): int
+    public function handle(PhoneHasher $phoneHasher, SessionInventoryService $sessions): int
     {
         $mobile = DigitNormalizer::iranianMobile((string) $this->argument('mobile'));
         $roleValue = (string) $this->argument('role');
@@ -72,6 +73,7 @@ final class ProvisionStaff extends Command
         }
 
         $created = false;
+        $roleChanged = false;
         if (! $user) {
             $user = User::query()->create([
                 'phone' => $mobile,
@@ -83,6 +85,7 @@ final class ProvisionStaff extends Command
             ]);
             $created = true;
         } else {
+            $roleChanged = $user->role !== $role;
             $user->update([
                 'name' => $this->option('name') ?: $user->name,
                 'role' => $role,
@@ -93,6 +96,9 @@ final class ProvisionStaff extends Command
 
         $needsMfa = $created || ! $user->totp_secret || (bool) $this->option('replace-mfa');
         if (! $needsMfa) {
+            if ($roleChanged) {
+                $this->revokeSessionsAfterSecurityChange($sessions, $user, 'staff_role_change');
+            }
             $this->info('Staff identity is active and already has MFA configured. No secret was displayed or changed.');
 
             return self::SUCCESS;
@@ -111,6 +117,16 @@ final class ProvisionStaff extends Command
             'mfa_recovery_codes' => $hashedRecoveryCodes,
         ]);
 
+        // Role elevation or MFA secret replacement invalidates prior sessions.
+        // New identities have none; still call revokeAll for a consistent audit trail when sessions exist.
+        if (! $created || $roleChanged) {
+            $reason = $roleChanged ? 'staff_role_change_and_mfa' : 'staff_mfa_replaced';
+            if ($created) {
+                $reason = 'staff_provisioned';
+            }
+            $this->revokeSessionsAfterSecurityChange($sessions, $user, $reason);
+        }
+
         $label = rawurlencode('Royadarman:'.$mobile);
         $issuer = rawurlencode('Royadarman');
         $this->warn('Display these MFA values only to the intended staff member now. They will not be recoverable from this command.');
@@ -122,6 +138,14 @@ final class ProvisionStaff extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    private function revokeSessionsAfterSecurityChange(SessionInventoryService $sessions, User $user, string $reason): void
+    {
+        $deleted = $sessions->revokeAll($user, null, $reason);
+        if ($deleted > 0) {
+            $this->info("Revoked {$deleted} existing session(s) after identity/security change ({$reason}).");
+        }
     }
 
     private function base32(string $binary): string
