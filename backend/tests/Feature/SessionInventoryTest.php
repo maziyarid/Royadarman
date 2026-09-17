@@ -150,9 +150,8 @@ final class SessionInventoryTest extends TestCase
         $this->assertTrue(
             AuditEvent::query()
                 ->where('action', 'session.revoke_all')
-                ->where('reason', 'staff_role_change')
-                ->where('resource_id', (string) $user->id)
-                ->exists()
+                ->get()
+                ->contains(fn (AuditEvent $event): bool => $event->reason === 'staff_role_change' && $event->resource_id === (string) $user->id)
         );
 
         $this->insertSession('pre-mfa', $user->id, '2.2.2.2', 'Firefox');
@@ -161,8 +160,8 @@ final class SessionInventoryTest extends TestCase
         $this->assertTrue(
             AuditEvent::query()
                 ->where('action', 'session.revoke_all')
-                ->where('reason', 'staff_mfa_replaced')
-                ->exists()
+                ->get()
+                ->contains(fn (AuditEvent $event): bool => $event->reason === 'staff_mfa_replaced')
         );
     }
 

@@ -86,45 +86,55 @@ final class ProvisionStaff extends Command
             $created = true;
         } else {
             $roleChanged = $user->role !== $role;
-            $user->update([
+        }
+
+        $needsMfa = $created || ! $user->totp_secret || (bool) $this->option('replace-mfa');
+
+        $secret = null;
+        $plainRecoveryCodes = [];
+        $hashedRecoveryCodes = [];
+        if ($needsMfa) {
+            $secret = $this->base32(random_bytes(20));
+            for ($i = 0; $i < 8; $i++) {
+                $code = strtoupper(Str::random(5).'-'.Str::random(5));
+                $plainRecoveryCodes[] = $code;
+                $hashedRecoveryCodes[] = Hash::make($code);
+            }
+        }
+
+        if ($created) {
+            if ($needsMfa) {
+                $user->update([
+                    'totp_secret' => $secret,
+                    'mfa_recovery_codes' => $hashedRecoveryCodes,
+                ]);
+            }
+        } else {
+            $attributes = [
                 'name' => $this->option('name') ?: $user->name,
                 'role' => $role,
                 'locale' => $locale,
                 'is_active' => true,
-            ]);
+            ];
+            if ($needsMfa) {
+                $attributes['totp_secret'] = $secret;
+                $attributes['mfa_recovery_codes'] = $hashedRecoveryCodes;
+            }
+
+            $shouldRevoke = $roleChanged || $needsMfa;
+            $reason = match (true) {
+                $roleChanged && $needsMfa => 'staff_role_change_and_mfa',
+                $roleChanged => 'staff_role_change',
+                default => 'staff_mfa_replaced',
+            };
+
+            $this->commitIdentityChangeAndRevoke($user, $attributes, $sessions, $shouldRevoke, $reason);
         }
 
-        $needsMfa = $created || ! $user->totp_secret || (bool) $this->option('replace-mfa');
         if (! $needsMfa) {
-            if ($roleChanged) {
-                $this->revokeSessionsAfterSecurityChange($sessions, $user, 'staff_role_change');
-            }
             $this->info('Staff identity is active and already has MFA configured. No secret was displayed or changed.');
 
             return self::SUCCESS;
-        }
-
-        $secret = $this->base32(random_bytes(20));
-        $plainRecoveryCodes = [];
-        $hashedRecoveryCodes = [];
-        for ($i = 0; $i < 8; $i++) {
-            $code = strtoupper(Str::random(5).'-'.Str::random(5));
-            $plainRecoveryCodes[] = $code;
-            $hashedRecoveryCodes[] = Hash::make($code);
-        }
-        $user->update([
-            'totp_secret' => $secret,
-            'mfa_recovery_codes' => $hashedRecoveryCodes,
-        ]);
-
-        // Role elevation or MFA secret replacement invalidates prior sessions.
-        // New identities have none; still call revokeAll for a consistent audit trail when sessions exist.
-        if (! $created || $roleChanged) {
-            $reason = $roleChanged ? 'staff_role_change_and_mfa' : 'staff_mfa_replaced';
-            if ($created) {
-                $reason = 'staff_provisioned';
-            }
-            $this->revokeSessionsAfterSecurityChange($sessions, $user, $reason);
         }
 
         $label = rawurlencode('Royadarman:'.$mobile);
@@ -138,6 +148,33 @@ final class ProvisionStaff extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Persist a sensitive identity/MFA change with session revocation.
+     *
+     * Revoke first inside the user/audit connection transaction so a same-connection
+     * audit failure cannot restore sessions after the role/MFA row has already been
+     * committed. Split SESSION_CONNECTION stores still delete first (no XA);
+     * identity then commits on the application connection.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    private function commitIdentityChangeAndRevoke(
+        User $user,
+        array $attributes,
+        SessionInventoryService $sessions,
+        bool $shouldRevoke,
+        string $reason,
+    ): void {
+        $connection = $user->getConnectionName() ?? (string) config('database.default');
+
+        DB::connection($connection)->transaction(function () use ($user, $attributes, $sessions, $shouldRevoke, $reason): void {
+            if ($shouldRevoke) {
+                $this->revokeSessionsAfterSecurityChange($sessions, $user, $reason);
+            }
+            $user->update($attributes);
+        });
     }
 
     private function revokeSessionsAfterSecurityChange(SessionInventoryService $sessions, User $user, string $reason): void

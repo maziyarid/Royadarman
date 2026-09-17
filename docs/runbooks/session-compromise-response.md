@@ -68,6 +68,19 @@ Laravel cannot XA two database connections. Containment wins:
 
 Never wrap the two connections in a pretend transaction.
 
+**Production policy:** `royadarman:preflight` **fails** when `APP_ENV=production` and the resolved session connection is not the AuditEvent/default connection. Split-store is a non-production / test degraded mode only. A durable outbox is not implemented; do not invent XA.
+
+### Staff identity / MFA changes
+
+`royadarman:staff:provision` invalidates existing sessions on role change and TOTP/recovery replacement. New identities have no sessions.
+
+Order, inside the user/audit connection transaction:
+
+1. Revoke all sessions for the subject (`staff_role_change`, `staff_mfa_replaced`, or `staff_role_change_and_mfa`).
+2. Persist the role/MFA attributes.
+
+A same-connection audit failure therefore rolls back **both** the session delete and the identity update. Prior sessions cannot remain active on an already-elevated or already-rotated MFA identity.
+
 ## After containment
 
 1. Confirm the subject can complete a fresh OTP (+ MFA) login.
@@ -87,7 +100,10 @@ Never wrap the two connections in a pretend transaction.
 ## Related code
 
 - `backend/app/Domain/Identity/Services/SessionInventoryService.php`
+- `backend/app/Console/Commands/ProvisionStaff.php`
+- `backend/app/Console/Commands/Preflight.php`
 - `backend/app/Http/Controllers/Web/ProfileWorkspaceController.php`
 - `backend/app/Http/Controllers/Api/V1/SessionController.php`
 - `backend/config/session.php` (`driver=database`, production `SESSION_ENCRYPT=true`)
 - `backend/tests/Feature/SessionInventoryTest.php`
+- `backend/tests/Feature/StaffProvisioningTest.php`

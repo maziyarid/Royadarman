@@ -109,6 +109,20 @@ final class Preflight extends Command
             $failures[] = 'SESSION_ENCRYPT is false in production.';
         }
 
+        $sessionConnection = config('session.connection');
+        $resolvedSessionConnection = is_string($sessionConnection) && $sessionConnection !== ''
+            ? $sessionConnection
+            : (string) config('database.default');
+        $auditConnection = (string) config('database.default');
+        if ($resolvedSessionConnection !== $auditConnection) {
+            $splitMessage = "SESSION_CONNECTION '{$resolvedSessionConnection}' is split from the AuditEvent connection '{$auditConnection}'. Split-store session audit is best-effort only (no XA). Production must share the audit connection, or a durable outbox must exist before merge.";
+            if ($isProduction) {
+                $failures[] = $splitMessage;
+            } else {
+                $this->warn($splitMessage);
+            }
+        }
+
         if ($failures !== []) {
             $this->error('Preflight FAILED with the following issues:');
             foreach ($failures as $failure) {
