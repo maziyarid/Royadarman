@@ -74,6 +74,7 @@ final class ProvisionStaff extends Command
 
         $created = false;
         $roleChanged = false;
+        $reactivated = false;
         if (! $user) {
             $user = User::query()->create([
                 'phone' => $mobile,
@@ -86,6 +87,7 @@ final class ProvisionStaff extends Command
             $created = true;
         } else {
             $roleChanged = $user->role !== $role;
+            $reactivated = ! $user->is_active;
         }
 
         $needsMfa = $created || ! $user->totp_secret || (bool) $this->option('replace-mfa');
@@ -121,11 +123,13 @@ final class ProvisionStaff extends Command
                 $attributes['mfa_recovery_codes'] = $hashedRecoveryCodes;
             }
 
-            $shouldRevoke = $roleChanged || $needsMfa;
+            $shouldRevoke = $roleChanged || $needsMfa || $reactivated;
             $reason = match (true) {
                 $roleChanged && $needsMfa => 'staff_role_change_and_mfa',
                 $roleChanged => 'staff_role_change',
-                default => 'staff_mfa_replaced',
+                $needsMfa => 'staff_mfa_replaced',
+                $reactivated => 'staff_reactivated',
+                default => 'staff_identity_update',
             };
 
             $this->commitIdentityChangeAndRevoke($user, $attributes, $sessions, $shouldRevoke, $reason);
@@ -151,12 +155,16 @@ final class ProvisionStaff extends Command
     }
 
     /**
-     * Persist a sensitive identity/MFA change with session revocation.
+     * Persist a sensitive identity/MFA/reactivation change with session revocation.
      *
      * Revoke first inside the user/audit connection transaction so a same-connection
-     * audit failure cannot restore sessions after the role/MFA row has already been
-     * committed. Split SESSION_CONNECTION stores still delete first (no XA);
+     * audit failure cannot restore sessions after the role/MFA/active row has already
+     * been committed. Split SESSION_CONNECTION stores still delete first (no XA);
      * identity then commits on the application connection.
+     *
+     * Inactive→active is a sensitive identity transition: dormant session rows can
+     * survive EnsureActiveUser (which only invalidates a request that actually
+     * presents an inactive session).
      *
      * @param  array<string, mixed>  $attributes
      */

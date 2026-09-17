@@ -129,6 +129,7 @@ class PreflightTest extends TestCase
 
     public function test_preflight_fails_in_production_when_session_connection_is_split_from_audit(): void
     {
+        // Gate uses SessionInventoryService::sharesAuditConnection(), not a hardcoded database.default.
         config()->set('royadarman.phone_hash_key', str_repeat('a', 64));
         config()->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
         config()->set('app.env', 'production');

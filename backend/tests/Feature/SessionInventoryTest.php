@@ -163,6 +163,30 @@ final class SessionInventoryTest extends TestCase
                 ->get()
                 ->contains(fn (AuditEvent $event): bool => $event->reason === 'staff_mfa_replaced')
         );
+
+        $this->insertSession('pre-reactivate', $user->id, '3.3.3.3', 'Safari');
+        $deletedReactivated = app(SessionInventoryService::class)->revokeAll($user, null, 'staff_reactivated');
+        $this->assertSame(1, $deletedReactivated);
+        $this->assertTrue(
+            AuditEvent::query()
+                ->where('action', 'session.revoke_all')
+                ->get()
+                ->contains(fn (AuditEvent $event): bool => $event->reason === 'staff_reactivated')
+        );
+    }
+
+    public function test_connection_resolver_matches_audit_event_not_hardcoded_default(): void
+    {
+        config(['session.connection' => null, 'database.default' => 'sqlite']);
+        $service = app(SessionInventoryService::class);
+        $this->assertTrue($service->sharesAuditConnection());
+        $this->assertSame('sqlite', $service->resolvedSessionConnectionName());
+        $this->assertSame('sqlite', $service->resolvedAuditConnectionName());
+
+        $this->useSplitSessionStore();
+        $this->assertFalse($service->sharesAuditConnection());
+        $this->assertSame('session_store', $service->resolvedSessionConnectionName());
+        $this->assertSame((string) config('database.default'), $service->resolvedAuditConnectionName());
     }
 
     public function test_profile_page_shows_sessions_section_for_authenticated_user(): void

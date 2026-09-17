@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Domain\Identity\Enums\UserRole;
+use App\Domain\Identity\Services\SessionInventoryService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +14,7 @@ final class Preflight extends Command
 
     protected $description = 'Refuse unsafe production configuration before deployment or release.';
 
-    public function handle(): int
+    public function handle(SessionInventoryService $sessions): int
     {
         $env = (string) config('app.env');
         $isProduction = $env === 'production';
@@ -109,12 +110,9 @@ final class Preflight extends Command
             $failures[] = 'SESSION_ENCRYPT is false in production.';
         }
 
-        $sessionConnection = config('session.connection');
-        $resolvedSessionConnection = is_string($sessionConnection) && $sessionConnection !== ''
-            ? $sessionConnection
-            : (string) config('database.default');
-        $auditConnection = (string) config('database.default');
-        if ($resolvedSessionConnection !== $auditConnection) {
+        if (! $sessions->sharesAuditConnection()) {
+            $resolvedSessionConnection = $sessions->resolvedSessionConnectionName();
+            $auditConnection = $sessions->resolvedAuditConnectionName();
             $splitMessage = "SESSION_CONNECTION '{$resolvedSessionConnection}' is split from the AuditEvent connection '{$auditConnection}'. Split-store session audit is best-effort only (no XA). Production must share the audit connection, or a durable outbox must exist before merge.";
             if ($isProduction) {
                 $failures[] = $splitMessage;

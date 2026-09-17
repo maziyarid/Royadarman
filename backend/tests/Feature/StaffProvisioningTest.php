@@ -104,6 +104,35 @@ class StaffProvisioningTest extends TestCase
         );
     }
 
+    public function test_reactivating_inactive_staff_revokes_dormant_sessions(): void
+    {
+        $hash = app(PhoneHasher::class)->hash('09127778888');
+        $user = User::factory()->create([
+            'role' => 'coordinator',
+            'phone' => '09127778888',
+            'phone_hash' => $hash,
+            'totp_secret' => 'JBSWY3DPEHPK3PXP',
+            'mfa_recovery_codes' => [hash('sha256', 'unused')],
+            'locale' => 'fa',
+            'is_active' => false,
+        ]);
+        $this->insertSession('dormant-sess', $user->id);
+
+        $this->artisan('royadarman:staff:provision', [
+            'mobile' => '09127778888',
+            'role' => 'coordinator',
+        ])->assertSuccessful();
+
+        $this->assertTrue($user->refresh()->is_active);
+        $this->assertSame('coordinator', $user->role->value);
+        $this->assertNotEmpty($user->totp_secret);
+        $this->assertSame(0, DB::table('sessions')->where('user_id', $user->id)->count());
+        $this->assertTrue(
+            AuditEvent::query()->where('action', 'session.revoke_all')->get()
+                ->contains(fn (AuditEvent $event): bool => $event->reason === 'staff_reactivated')
+        );
+    }
+
     public function test_same_connection_audit_failure_does_not_leave_elevated_sessions(): void
     {
         $hash = app(PhoneHasher::class)->hash('09125556666');

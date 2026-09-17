@@ -68,18 +68,24 @@ Laravel cannot XA two database connections. Containment wins:
 
 Never wrap the two connections in a pretend transaction.
 
-**Production policy:** `royadarman:preflight` **fails** when `APP_ENV=production` and the resolved session connection is not the AuditEvent/default connection. Split-store is a non-production / test degraded mode only. A durable outbox is not implemented; do not invent XA.
+**Production policy:** `royadarman:preflight` **fails** when `APP_ENV=production` and `SessionInventoryService::sharesAuditConnection()` is false (session store resolved independently of `AuditEvent::getConnectionName() ?? database.default`). Split-store is a non-production / test degraded mode only. A durable outbox is not implemented; do not invent XA.
 
-### Staff identity / MFA changes
+### Staff identity / MFA / reactivation changes
 
-`royadarman:staff:provision` invalidates existing sessions on role change and TOTP/recovery replacement. New identities have no sessions.
+`royadarman:staff:provision` invalidates existing sessions on:
+
+- staff role change (`staff_role_change`)
+- TOTP/recovery replacement (`staff_mfa_replaced`, or `staff_role_change_and_mfa` when both)
+- inactive→active reactivation (`staff_reactivated`) — dormant session rows are **not** removed by `EnsureActiveUser` unless the inactive account actually presents a request
+
+Role/MFA reasons take precedence over `staff_reactivated`. New identities skip revoke (no sessions).
 
 Order, inside the user/audit connection transaction:
 
-1. Revoke all sessions for the subject (`staff_role_change`, `staff_mfa_replaced`, or `staff_role_change_and_mfa`).
-2. Persist the role/MFA attributes.
+1. Revoke all sessions for the subject (`staff_role_change`, `staff_mfa_replaced`, `staff_role_change_and_mfa`, or `staff_reactivated`).
+2. Persist the role/MFA/`is_active` attributes.
 
-A same-connection audit failure therefore rolls back **both** the session delete and the identity update. Prior sessions cannot remain active on an already-elevated or already-rotated MFA identity.
+A same-connection audit failure therefore rolls back **both** the session delete and the identity update. Prior sessions cannot remain active on an already-elevated, already-rotated MFA, or newly reactivated identity.
 
 ## After containment
 

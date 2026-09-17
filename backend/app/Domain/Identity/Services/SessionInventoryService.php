@@ -144,17 +144,17 @@ final class SessionInventoryService
         return is_string($table) && $table !== '' ? $table : 'sessions';
     }
 
-    private function resolvedSessionConnectionName(): string
+    public function resolvedSessionConnectionName(): string
     {
         return $this->sessionConnection() ?? (string) config('database.default');
     }
 
-    private function resolvedAuditConnectionName(): string
+    public function resolvedAuditConnectionName(): string
     {
         return (new AuditEvent())->getConnectionName() ?? (string) config('database.default');
     }
 
-    private function sharesAuditConnection(): bool
+    public function sharesAuditConnection(): bool
     {
         return $this->resolvedSessionConnectionName() === $this->resolvedAuditConnectionName();
     }
