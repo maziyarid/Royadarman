@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\HomeServiceController;
 use App\Http\Controllers\Api\V1\NotificationCallbackController;
 use App\Http\Controllers\Api\V1\PolicyController;
 use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\SessionController;
 use App\Http\Controllers\Api\V1\ReferralController;
 use App\Http\Controllers\Api\V1\StaffCaseController;
 use App\Http\Controllers\Api\V1\SupportController;
@@ -36,6 +37,10 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [ProfileController::class, 'show']);
         Route::patch('/me/preferences', [ProfileController::class, 'update']);
+        Route::get('/me/sessions', [SessionController::class, 'index']);
+        Route::delete('/me/sessions/{session}', [SessionController::class, 'destroy']);
+        Route::post('/me/sessions/revoke-others', [SessionController::class, 'destroyOthers']);
+        Route::post('/me/sessions/revoke-all', [SessionController::class, 'destroyAll']);
 
         Route::get('/dashboard', [DashboardController::class, 'show']);
 
