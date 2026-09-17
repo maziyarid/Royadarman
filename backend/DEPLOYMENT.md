@@ -1,5 +1,11 @@
 # Royadarman deployment and rollback
 
+Version-controlled host templates (queue unit, cron, ClamAV, deploy/rollback
+checklists) live in [`../infra/`](../infra/README.md). **Committing or merging
+those files does not install units, edit crontab, restart workers, run
+migrations, or change production.** Apply them only as a reviewed host change
+using `infra/deploy.md`.
+
 ## Runtime requirement
 
 The shared host exposes multiple PHP versions. Laravel 13 requires PHP >= 8.3,

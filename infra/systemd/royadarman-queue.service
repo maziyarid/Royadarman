@@ -1,0 +1,33 @@
+# Royadarman Laravel database queue worker.
+#
+# COMMITTING THIS FILE DOES NOT INSTALL OR RESTART THE UNIT.
+# Copy to the host (for example /etc/systemd/system/royadarman-queue.service)
+# only as a reviewed operator change, then `daemon-reload` + enable + start.
+#
+# Matches backend/DEPLOYMENT.md: ExecStart uses /usr/local/bin/ea-php83
+# and bounded retries on otp,scanning,notifications,maintenance.
+# Jobs currently routed: scanning (ScanClinicalDocument), notifications
+# (ProcessOutboxEvent). otp and maintenance are reserved names from DEPLOYMENT.md.
+
+[Unit]
+Description=Royadarman Laravel queue worker
+Documentation=file:///home/royadarman/apps/royadarman-backend/../infra/README.md
+After=network.target
+# MariaDB unit name varies on cPanel; do not hard-fail if the alias differs.
+
+[Service]
+Type=simple
+User=royadarman
+Group=royadarman
+WorkingDirectory=/home/royadarman/apps/royadarman-backend
+# Secrets come from the application .env on the host, not from this unit.
+Environment=APP_ENV=production
+ExecStart=/usr/local/bin/ea-php83 artisan queue:work database --queue=otp,scanning,notifications,maintenance --sleep=1 --tries=3 --backoff=5 --timeout=90 --max-time=3600
+Restart=always
+RestartSec=5
+TimeoutStopSec=120
+Nice=10
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
