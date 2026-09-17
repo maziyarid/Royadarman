@@ -31,6 +31,7 @@ final class CaseController extends Controller
             'budget_band' => ['required', 'in:economic,balanced,flexible,call'],
             'budget_input_unit' => ['required', 'in:toman,irr'],
             'source_language' => ['required', 'in:fa,ar,en'],
+            'priority' => ['nullable', 'in:normal,urgent'],
         ]);
 
         if ($data['service_type'] === ServiceType::HomeDentistry->value && empty($data['tehran_area'])) {
@@ -51,7 +52,7 @@ final class CaseController extends Controller
                 'patient_user_id' => $user->id,
                 'service_type' => $data['service_type'],
                 'status' => CaseStatus::Draft,
-                'priority' => 'normal',
+                'priority' => $data['priority'] ?? 'normal',
                 'patient_name' => $data['name'] ?? $user->name,
                 'patient_mobile' => $user->phone,
                 'patient_mobile_hash' => $user->phone_hash,
