@@ -32,7 +32,7 @@ class PatientRequestPageTest extends TestCase
             ->assertNotFound();
     }
 
-    public function test_enabled_request_page_contains_fail_closed_consent_workflow(): void
+    public function test_enabled_request_page_contains_guided_fail_closed_workflow(): void
     {
         config()->set('royadarman.intake_enabled', true);
         $patient = User::factory()->create(['role' => 'patient', 'is_active' => true]);
@@ -42,14 +42,17 @@ class PatientRequestPageTest extends TestCase
             ->assertOk()
             ->assertSee('id="request-form"', false)
             ->assertSee('/assets/patient-request.js', false)
-            ->assertSee('guidance_referral', false)
             ->assertSee('data-patient-request', false)
-            ->assertDontSee('<style>', false);
+            ->assertSee('data-step="1"', false)
+            ->assertSee('data-step="8"', false)
+            ->assertSee('guidance_referral', false)
+            ->assertSee('name="priority"', false);
 
         $script = file_get_contents(public_path('assets/patient-request.js'));
         $this->assertIsString($script);
         $this->assertStringContainsString('/api/v1/policies/case_coordination', $script);
         $this->assertStringContainsString('Idempotency-Key', $script);
-        $this->assertStringContainsString('content_hash:policy.content_hash', $script);
+        $this->assertStringContainsString('content_hash: policy.content_hash', $script);
+        $this->assertStringContainsString('priority: selectedPriority()', $script);
     }
 }
