@@ -8,6 +8,10 @@
 # and bounded retries on otp,scanning,notifications,maintenance.
 # Jobs currently routed: scanning (ScanClinicalDocument), notifications
 # (ProcessOutboxEvent). otp and maintenance are reserved names from DEPLOYMENT.md.
+#
+# Timeout must stay several seconds below Laravel's DB_QUEUE_RETRY_AFTER
+# (default 90s). Otherwise a job whose reservation reaches the boundary can be
+# claimed by another worker before this process has exited.
 
 [Unit]
 Description=Royadarman Laravel queue worker
@@ -22,7 +26,7 @@ Group=royadarman
 WorkingDirectory=/home/royadarman/apps/royadarman-backend
 # Secrets come from the application .env on the host, not from this unit.
 Environment=APP_ENV=production
-ExecStart=/usr/local/bin/ea-php83 artisan queue:work database --queue=otp,scanning,notifications,maintenance --sleep=1 --tries=3 --backoff=5 --timeout=90 --max-time=3600
+ExecStart=/usr/local/bin/ea-php83 artisan queue:work database --queue=otp,scanning,notifications,maintenance --sleep=1 --tries=3 --backoff=5 --timeout=85 --max-time=3600
 Restart=always
 RestartSec=5
 TimeoutStopSec=120
