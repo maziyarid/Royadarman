@@ -4,13 +4,21 @@ namespace App\Domain\Identity\Services;
 
 use App\Models\AuditEvent;
 use App\Models\User;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
- * First-class inventory and revocation over Laravel's existing database sessions table.
+ * First-class inventory and revocation over Laravel's existing database session store.
  * Does not introduce a parallel session store.
+ *
+ * Inventory and deletion always use config('session.connection') / config('session.table').
+ * When that store shares the audit connection, delete + AuditEvent are one transaction.
+ * Split stores cannot be XA-atomic: the session row is deleted first, then the audit
+ * write is best-effort (reported, not rethrown) so a failed encrypted audit cannot
+ * resurrect an already-revoked session or turn a successful revoke into an HTTP error.
  */
 final class SessionInventoryService
 {
@@ -19,7 +27,7 @@ final class SessionInventoryService
      */
     public function listForUser(User $user, ?string $currentSessionId = null): Collection
     {
-        $rows = DB::table(config('session.table', 'sessions'))
+        $rows = $this->sessionQuery()
             ->where('user_id', $user->id)
             ->orderByDesc('last_activity')
             ->get(['id', 'ip_address', 'user_agent', 'last_activity']);
@@ -41,73 +49,144 @@ final class SessionInventoryService
 
     public function revokeOne(User $user, string $sessionId, ?int $actorUserId = null, string $reason = 'user_revoke_one'): bool
     {
-        $deleted = DB::table(config('session.table', 'sessions'))
-            ->where('user_id', $user->id)
-            ->where('id', $sessionId)
-            ->delete();
-
-        if ($deleted > 0) {
-            $this->audit($actorUserId ?? $user->id, 'session.revoke_one', $user, $reason, [
-                'session_id_prefix' => substr($sessionId, 0, 8),
-                'deleted' => $deleted,
-            ]);
-        }
+        $deleted = $this->mutate(
+            fn (): int => $this->sessionQuery()
+                ->where('user_id', $user->id)
+                ->where('id', $sessionId)
+                ->delete(),
+            function (int $deleted) use ($user, $sessionId, $actorUserId, $reason): void {
+                if ($deleted > 0) {
+                    $this->audit($actorUserId ?? $user->id, 'session.revoke_one', $user, $reason, [
+                        'session_id_prefix' => substr($sessionId, 0, 8),
+                        'deleted' => $deleted,
+                    ]);
+                }
+            },
+        );
 
         return $deleted > 0;
     }
 
     public function revokeOthers(User $user, string $keepSessionId, ?int $actorUserId = null, string $reason = 'user_revoke_others'): int
     {
-        $deleted = DB::table(config('session.table', 'sessions'))
-            ->where('user_id', $user->id)
-            ->where('id', '!=', $keepSessionId)
-            ->delete();
-
-        if ($deleted > 0) {
-            $this->audit($actorUserId ?? $user->id, 'session.revoke_others', $user, $reason, [
-                'kept_prefix' => substr($keepSessionId, 0, 8),
-                'deleted' => $deleted,
-            ]);
-        }
-
-        return $deleted;
+        return $this->mutate(
+            fn (): int => $this->sessionQuery()
+                ->where('user_id', $user->id)
+                ->where('id', '!=', $keepSessionId)
+                ->delete(),
+            function (int $deleted) use ($user, $keepSessionId, $actorUserId, $reason): void {
+                if ($deleted > 0) {
+                    $this->audit($actorUserId ?? $user->id, 'session.revoke_others', $user, $reason, [
+                        'kept_prefix' => substr($keepSessionId, 0, 8),
+                        'deleted' => $deleted,
+                    ]);
+                }
+            },
+        );
     }
 
     public function revokeAll(User $user, ?int $actorUserId = null, string $reason = 'user_revoke_all'): int
     {
-        $deleted = DB::table(config('session.table', 'sessions'))
-            ->where('user_id', $user->id)
-            ->delete();
-
-        if ($deleted > 0) {
-            $this->audit($actorUserId ?? $user->id, 'session.revoke_all', $user, $reason, [
-                'deleted' => $deleted,
-            ]);
-        }
-
-        return $deleted;
+        return $this->mutate(
+            fn (): int => $this->sessionQuery()
+                ->where('user_id', $user->id)
+                ->delete(),
+            function (int $deleted) use ($user, $actorUserId, $reason): void {
+                if ($deleted > 0) {
+                    $this->audit($actorUserId ?? $user->id, 'session.revoke_all', $user, $reason, [
+                        'deleted' => $deleted,
+                    ]);
+                }
+            },
+        );
     }
 
     public function forceRevokeAll(User $subject, User $actor, string $reason = 'compromise_response'): int
     {
-        $deleted = $this->revokeAll($subject, $actor->id, $reason);
+        return $this->mutate(
+            fn (): int => $this->sessionQuery()
+                ->where('user_id', $subject->id)
+                ->delete(),
+            function (int $deleted) use ($subject, $actor, $reason): void {
+                if ($deleted > 0) {
+                    $this->audit($actor->id, 'session.revoke_all', $subject, $reason, [
+                        'deleted' => $deleted,
+                    ]);
+                }
 
-        AuditEvent::query()->create([
-            'actor_user_id' => $actor->id,
-            'action' => 'session.force_revoke_all',
-            'resource_type' => 'user',
-            'resource_id' => (string) $subject->id,
-            'result' => 'success',
-            'reason' => $reason,
-            'context' => [
-                'subject_user_id' => $subject->id,
-                'sessions_deleted' => $deleted,
-            ],
-            'correlation_id' => (string) Str::ulid(),
-            'created_at' => now(),
-        ]);
+                $this->audit($actor->id, 'session.force_revoke_all', $subject, $reason, [
+                    'subject_user_id' => $subject->id,
+                    'sessions_deleted' => $deleted,
+                ]);
+            },
+        );
+    }
+
+    private function sessionQuery(): Builder
+    {
+        return DB::connection($this->sessionConnection())->table($this->sessionTable());
+    }
+
+    /**
+     * Null means Laravel's default database connection (session.connection unset).
+     */
+    private function sessionConnection(): ?string
+    {
+        $connection = config('session.connection');
+
+        return is_string($connection) && $connection !== '' ? $connection : null;
+    }
+
+    private function sessionTable(): string
+    {
+        $table = config('session.table', 'sessions');
+
+        return is_string($table) && $table !== '' ? $table : 'sessions';
+    }
+
+    private function resolvedSessionConnectionName(): string
+    {
+        return $this->sessionConnection() ?? (string) config('database.default');
+    }
+
+    private function resolvedAuditConnectionName(): string
+    {
+        return (new AuditEvent())->getConnectionName() ?? (string) config('database.default');
+    }
+
+    private function sharesAuditConnection(): bool
+    {
+        return $this->resolvedSessionConnectionName() === $this->resolvedAuditConnectionName();
+    }
+
+    /**
+     * @param  callable(): int  $delete
+     * @param  callable(int): void  $after
+     */
+    private function mutate(callable $delete, callable $after): int
+    {
+        if ($this->sharesAuditConnection()) {
+            return (int) DB::connection($this->resolvedSessionConnectionName())->transaction(function () use ($delete, $after): int {
+                $deleted = $delete();
+                $after($deleted);
+
+                return $deleted;
+            });
+        }
+
+        $deleted = $delete();
+        $this->auditSafely(fn () => $after($deleted));
 
         return $deleted;
+    }
+
+    private function auditSafely(callable $write): void
+    {
+        try {
+            $write();
+        } catch (Throwable $e) {
+            report($e);
+        }
     }
 
     private function deviceLabel(string $userAgent): string
