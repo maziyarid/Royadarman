@@ -18,6 +18,7 @@ final class PatientRequestController extends Controller
             'locale' => $locale,
             'intakeEnabled' => (bool) config('royadarman.intake_enabled'),
             'tehranAreas' => config('royadarman.tehran_areas', []),
+            'tehranNeighborhoods' => config('royadarman.tehran_neighborhoods', []),
         ]);
     }
 }

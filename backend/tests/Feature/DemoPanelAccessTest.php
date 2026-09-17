@@ -417,7 +417,12 @@ final class DemoPanelAccessTest extends TestCase
             ->assertSee(PanelDemoRegistry::OPG_CASE_REFERENCE)
             ->assertSee(PanelDemoRegistry::HOME_CASE_REFERENCE);
 
-        $this->get('/en/panel/cases/new')->assertForbidden();
+        $this->get('/en/panel/cases/new')
+            ->assertOk()
+            ->assertSee('id="request-form"', false)
+            ->assertSee('data-demo="1"', false)
+            ->assertSee(__('request.demo_readonly'), false);
+
         $this->get('/en/panel/marketing')->assertForbidden();
         $this->get('/en/panel/network')->assertForbidden();
     }

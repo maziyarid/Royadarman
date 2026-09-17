@@ -15,6 +15,25 @@ return [
         'south',
     ],
 
+    'tehran_neighborhoods' => [
+        ['id' => 'tajrish', 'area' => 'north', 'fa' => 'تجریش', 'en' => 'Tajrish', 'ar' => 'تجريش'],
+        ['id' => 'niavaran', 'area' => 'north', 'fa' => 'نیاوران', 'en' => 'Niavaran', 'ar' => 'نياوران'],
+        ['id' => 'pasdaran', 'area' => 'north', 'fa' => 'پاسداران', 'en' => 'Pasdaran', 'ar' => 'باسداران'],
+        ['id' => 'vanak', 'area' => 'north', 'fa' => 'ونک', 'en' => 'Vanak', 'ar' => 'فناك'],
+        ['id' => 'jordan', 'area' => 'north', 'fa' => 'جردن', 'en' => 'Jordan', 'ar' => 'جردن'],
+        ['id' => 'saadatabad', 'area' => 'west', 'fa' => 'سعادت‌آباد', 'en' => 'Saadatabad', 'ar' => 'سعادت آباد'],
+        ['id' => 'shahrak-gharb', 'area' => 'west', 'fa' => 'شهرک غرب', 'en' => 'Shahrak-e Gharb', 'ar' => 'شهرك غرب'],
+        ['id' => 'punak', 'area' => 'west', 'fa' => 'پونک', 'en' => 'Punak', 'ar' => 'بونك'],
+        ['id' => 'sadeghieh', 'area' => 'west', 'fa' => 'صادقیه', 'en' => 'Sadeghieh', 'ar' => 'صادقية'],
+        ['id' => 'valiasr', 'area' => 'central', 'fa' => 'ولیعصر', 'en' => 'Valiasr', 'ar' => 'ولي العصر'],
+        ['id' => 'enghelab', 'area' => 'central', 'fa' => 'انقلاب', 'en' => 'Enghelab', 'ar' => 'انقلاب'],
+        ['id' => 'ferdowsi', 'area' => 'central', 'fa' => 'فردوسی', 'en' => 'Ferdowsi', 'ar' => 'فردوسي'],
+        ['id' => 'tehranpars', 'area' => 'east', 'fa' => 'تهرانپارس', 'en' => 'Tehranpars', 'ar' => 'طهران بارس'],
+        ['id' => 'narmak', 'area' => 'east', 'fa' => 'نارمک', 'en' => 'Narmak', 'ar' => 'نارمك'],
+        ['id' => 'naziabad', 'area' => 'south', 'fa' => 'نازی‌آباد', 'en' => 'Naziabad', 'ar' => 'نازي آباد'],
+        ['id' => 'javadiyeh', 'area' => 'south', 'fa' => 'جوادیه', 'en' => 'Javadiyeh', 'ar' => 'جوادية'],
+    ],
+
     'opg' => [
         'disk' => env('ROYADARMAN_OPG_DISK', 'private-opg'),
         'quarantine_disk' => env('ROYADARMAN_OPG_QUARANTINE_DISK', 'opg-quarantine'),

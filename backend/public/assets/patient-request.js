@@ -6,6 +6,8 @@
   const form = document.getElementById('request-form');
   if (!form) return;
 
+  const intakeOn = root.dataset.intake === '1';
+  const isDemo = root.dataset.demo === '1';
   const steps = Array.from(form.querySelectorAll('.request-step'));
   const total = steps.length;
   let current = 1;
@@ -22,6 +24,7 @@
   const progressBar = root.querySelector('[data-progress-bar]');
   const progressLabel = root.querySelector('[data-progress-label]');
   const homeNote = form.querySelector('[data-home-area-note]');
+  const escalate = form.querySelector('[data-escalate]');
 
   const key = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`);
   const headers = (id) => {
@@ -67,6 +70,10 @@
     if (area) area.required = home;
   };
 
+  const updateEscalate = () => {
+    if (escalate) escalate.hidden = selectedPriority() !== 'urgent';
+  };
+
   const fillSummary = () => {
     const set = (key, text) => {
       const el = form.querySelector(`[data-sum="${key}"]`);
@@ -81,34 +88,38 @@
     set('reason', document.getElementById('reason')?.value?.trim() || '—');
   };
 
+  const blockedReason = () => {
+    if (isDemo) return root.dataset.demoReadonly || root.dataset.error;
+    if (!intakeOn) return root.dataset.intakeClosed || root.dataset.error;
+    return '';
+  };
+
   const go = (n) => {
     current = Math.max(1, Math.min(total, n));
     steps.forEach((step) => {
       const num = Number(step.dataset.step);
       step.hidden = num !== current;
     });
-    if (progress) {
-      progress.setAttribute('aria-valuenow', String(current));
-    }
-    if (progressBar) {
-      progressBar.style.width = `${(current / total) * 100}%`;
-    }
+    if (progress) progress.setAttribute('aria-valuenow', String(current));
+    if (progressBar) progressBar.style.width = `${(current / total) * 100}%`;
     if (progressLabel) {
       const template = root.dataset.stepOf || ':current / :total';
       progressLabel.textContent = template
-        .replace(':current', String(current))
-        .replace(':total', String(total))
-        .replace(':current', String(current));
+        .replaceAll(':current', String(current))
+        .replaceAll(':total', String(total));
     }
     prevBtn.hidden = current === 1;
     nextBtn.hidden = current === total;
     submit.hidden = current !== total;
     if (current === total) {
       fillSummary();
-      submit.disabled = !policy || !accept?.checked;
+      const blocked = blockedReason();
+      submit.disabled = Boolean(blocked) || !policy || !accept?.checked;
+      if (blocked) show(blocked);
     }
     updateHomeNote();
-    clearMessage();
+    updateEscalate();
+    if (current !== total) clearMessage();
   };
 
   const validateStep = () => {
@@ -150,6 +161,18 @@
   form.querySelectorAll('input[name="service_type"]').forEach((el) => {
     el.addEventListener('change', updateHomeNote);
   });
+  form.querySelectorAll('input[name="priority"]').forEach((el) => {
+    el.addEventListener('change', updateEscalate);
+  });
+  form.querySelectorAll('[data-neighborhood]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const value = btn.getAttribute('data-area') || '';
+      if (area) area.value = value;
+      form.querySelectorAll('[data-neighborhood]').forEach((el) => {
+        el.classList.toggle('is-on', el === btn);
+      });
+    });
+  });
 
   fetch('/api/v1/policies/case_coordination', {
     headers: { Accept: 'application/json', 'X-Locale': locale },
@@ -169,7 +192,7 @@
 
   accept?.addEventListener('change', () => {
     if (current === total) {
-      submit.disabled = !accept.checked || !policy;
+      submit.disabled = Boolean(blockedReason()) || !accept.checked || !policy;
     }
   });
 
@@ -177,6 +200,11 @@
     e.preventDefault();
     if (current !== total) {
       if (validateStep()) go(current + 1);
+      return;
+    }
+    const blocked = blockedReason();
+    if (blocked) {
+      show(blocked);
       return;
     }
     if (!policy || !accept?.checked) return;

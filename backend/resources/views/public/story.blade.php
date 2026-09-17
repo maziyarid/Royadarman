@@ -50,8 +50,8 @@
     @endif
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/assets/font.css?v=20260915">
-    <link rel="stylesheet" href="/assets/site.css?v=20260915">
-    <script src="/assets/site.js?v=20260915" defer></script>
+    <link rel="stylesheet" href="/assets/site.css?v=20260917">
+    <script src="/assets/site.js?v=20260917" defer></script>
     <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
     @if(!empty($faqSchema))
         <script type="application/ld+json">{!! json_encode($faqSchema, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
@@ -92,12 +92,22 @@
     @if(!empty($serviceCards))
         <section class="section white">
             <div class="shell">
+                @if(!empty($serviceQuery))
+                    <p class="notice">
+                        @if(!empty($serviceMatched))
+                            {{ __('site.home.search_results', ['q' => $serviceQuery]) }}
+                        @else
+                            {{ __('site.home.search_no_match') }}
+                        @endif
+                    </p>
+                @endif
                 <div class="service-links large-services">
                     @foreach($serviceCards as $service)
-                        <a class="service-link photo-card" href="{{ $pub($service['key']) }}">
+                        <a class="service-link photo-card{{ !empty($service['matched']) ? ' is-match' : '' }}" href="{{ $pub($service['key']) }}" data-service-card data-search="{{ $service['title'] }} {{ $service['text'] }} {{ $service['key'] }}">
                             <img src="/assets/photos/{{ $service['photo'] }}.jpg" width="640" height="360" alt="" loading="lazy">
                             <span>
                                 <strong>{{ $service['title'] }}</strong>
+                                @if(!empty($service['matched']))<em class="match-flag">{{ __('site.home.search_matched') }}</em>@endif
                                 <small>{{ $service['text'] }}</small>
                             </span>
                             <b>←</b>

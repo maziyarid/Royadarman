@@ -56,7 +56,8 @@ final class DashboardUiTest extends TestCase
             ->assertOk()
             ->assertSee(__('ui.dashboard.roles.coordinator'), false)
             ->assertSee(__('ui.dashboard.case_queue'), false)
-            ->assertSee(__('ui.dashboard.no_cases_queue'), false);
+            ->assertSee(__('ui.dashboard.no_cases_queue'), false)
+            ->assertSee(__('ui.dashboard.wait_note'), false);
     }
 
     public function test_owner_dashboard_renders_aggregate_stats(): void

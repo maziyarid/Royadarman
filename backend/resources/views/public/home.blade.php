@@ -17,8 +17,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/font.css?v=20260916">
-<link rel="stylesheet" href="/assets/site.css?v=20260916">
-<script src="/assets/site.js?v=20260916" defer></script>
+<link rel="stylesheet" href="/assets/site.css?v=20260917">
+<script src="/assets/site.js?v=20260917" defer></script>
 @php($orgSchema=['@context'=>'https://schema.org','@type'=>'Organization','name'=>'Royadarman','url'=>route('public.home.fa'),'description'=>__('ui.meta_description')])
 <script type="application/ld+json">{!! json_encode($orgSchema, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
 </head>
@@ -58,17 +58,17 @@
             <p>{{ __('site.home.services_intro') }}</p>
         </div>
         <div class="service-links">
-            <a class="service-link photo-card" href="{{ $pub('public.opg') }}">
+            <a class="service-link photo-card" href="{{ $pub('public.opg') }}" data-service-card data-search="OPG opg پانورامیک review">
                 <img src="/assets/photos/opg.jpg" width="640" height="360" alt="" loading="lazy">
                 <span><strong>{{ __('site.home.services.opg.title') }}</strong><small>{{ __('site.home.services.opg.text') }}</small></span>
                 <b>←</b>
             </a>
-            <a class="service-link photo-card" href="{{ $pub('public.home-dentistry') }}">
+            <a class="service-link photo-card" href="{{ $pub('public.home-dentistry') }}" data-service-card data-search="home dentistry منزل خانه">
                 <img src="/assets/photos/home.jpg" width="640" height="360" alt="" loading="lazy">
                 <span><strong>{{ __('site.home.services.home.title') }}</strong><small>{{ __('site.home.services.home.text') }}</small></span>
                 <b>←</b>
             </a>
-            <a class="service-link photo-card" href="{{ $pub('public.referrals') }}">
+            <a class="service-link photo-card" href="{{ $pub('public.referrals') }}" data-service-card data-search="referral clinic کلینیک ارجاع guidance">
                 <img src="/assets/photos/coord.jpg" width="640" height="360" alt="" loading="lazy">
                 <span><strong>{{ __('site.home.services.referral.title') }}</strong><small>{{ __('site.home.services.referral.text') }}</small></span>
                 <b>←</b>
@@ -83,8 +83,8 @@
             <h2>{{ __('site.home.coverage_title') }}</h2>
             <p>{{ __('site.home.coverage_text') }}</p>
             <div class="coverage-chips">
-                @foreach(__('site.home.neighborhoods') as $area)
-                    <a href="{{ $pub('public.home-dentistry') }}" data-area="{{ $area }}">{{ $area }}</a>
+                @foreach(config('royadarman.tehran_neighborhoods', []) as $n)
+                    <a href="{{ $pub('public.services') }}?q={{ urlencode($n[$locale] ?? $n['en']) }}" data-area="{{ $n['id'] }}" data-search="{{ $n['fa'] }} {{ $n['en'] }} {{ $n['ar'] }} {{ $n['area'] }}">{{ $n[$locale] ?? $n['en'] }}</a>
                 @endforeach
             </div>
             <a class="button ghost" href="{{ $pub('public.home-dentistry') }}">{{ __('site.home.coverage_cta') }}</a>

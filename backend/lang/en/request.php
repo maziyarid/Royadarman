@@ -5,6 +5,8 @@ return [
     'intro' => 'Describe what you need. The request is assigned to an active coordinator only after you review and accept the current coordination consent.',
     'disabled_title' => 'New requests are not open yet',
     'disabled_text' => 'The workspace is ready for review, but live patient intake stays disabled until remaining operational gates close.',
+    'intake_closed' => 'Intake is closed. You can review the steps, but nothing will be submitted.',
+    'demo_readonly' => 'This demo session is read-only. A live case will not be created.',
     'service_type' => 'Service type',
     'services' => [
         'opg_review' => 'Preliminary OPG review',
@@ -35,11 +37,14 @@ return [
     'service_help' => 'Choose the coordination service you need. Royadarman coordinates; it does not diagnose or treat.',
     'urgency_help' => 'Tell us how soon you need a coordinator to respond. This does not replace emergency care.',
     'location_help' => 'Tehran area helps matching. Required for home dentistry coordination.',
+    'neighborhood_hint' => 'Picking a neighbourhood sets the area. An exact address is not stored on this step.',
     'area_optional' => 'Prefer not to say / not applicable',
     'home_area_required' => 'Home dentistry coordination requires a Tehran area.',
     'documents_note' => 'If you already have an OPG, you can upload it later from the case page after submission. Files stay in a private quarantine until scanned.',
     'documents_no_diagnosis' => 'Royadarman does not provide autonomous diagnosis. Any OPG review is preliminary and performed by an assigned licensed clinician.',
     'review_help' => 'Confirm the details below. Submission records coordination consent and opens a case for an active coordinator.',
+    'escalate_title' => 'Signs that need emergency care',
+    'escalate_text' => 'Uncontrolled bleeding, spreading swelling, fever, or recent facial trauma belong in a hospital emergency. Royadarman is not a substitute for emergency medicine.',
     'steps' => [
         'service' => 'What do you need?',
         'urgency' => 'How urgent is it?',

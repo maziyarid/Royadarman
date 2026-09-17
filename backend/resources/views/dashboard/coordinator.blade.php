@@ -13,30 +13,23 @@
     @if(count($data['case_queue']) === 0)
         <div class="empty">{{ __('ui.dashboard.no_cases_queue') }}</div>
     @else
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">{{ __('panel.table.reference') }}</th>
-                        <th scope="col">{{ __('ui.dashboard.col_status') }}</th>
-                        <th scope="col">{{ __('ui.dashboard.col_service') }}</th>
-                        <th scope="col">{{ __('ui.dashboard.col_documents') }}</th>
-                        <th scope="col">{{ __('ui.dashboard.col_review') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($data['case_queue'] as $c)
-                        <tr>
-                            <td><a class="case-link" href="{{ route('panel.case', ['locale' => $locale, 'case' => $c['id']]) }}"><bdi>{{ $c['public_reference'] }}</bdi></a></td>
-                            <td><span class="badge {{ $c['status'] }}">{{ __('ui.dashboard.status.'.$c['status']) }}</span></td>
-                            <td>{{ __('ui.dashboard.service.'.$c['service_type']) }}</td>
-                            <td>{{ $c['documents_count'] }}</td>
-                            <td>@if($c['has_published_review'])<span class="ok">{{ __('ui.dashboard.yes') }}</span>@else<span class="muted">{{ __('ui.dashboard.no') }}</span>@endif</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+        @foreach($data['case_queue'] as $c)
+            <article class="task-card">
+                <div class="task-card-main">
+                    <a class="case-link" href="{{ route('panel.case', ['locale' => $locale, 'case' => $c['id']]) }}"><bdi>{{ $c['public_reference'] }}</bdi></a>
+                    <div class="task-meta">
+                        <span class="badge {{ $c['status'] }}">{{ __('ui.dashboard.status.'.$c['status']) }}</span>
+                        {{ __('ui.dashboard.service.'.$c['service_type']) }}
+                        · {{ __('ui.dashboard.col_documents') }} {{ $c['documents_count'] }}
+                        · {{ __('ui.dashboard.col_review') }}
+                        @if($c['has_published_review'])<span class="ok">{{ __('ui.dashboard.yes') }}</span>@else<span class="muted">{{ __('ui.dashboard.no') }}</span>@endif
+                    </div>
+                </div>
+                @include('dashboard.partials.wait-chip', ['minutes' => $c['wait_minutes'] ?? null, 'band' => $c['sla_band'] ?? 'unknown'])
+                <a class="btn sm" href="{{ route('panel.case', ['locale' => $locale, 'case' => $c['id']]) }}">{{ __('ui.dashboard.next_queue') }}</a>
+            </article>
+        @endforeach
     @endif
 </div>
+<p class="hint">{{ __('ui.dashboard.wait_note') }}</p>
 @endsection

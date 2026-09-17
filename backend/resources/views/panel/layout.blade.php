@@ -18,8 +18,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', __('panel.roles.'.$panelKey.'.title')) · Royadarman</title>
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/assets/workspace.css?v=20260915">
-    <script src="/assets/workspace.js?v=20260915" defer></script>
+    <link rel="stylesheet" href="/assets/workspace.css?v=20260917">
+    <script src="/assets/workspace.js?v=20260917" defer></script>
     @stack('scripts')
 </head>
 <body class="workspace-body" data-dialog-ok="{{ __('panel.dialog.ok') }}" data-dialog-cancel="{{ __('panel.dialog.cancel') }}" data-dialog-url="{{ __('panel.dialog.url') }}">
@@ -43,7 +43,7 @@
                 <a class="{{ $nav === 'home-service' ? 'active' : '' }}" href="{{ route('panel.home-service.index', ['locale' => $locale]) }}">{{ __('panel.nav.home_service') }}</a>
             @endif
             <a class="{{ $nav === 'profile' ? 'active' : '' }}" href="{{ route('panel.profile', ['locale' => $locale]) }}">{{ __('panel.nav.profile') }}</a>
-            @if(!$isDemo && $panelKey === 'patient')
+            @if($panelKey === 'patient')
                 <a class="{{ $nav === 'request' ? 'active' : '' }}" href="{{ route('patient.request.create', ['locale' => $locale]) }}">{{ __('request.title') }}</a>
             @endif
             @if($canManageMarketing)

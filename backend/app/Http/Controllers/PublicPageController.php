@@ -92,13 +92,27 @@ final class PublicPageController extends Controller
         $content = trans('site.pages.services');
         abort_unless(is_array($content), 404);
 
+        $query = trim((string) request()->query('q', ''));
+        $cards = [
+            ['key' => 'referrals', 'photo' => 'coord', 'title' => $content['services'][0]['title'], 'text' => $content['services'][0]['text'], 'aliases' => ['referral', 'clinic', 'کلینیک', 'عيادة', 'ارجاع', 'معرفی', 'guidance']],
+            ['key' => 'home-dentistry', 'photo' => 'home', 'title' => $content['services'][1]['title'], 'text' => $content['services'][1]['text'], 'aliases' => ['home', 'منزل', 'خانه', 'منزلية', 'dentistry']],
+            ['key' => 'opg', 'photo' => 'opg', 'title' => $content['services'][2]['title'], 'text' => $content['services'][2]['text'], 'aliases' => ['opg', 'پانورامیک', 'اشعه', 'xray', 'x-ray', 'تصوير', 'radiograph']],
+        ];
+        $matchedAny = false;
+        if ($query !== '') {
+            foreach ($cards as $i => $card) {
+                $matched = $this->serviceCardMatches($query, $card);
+                $cards[$i]['matched'] = $matched;
+                $matchedAny = $matchedAny || $matched;
+            }
+            usort($cards, fn ($a, $b) => ((int) ($b['matched'] ?? false)) <=> ((int) ($a['matched'] ?? false)));
+        }
+
         return $this->story($locale, 'services', $content, [
             'photo' => self::PHOTOS['services'],
-            'serviceCards' => [
-                ['key' => 'referrals', 'photo' => 'coord', 'title' => $content['services'][0]['title'], 'text' => $content['services'][0]['text']],
-                ['key' => 'home-dentistry', 'photo' => 'home', 'title' => $content['services'][1]['title'], 'text' => $content['services'][1]['text']],
-                ['key' => 'opg', 'photo' => 'opg', 'title' => $content['services'][2]['title'], 'text' => $content['services'][2]['text']],
-            ],
+            'serviceQuery' => $query,
+            'serviceMatched' => $matchedAny,
+            'serviceCards' => $cards,
             'related' => $this->related(['opg', 'home-dentistry', 'referrals']),
             'heroActions' => [
                 ['href' => route('login', ['locale' => $locale]), 'label' => __('site.cta'), 'style' => 'primary'],
@@ -249,6 +263,30 @@ final class PublicPageController extends Controller
     private function url(string $key, string $locale): string
     {
         return $locale === 'fa' ? route('public.'.$key.'.fa') : route('public.'.$key, ['locale' => $locale]);
+    }
+
+    /** @param array{key: string, title: string, text: string, aliases?: list<string>} $card */
+    private function serviceCardMatches(string $query, array $card): bool
+    {
+        $needle = mb_strtolower($query);
+        $hay = mb_strtolower($card['title'].' '.$card['text'].' '.$card['key']);
+        if ($needle !== '' && str_contains($hay, $needle)) {
+            return true;
+        }
+        foreach ($card['aliases'] ?? [] as $alias) {
+            $alias = mb_strtolower((string) $alias);
+            if ($alias !== '' && (str_contains($needle, $alias) || str_contains($alias, $needle))) {
+                return true;
+            }
+        }
+        foreach (config('royadarman.tehran_neighborhoods', []) as $n) {
+            $label = mb_strtolower(($n['fa'] ?? '').' '.($n['en'] ?? '').' '.($n['ar'] ?? '').' '.($n['id'] ?? ''));
+            if (str_contains($label, $needle) && $card['key'] === 'home-dentistry') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function fa(callable $cb): Response

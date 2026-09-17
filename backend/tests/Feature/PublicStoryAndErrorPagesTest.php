@@ -28,7 +28,23 @@ final class PublicStoryAndErrorPagesTest extends TestCase
         $this->get('/en')
             ->assertOk()
             ->assertSee('What do you need?', false)
-            ->assertSee('<html lang="en" dir="ltr">', false);
+            ->assertSee('<html lang="en" dir="ltr">', false)
+            ->assertSee('Tajrish', false);
+    }
+
+    public function test_services_search_highlights_matching_route(): void
+    {
+        $this->get('/en/services?q=OPG')
+            ->assertOk()
+            ->assertSee('Preliminary OPG review', false)
+            ->assertSee('is-match', false)
+            ->assertSee(__('site.home.search_matched'), false)
+            ->assertSee(__('site.home.search_results', ['q' => 'OPG']), false);
+
+        $this->get('/en/services?q=Tajrish')
+            ->assertOk()
+            ->assertSee('Home dentistry in Tehran', false)
+            ->assertSee('is-match', false);
     }
 
     public function test_service_story_pages_include_photography_and_safety_copy(): void

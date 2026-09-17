@@ -15,26 +15,21 @@
     @if($data['case_status_counts']->isEmpty())
         <div class="empty">{{ __('ui.dashboard.no_cases') }}</div>
     @else
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th scope="col">{{ __('ui.dashboard.col_status') }}</th><th scope="col">{{ __('ui.dashboard.col_count') }}</th></tr></thead>
-                <tbody>
-                    @foreach($data['case_status_counts'] as $status => $count)
-                        <tr>
-                            <td><span class="badge {{ $status }}">{{ __('ui.dashboard.status.'.$status) }}</span></td>
-                            <td>{{ $count }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <div class="task-grid compact">
+            @foreach($data['case_status_counts'] as $status => $count)
+                <article class="task-card">
+                    <span class="badge {{ $status }}">{{ __('ui.dashboard.status.'.$status) }}</span>
+                    <strong>{{ $count }}</strong>
+                </article>
+            @endforeach
         </div>
     @endif
 </div>
 @if($data['pending_review_posts'] > 0)
-    <div class="card pad">
-        <h2>{{ __('ui.dashboard.pending_review_posts') }}</h2>
-        <p><a class="btn" href="{{ route('admin.cms.posts.index') }}">{{ $data['pending_review_posts'] }} {{ __('ui.dashboard.posts_in_review') }}</a></p>
-    </div>
+    <a class="task-card action" href="{{ route('admin.cms.posts.index') }}">
+        <strong>{{ __('ui.dashboard.pending_review_posts') }}</strong>
+        <small>{{ $data['pending_review_posts'] }} {{ __('ui.dashboard.posts_in_review') }}</small>
+    </a>
 @endif
 <p class="notice">{{ __('panel.roles.owner.subtitle') }}</p>
 @endsection

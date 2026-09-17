@@ -23,6 +23,7 @@ use App\Models\ReviewRevision;
 use App\Models\SupportConversation;
 use App\Models\User;
 use App\Support\PanelDemoRegistry;
+use App\Support\WaitClock;
 use Illuminate\Support\Facades\Schema;
 
 final class DashboardService
@@ -73,6 +74,7 @@ final class DashboardService
                 'created_at' => $c->created_at,
                 'documents_count' => $c->documents->count(),
                 'has_published_review' => $c->reviewRevisions->contains(fn ($r) => $r->isPublished()),
+                ...WaitClock::waiting($c->updated_at ?? $c->created_at),
             ]),
             'open_referral_proposals' => $openReferrals,
             'home_service_requests' => $user->homeServiceRequests()
@@ -128,6 +130,7 @@ final class DashboardService
                     ? $r->case->status->value : (string) optional($r->case)->status,
                 'is_published' => $r->isPublished(),
                 'updated_at' => $r->updated_at,
+                ...WaitClock::waiting($r->updated_at),
             ]),
             'open_drafts_count' => $openDrafts,
         ];
@@ -165,6 +168,8 @@ final class DashboardService
                     ? $g->case->status->value : (string) optional($g->case)->status,
                 'granted_at' => $g->granted_at,
                 'expires_at' => $g->expires_at,
+                'expires_in_minutes' => WaitClock::remainingMinutes($g->expires_at),
+                'expiry_band' => WaitClock::expiryBand(WaitClock::remainingMinutes($g->expires_at)),
             ]),
             'pending_proposals' => ReferralProposal::query()
                 ->whereIn('clinic_id', $clinicIds)
@@ -208,6 +213,7 @@ final class DashboardService
                 'documents_count' => $c->documents->count(),
                 'has_published_review' => $c->reviewRevisions->contains(fn ($r) => $r->isPublished()),
                 'updated_at' => $c->updated_at,
+                ...WaitClock::waiting($c->updated_at ?? $c->created_at),
             ]),
             'awaiting_patient_count' => $awaitingPatient,
             'open_unassigned_support' => $openSupport,
