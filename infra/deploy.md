@@ -13,6 +13,7 @@ always `/usr/local/bin/ea-php83` (`$PHP` below). `backend/` is the artefact.
 - [ ] `SESSION_CONNECTION` shares the AuditEvent connection in production (preflight fail-closed).
 - [ ] Additive migrations only in this release (no rename/drop of live columns).
 - [ ] Host `.env` `DB_QUEUE_RETRY_AFTER` and `ROYADARMAN_QUEUE_WORKER_TIMEOUT` match [`queue-timing.conf`](queue-timing.conf) (90 / 85, margin 5). A live override such as `DB_QUEUE_RETRY_AFTER=85` is a double-claim hazard.
+- [ ] Live installed `royadarman-queue.service` ExecStart matches the reviewed contract (see `infra/checks/live-unit-verify.md`). As of 2026-09-18 it does **not**: live `--timeout=120` exceeds live `retry_after=90`. **STOP** until a ticketed host unit change aligns it. Do not silently restart stale configuration.
 
 ## Deploy (operator, on the host)
 
@@ -43,14 +44,17 @@ cd "$APP"
 "$PHP" artisan royadarman:release-identity --write
 
 # LIVE unit gate (read-only). Preflight does not inspect systemd.
-# Require installed ExecStart PHP binary, --queue list, and --timeout to match
-# host.env.example + queue-timing.conf before any restart. See
+# Require installed ExecStart PHP binary, --queue list, --sleep, --tries,
+# --backoff, --timeout, and --max-time to match host.env.example +
+# queue-timing.conf + the systemd template before any restart. See
 # infra/checks/live-unit-verify.md.
 systemctl cat royadarman-queue.service
 systemctl show -p ExecStart royadarman-queue.service
 # STOP if ExecStart PHP path != PHP_BIN, --queue list != QUEUE_NAMES, or
-# --timeout != WORKER_TIMEOUT. Apply the reviewed unit as a separate ticketed
-# host change; do not silently restart stale configuration.
+# --sleep/--tries/--backoff/--timeout/--max-time differ from the reviewed
+# template, or live --timeout is not SAFETY_MARGIN below live retry_after.
+# Apply the reviewed unit as a separate ticketed host change; do not silently
+# restart stale configuration.
 
 # Restart only after the live unit matches the reviewed contract.
 # Installing/replacing the unit is a separate change.
@@ -66,7 +70,7 @@ tick a box. Keep `INTAKE_ENABLED=false` unless every CHECKLIST.md gate is closed
 If application code fails:
 
 1. Restore the previous artefact under `$APP` and the previous `public_html`.
-2. Restart `royadarman-queue.service`.
+2. Restart `royadarman-queue.service` **only if** the restored unit still matches the reviewed contract; otherwise STOP and ticket the unit first.
 3. Keep additive schema in place — old code must tolerate new columns.
 4. Overwrite `storage/app/release-identity.json` for the restored SHA
    (`"$PHP" artisan royadarman:release-identity --write` after setting
