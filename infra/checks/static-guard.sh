@@ -95,13 +95,12 @@ contains "checks/ci-empty-step.md" "Not a pass"
 contains "checks/live-unit-verify.md" "Committing this file does not inspect systemd"
 contains "checks/live-unit-verify.md" "systemctl show -p ExecStart"
 contains "checks/live-unit-verify.md" "Do not restart"
+contains "checks/live-unit-verify.md" "Recording an observed mismatch"
+contains "checks/live-unit-verify.md" "live Laravel"
 contains "checks/live-unit-verify.md" "--sleep="
 contains "checks/live-unit-verify.md" "--backoff="
-contains "checks/live-unit-verify.md" "Observed live mismatch"
-contains "checks/live-unit-verify.md" "--timeout=120"
 contains "deploy.md" "systemctl show -p ExecStart"
 contains "deploy.md" "STOP if ExecStart"
-contains "deploy.md" "--timeout=120"
 
 # Queue reservation contract (ChatGPT REVIEW — b068639 / Greptile P1):
 # Do not hard-code 90. Parse infra/queue-timing.conf, require the unit
