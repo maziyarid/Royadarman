@@ -51,31 +51,17 @@ Expected shape (values must match the current contract, not this example forever
 ExecStart=/usr/local/bin/ea-php83 artisan queue:work database --queue=otp,scanning,notifications,maintenance --sleep=1 --tries=3 --backoff=5 --timeout=85 --max-time=3600
 ```
 
-## Observed live mismatch (2026-09-18, independent Grok MCP re-check)
+## Recording an observed mismatch
 
-**Committing these numbers does not change the installed unit.**
-Read-only inspection of `royadarman-queue.service` as user `grok-royadarman`
-(no sudo, no restart):
+Record concrete live values, timestamps, host identity, and operator evidence in the
+operations/task record for the specific incident or deployment attempt. Keep this
+runbook contract-based: after the installed unit is corrected, historical bad values
+must not become required repository invariants.
 
-| Field | Reviewed contract | Live installed |
-|---|---|---|
-| PHP binary | `/usr/local/bin/ea-php83` | `/usr/local/bin/ea-php83` (match) |
-| `--queue=` | `otp,scanning,notifications,maintenance` | `otp,scanning,notifications,maintenance,default` (extra `default`) |
-| `--sleep=` | `1` | `3` |
-| `--tries=` | `3` | `3` (match) |
-| `--backoff=` | `5` | `10` |
-| `--timeout=` | `85` | `120` |
-| `--max-time=` | `3600` | `3600` (match) |
-| live Laravel `retry_after` | `90` | `90` |
-| unit state | — | active / enabled |
-
-**STOP:** live `--timeout=120` exceeds live `retry_after=90`. That is the
-stale-unit double-claim hazard. Do not restart. A separately controlled
-host change must install the reviewed template before the next release restart.
-
-Fragment path observed: `/etc/systemd/system/royadarman-queue.service`.
-Live Laravel `retry_after` was read via `artisan tinker` config() only;
-production `.env` was not printed.
+A live mismatch is evidence to **STOP**, not a new expected value. In particular, if
+the installed worker timeout is greater than or too close to the live Laravel
+`retry_after`, do not restart the worker until a separately reviewed host change
+aligns the installed unit with the current repository contract.
 
 ## What this is not
 
