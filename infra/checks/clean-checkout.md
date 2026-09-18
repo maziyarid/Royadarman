@@ -1,6 +1,6 @@
 # Verification procedure
 
-Two regimes. Do not mix them. See `backend/DEPLOYMENT.md`.
+Four regimes. Do not mix them. See `backend/DEPLOYMENT.md`.
 
 **Committing this file does not run tests on the host and is not PHPUnit evidence.**
 
@@ -49,3 +49,11 @@ RPH-5 still requires this evidence for `SessionInventoryTest`,
 
 Forbidden on live: `migrate:fresh`, `php artisan test`, `config:clear` merely
 to satisfy this list.
+
+## D. GitHub Actions red X (do not mix with A/B/C)
+
+See [`ci-empty-step.md`](ci-empty-step.md). A `ci` job that completes in
+about 1–4 seconds with empty steps is host/Actions policy (RPH-9),
+**not an application-test failure** and **not a pass**. It is not PHPUnit
+evidence and not a merge signal.
+

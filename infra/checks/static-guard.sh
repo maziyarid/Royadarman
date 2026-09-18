@@ -49,6 +49,7 @@ need "cron/royadarman"
 need "clamav.md"
 need "deploy.md"
 need "checks/clean-checkout.md"
+need "checks/ci-empty-step.md"
 
 contains "README.md" "Committing or merging this directory does not mutate production."
 contains "README.md" "queue-timing.conf"
@@ -71,6 +72,9 @@ contains "deploy.md" "INTAKE_ENABLED=false"
 contains "deploy.md" "config('queue.connections.database.retry_after')"
 contains "checks/clean-checkout.md" "migrate:fresh --force # throwaway schema only"
 contains "checks/clean-checkout.md" '"$PHP" vendor/bin/pint --test'
+contains "checks/ci-empty-step.md" "Committing this file does not enable GitHub Actions runners"
+contains "checks/ci-empty-step.md" "Not an application-test failure"
+contains "checks/ci-empty-step.md" "Not a pass"
 
 # Queue reservation contract (ChatGPT REVIEW — b068639 / Greptile P1):
 # Do not hard-code 90. Parse infra/queue-timing.conf, require the unit

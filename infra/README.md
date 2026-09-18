@@ -20,7 +20,8 @@ redesign the AlmaLinux 9 / cPanel / Apache host.
 | `cron/royadarman` | Minute scheduler: `artisan schedule:run` via `/usr/local/bin/ea-php83`. |
 | `clamav.md` | Fail-closed ClamAV expectations for OPG quarantine. |
 | `deploy.md` | Additive deploy, rollback, and release-identity procedure. |
-| `checks/clean-checkout.md` | Staging/CI verification vs live smoke (do not mix). |
+| `checks/clean-checkout.md` | Staging/CI verification vs live smoke vs empty-step Actions (do not mix). |
+| `checks/ci-empty-step.md` | How to tell a 1–4s empty-step red X from PHPUnit. Not a pass. |
 | `checks/static-guard.sh` | Secret/placeholder/binary static check. Safe to run without PHP. |
 
 ## Non-negotiables
