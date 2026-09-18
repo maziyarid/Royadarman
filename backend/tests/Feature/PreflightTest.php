@@ -139,6 +139,7 @@ class PreflightTest extends TestCase
         config()->set('filesystems.default', 'local');
         config()->set('royadarman.intake_enabled', false);
         config()->set('database.default', 'sqlite');
+        config()->set('database.connections.sqlite.database', ':memory:');
         config()->set('session.connection', 'session_store');
 
         $this->artisan('royadarman:preflight')
@@ -153,6 +154,7 @@ class PreflightTest extends TestCase
         config()->set('app.env', 'local');
         config()->set('royadarman.intake_enabled', false);
         config()->set('database.default', 'sqlite');
+        config()->set('database.connections.sqlite.database', ':memory:');
         config()->set('session.connection', 'session_store');
 
         $this->artisan('royadarman:preflight')->assertSuccessful();
