@@ -70,6 +70,7 @@ need "clamav.md"
 need "deploy.md"
 need "checks/clean-checkout.md"
 need "checks/ci-empty-step.md"
+need "checks/live-unit-verify.md"
 
 contains "README.md" "Committing or merging this directory does not mutate production."
 contains "README.md" "queue-timing.conf"
@@ -91,6 +92,11 @@ contains "checks/clean-checkout.md" '"$PHP" vendor/bin/pint --test'
 contains "checks/ci-empty-step.md" "Committing this file does not enable GitHub Actions runners"
 contains "checks/ci-empty-step.md" "Not an application-test failure"
 contains "checks/ci-empty-step.md" "Not a pass"
+contains "checks/live-unit-verify.md" "Committing this file does not inspect systemd"
+contains "checks/live-unit-verify.md" "systemctl show -p ExecStart"
+contains "checks/live-unit-verify.md" "Do not restart"
+contains "deploy.md" "systemctl show -p ExecStart"
+contains "deploy.md" "STOP if ExecStart"
 
 # Queue reservation contract (ChatGPT REVIEW — b068639 / Greptile P1):
 # Do not hard-code 90. Parse infra/queue-timing.conf, require the unit
@@ -310,7 +316,7 @@ fi
 
 # Bare php must not be the documented CLI for host commands.
 if grep -n -E '(^|[[:space:]])php artisan|(^|[[:space:]])php -v' "$INFRA/systemd/royadarman-queue.service" "$INFRA/cron/royadarman" "$INFRA/deploy.md"; then
-  bad "host command templates must use ea-php83, not bare php"
+  bad "host command templates must use declared PHP_BIN, not bare php"
 else
   ok "queue/cron/deploy templates do not call bare php artisan"
 fi
