@@ -13,7 +13,7 @@ always `/usr/local/bin/ea-php83` (`$PHP` below). `backend/` is the artefact.
 - [ ] `SESSION_CONNECTION` shares the AuditEvent connection in production (preflight fail-closed).
 - [ ] Additive migrations only in this release (no rename/drop of live columns).
 - [ ] Host `.env` `DB_QUEUE_RETRY_AFTER` and `ROYADARMAN_QUEUE_WORKER_TIMEOUT` match [`queue-timing.conf`](queue-timing.conf) (90 / 85, margin 5). A live override such as `DB_QUEUE_RETRY_AFTER=85` is a double-claim hazard.
-- [ ] Live installed `royadarman-queue.service` ExecStart matches the reviewed contract (see `infra/checks/live-unit-verify.md`). As of 2026-09-18 it does **not**: live `--timeout=120` exceeds live `retry_after=90`. **STOP** until a ticketed host unit change aligns it. Do not silently restart stale configuration.
+- [ ] Live installed `royadarman-queue.service` ExecStart matches the reviewed contract (see `infra/checks/live-unit-verify.md`). If any installed field differs, or live worker timeout is not safely below live `retry_after`, **STOP** until a separately reviewed host unit change aligns it. Do not silently restart stale configuration.
 
 ## Deploy (operator, on the host)
 
