@@ -138,6 +138,41 @@ if [ -n "$DECLARED_RETRY" ] && [ -n "$DECLARED_TIMEOUT" ]; then
   fi
 fi
 
+# Laravel config defaults must lockstep with the contract. A missing host .env
+# falls back to these; drifting them re-introduces the magic-90 hole.
+PHP_RETRY="$(sed -n "s/.*env('DB_QUEUE_RETRY_AFTER', *\\([0-9][0-9]*\\)).*/\\1/p" "$ROOT/backend/config/queue.php" | head -n 1)"
+PHP_TIMEOUT="$(sed -n "s/.*env('ROYADARMAN_QUEUE_WORKER_TIMEOUT', *\\([0-9][0-9]*\\)).*/\\1/p" "$ROOT/backend/config/royadarman.php" | head -n 1)"
+PHP_MARGIN="$(sed -n "s/.*'retry_after_min_margin_seconds' => *\\([0-9][0-9]*\\).*/\\1/p" "$ROOT/backend/config/royadarman.php" | head -n 1)"
+if [ -n "$DECLARED_RETRY" ] && [ -n "$DECLARED_TIMEOUT" ] && [ -n "$DECLARED_MARGIN" ]; then
+  if [ "$PHP_RETRY" = "$DECLARED_RETRY" ]; then
+    ok "backend/config/queue.php env('DB_QUEUE_RETRY_AFTER') default=$PHP_RETRY"
+  else
+    bad "backend/config/queue.php env('DB_QUEUE_RETRY_AFTER') default must be $DECLARED_RETRY (got ${PHP_RETRY:-missing})"
+  fi
+  if [ "$PHP_TIMEOUT" = "$DECLARED_TIMEOUT" ]; then
+    ok "backend/config/royadarman.php env('ROYADARMAN_QUEUE_WORKER_TIMEOUT') default=$PHP_TIMEOUT"
+  else
+    bad "backend/config/royadarman.php env('ROYADARMAN_QUEUE_WORKER_TIMEOUT') default must be $DECLARED_TIMEOUT (got ${PHP_TIMEOUT:-missing})"
+  fi
+  if [ "$PHP_MARGIN" = "$DECLARED_MARGIN" ]; then
+    ok "backend/config/royadarman.php retry_after_min_margin_seconds=$PHP_MARGIN"
+  else
+    bad "backend/config/royadarman.php retry_after_min_margin_seconds must be $DECLARED_MARGIN (got ${PHP_MARGIN:-missing})"
+  fi
+fi
+
+# Fail-closed live gate must remain in Preflight (does not inspect systemd).
+PREFLIGHT="$ROOT/backend/app/Console/Commands/Preflight.php"
+if [ -f "$PREFLIGHT" ] \
+  && grep -F -q "config('queue.connections.database.retry_after')" "$PREFLIGHT" \
+  && grep -F -q "config('royadarman.queue.worker_timeout_seconds')" "$PREFLIGHT" \
+  && grep -F -q "config('royadarman.queue.retry_after_min_margin_seconds')" "$PREFLIGHT" \
+  && grep -F -q 'DB_QUEUE_RETRY_AFTER' "$PREFLIGHT"; then
+  ok "Preflight fail-closed queue-timing invariant is present"
+else
+  bad "Preflight.php must fail-closed on live retry_after vs worker timeout (see infra/queue-timing.conf)"
+fi
+
 # deploy.md must run preflight before migrate --force (fail-fast config gate).
 preflight_line="$(grep -n 'artisan royadarman:preflight' "$INFRA/deploy.md" | head -n 1 | cut -d: -f1 || true)"
 migrate_line="$(grep -n 'artisan migrate --force' "$INFRA/deploy.md" | head -n 1 | cut -d: -f1 || true)"
