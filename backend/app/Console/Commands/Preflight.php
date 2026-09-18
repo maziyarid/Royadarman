@@ -121,6 +121,13 @@ final class Preflight extends Command
             }
         }
 
+        $retryAfter = (int) config('queue.connections.database.retry_after');
+        $workerTimeout = (int) config('royadarman.queue.worker_timeout_seconds');
+        $margin = (int) config('royadarman.queue.retry_after_min_margin_seconds');
+        if ($retryAfter - $workerTimeout < $margin) {
+            $failures[] = "DB_QUEUE_RETRY_AFTER ({$retryAfter}) must exceed ROYADARMAN_QUEUE_WORKER_TIMEOUT ({$workerTimeout}) by at least {$margin}s so a still-running job cannot be reclaimed. See infra/queue-timing.conf.";
+        }
+
         if ($failures !== []) {
             $this->error('Preflight FAILED with the following issues:');
             foreach ($failures as $failure) {

@@ -75,4 +75,11 @@ return [
             'max_pixels' => (int) env('ROYADARMAN_CMS_MEDIA_MAX_PIXELS', 40_000_000),
         ],
     ],
+    'queue' => [
+        // Documented worker --timeout. Keep lockstep with infra/queue-timing.conf.
+        // Preflight compares this to config('queue.connections.database.retry_after')
+        // and does not inspect systemd.
+        'worker_timeout_seconds' => (int) env('ROYADARMAN_QUEUE_WORKER_TIMEOUT', 85),
+        'retry_after_min_margin_seconds' => 5,
+    ],
 ];

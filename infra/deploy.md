@@ -8,10 +8,11 @@ always `/usr/local/bin/ea-php83` (`$PHP` below). `backend/` is the artefact.
 ## Before any host change
 
 - [ ] Encrypted database, application, and `public_html` backups exist, with SHA-256 recorded.
-- [ ] `INTAKE_ENABLED=false` unless every activation gate in `backend/CHECKLIST.md` is closed.
+- [ ] `INTAKE_ENABLED=false` unless every activation gate in `backend/CHECKLIST.md` is closed. Intake stays disabled for the whole deploy window.
 - [ ] Secrets are already on the host `.env` — not in git.
 - [ ] `SESSION_CONNECTION` shares the AuditEvent connection in production (preflight fail-closed).
 - [ ] Additive migrations only in this release (no rename/drop of live columns).
+- [ ] Host `.env` `DB_QUEUE_RETRY_AFTER` and `ROYADARMAN_QUEUE_WORKER_TIMEOUT` match [`queue-timing.conf`](queue-timing.conf) (90 / 85, margin 5). A live override such as `DB_QUEUE_RETRY_AFTER=85` is a double-claim hazard.
 
 ## Deploy (operator, on the host)
 
@@ -23,10 +24,20 @@ cd "$APP"
 "$PHP" -v   # must be 8.3.x
 "$PHP" "$(command -v composer)" install --no-dev --prefer-dist --optimize-autoloader
 
+# Fail-fast config gate BEFORE schema change. Intake remains disabled.
+# Preflight reads live Laravel config, including
+# config('queue.connections.database.retry_after') vs
+# config('royadarman.queue.worker_timeout_seconds'). It does not inspect systemd.
+"$PHP" artisan royadarman:preflight   # must pass against production .env
+
 # Schema: additive expand only. Never migrate:fresh on this host.
 "$PHP" artisan migrate --force
 
-"$PHP" artisan royadarman:preflight   # must pass against production .env
+"$PHP" artisan royadarman:preflight   # re-check after migration
+
+# Confirm the LIVE reservation window, not the documented default, before workers restart.
+"$PHP" artisan tinker --execute="echo config('queue.connections.database.retry_after');"
+# Must be >= WORKER_TIMEOUT + SAFETY_MARGIN from infra/queue-timing.conf.
 
 # Provenance: set ROYADARMAN_RELEASE_COMMIT when there is no .git on the host.
 "$PHP" artisan royadarman:release-identity --write
@@ -37,7 +48,7 @@ sudo systemctl restart royadarman-queue.service
 
 Warm caches only with the production `.env` loaded. Do **not** run
 `php artisan test`, `migrate:fresh`, or `config:clear` against live merely to
-tick a box.
+tick a box. Keep `INTAKE_ENABLED=false` unless every CHECKLIST.md gate is closed.
 
 ## Rollback
 

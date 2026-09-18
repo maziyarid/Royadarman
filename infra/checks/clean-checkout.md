@@ -13,7 +13,8 @@ sh infra/checks/static-guard.sh
 ```
 
 Must pass before a host operator copies templates. This checks placeholders,
-the PHP 8.3 binary, queue names, ClamAV path, and the non-mutation contract.
+the PHP 8.3 binary, queue names, ClamAV path, `queue-timing.conf` lockstep,
+and the non-mutation contract.
 
 ## B. Clean-checkout (pre-deploy / CI) — needs PHP >= 8.3 + Composer
 
@@ -29,7 +30,7 @@ cd backend
 "$PHP" artisan config:clear          # clean checkout only
 "$PHP" artisan migrate:fresh --force # throwaway schema only
 "$PHP" artisan test
-vendor/bin/pint --test
+"$PHP" vendor/bin/pint --test
 "$PHP" artisan royadarman:preflight
 ```
 
@@ -42,6 +43,7 @@ RPH-5 still requires this evidence for `SessionInventoryTest`,
 - Unauthenticated API errors keep the envelope + `request_id`
 - `/fa/`, `/ar/`, `/en/` `lang`/`dir`
 - `"$PHP" artisan royadarman:preflight` against production `.env`
+- confirm live `config('queue.connections.database.retry_after')` vs `infra/queue-timing.conf`
 - queue unit + cron are running with `ea-php83`
 - no HTTP 5xx spike; no new `failed_jobs`
 

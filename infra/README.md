@@ -15,6 +15,7 @@ redesign the AlmaLinux 9 / cPanel / Apache host.
 | Path | Purpose |
 |---|---|
 | `host.env.example` | Documented host paths and PHP 8.3 binary. Placeholders only. |
+| `queue-timing.conf` | Non-secret source of truth for worker timeout vs `DB_QUEUE_RETRY_AFTER`. |
 | `systemd/royadarman-queue.service` | Supervised database queue worker (`otp,scanning,notifications,maintenance`). |
 | `cron/royadarman` | Minute scheduler: `artisan schedule:run` via `/usr/local/bin/ea-php83`. |
 | `clamav.md` | Fail-closed ClamAV expectations for OPG quarantine. |
@@ -29,6 +30,7 @@ redesign the AlmaLinux 9 / cPanel / Apache host.
 - Intake stays fail-closed until `royadarman:preflight` passes on production `.env`.
 - Owner has no clinical-document access. No autonomous diagnosis. No payments.
 - `backend/` is the only deployable application.
+- Queue worker `--timeout` must equal `WORKER_TIMEOUT` in `queue-timing.conf` and sit `SAFETY_MARGIN` seconds below the live `DB_QUEUE_RETRY_AFTER`.
 
 ## Apply vs commit
 

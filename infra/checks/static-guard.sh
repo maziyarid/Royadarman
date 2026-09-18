@@ -30,9 +30,20 @@ contains() {
   fi
 }
 
+# Parse KEY=integer from a conf/env file. Comments and blanks ignored.
+conf_int() {
+  file="$1"
+  key="$2"
+  if [ ! -f "$file" ]; then
+    return 0
+  fi
+  sed -n "s/^${key}=\([0-9][0-9]*\)[[:space:]]*$/\1/p" "$file" | head -n 1
+}
+
 # Files required for RPH-8 AC1–AC3.
 need "README.md"
 need "host.env.example"
+need "queue-timing.conf"
 need "systemd/royadarman-queue.service"
 need "cron/royadarman"
 need "clamav.md"
@@ -40,13 +51,14 @@ need "deploy.md"
 need "checks/clean-checkout.md"
 
 contains "README.md" "Committing or merging this directory does not mutate production."
+contains "README.md" "queue-timing.conf"
 contains "host.env.example" "/usr/local/bin/ea-php83"
 contains "host.env.example" "QUEUE_NAMES=otp,scanning,notifications,maintenance"
 contains "host.env.example" "/usr/bin/clamscan"
 contains "systemd/royadarman-queue.service" "COMMITTING THIS FILE DOES NOT INSTALL OR RESTART THE UNIT."
 contains "systemd/royadarman-queue.service" "/usr/local/bin/ea-php83"
 contains "systemd/royadarman-queue.service" "--queue=otp,scanning,notifications,maintenance"
-contains "systemd/royadarman-queue.service" "DB_QUEUE_RETRY_AFTER"
+contains "systemd/royadarman-queue.service" "infra/queue-timing.conf"
 contains "cron/royadarman" "COMMITTING THIS FILE DOES NOT INSTALL CRON."
 contains "cron/royadarman" "/usr/local/bin/ea-php83 artisan schedule:run"
 contains "clamav.md" "Committing this file does not install ClamAV"
@@ -55,38 +67,91 @@ contains "deploy.md" "Committing this file does not deploy"
 contains "deploy.md" "artisan migrate --force"
 contains "deploy.md" "royadarman:release-identity --write"
 contains "deploy.md" "Keep additive schema in place"
+contains "deploy.md" "INTAKE_ENABLED=false"
+contains "deploy.md" "config('queue.connections.database.retry_after')"
 contains "checks/clean-checkout.md" "migrate:fresh --force # throwaway schema only"
+contains "checks/clean-checkout.md" '"$PHP" vendor/bin/pint --test'
 
-# Queue reservation boundary (Greptile P1):
-# Worker --timeout must sit several seconds below Laravel's DB_QUEUE_RETRY_AFTER
-# (documented default 90). Presence of the tokens alone is insufficient: equal
-# values allow a second worker to claim a still-running job.
+# Queue reservation contract (ChatGPT REVIEW — b068639 / Greptile P1):
+# Do not hard-code 90. Parse infra/queue-timing.conf, require the unit
+# --timeout to equal declared WORKER_TIMEOUT, and require
+# declared retry_after - worker timeout >= SAFETY_MARGIN.
+CONTRACT="$INFRA/queue-timing.conf"
 UNIT="$INFRA/systemd/royadarman-queue.service"
+DECLARED_TIMEOUT="$(conf_int "$CONTRACT" WORKER_TIMEOUT)"
+DECLARED_RETRY="$(conf_int "$CONTRACT" DB_QUEUE_RETRY_AFTER)"
+DECLARED_MARGIN="$(conf_int "$CONTRACT" SAFETY_MARGIN)"
+
+if [ -z "$DECLARED_TIMEOUT" ] || [ -z "$DECLARED_RETRY" ] || [ -z "$DECLARED_MARGIN" ]; then
+  bad "queue-timing.conf must declare integer WORKER_TIMEOUT, DB_QUEUE_RETRY_AFTER, SAFETY_MARGIN"
+else
+  ok "parsed queue-timing.conf WORKER_TIMEOUT=$DECLARED_TIMEOUT DB_QUEUE_RETRY_AFTER=$DECLARED_RETRY SAFETY_MARGIN=$DECLARED_MARGIN"
+  contract_margin=$((DECLARED_RETRY - DECLARED_TIMEOUT))
+  if [ "$contract_margin" -lt "$DECLARED_MARGIN" ]; then
+    bad "queue-timing.conf itself is unsafe: retry_after=$DECLARED_RETRY timeout=$DECLARED_TIMEOUT margin=$contract_margin (need >= $DECLARED_MARGIN)"
+  else
+    ok "queue-timing.conf margin ${contract_margin}s >= SAFETY_MARGIN ${DECLARED_MARGIN}s"
+  fi
+fi
+
 WORKER_TIMEOUT=""
 if [ -f "$UNIT" ]; then
-  # Extract the first --timeout=N from ExecStart (digits only).
   WORKER_TIMEOUT="$(sed -n 's/.*--timeout=\([0-9][0-9]*\).*/\1/p' "$UNIT" | head -n 1)"
 fi
-DOCUMENTED_RETRY_AFTER=90
-MIN_MARGIN=5
 if [ -z "$WORKER_TIMEOUT" ]; then
   bad "systemd/royadarman-queue.service missing parseable --timeout=N"
 elif ! printf '%s' "$WORKER_TIMEOUT" | grep -Eq '^[0-9]+$'; then
   bad "systemd/royadarman-queue.service --timeout is not an integer: $WORKER_TIMEOUT"
 else
   ok "parsed worker --timeout=$WORKER_TIMEOUT"
-  # Require documented default retry_after mentioned in the unit comments.
-  if ! grep -F -q "default 90" "$UNIT" && ! grep -F -q "default 90s" "$UNIT"; then
-    bad "unit must document Laravel DB_QUEUE_RETRY_AFTER default 90 so operators know the floor"
+  if [ -n "$DECLARED_TIMEOUT" ] && [ "$WORKER_TIMEOUT" -ne "$DECLARED_TIMEOUT" ]; then
+    bad "unit --timeout=$WORKER_TIMEOUT must equal queue-timing.conf WORKER_TIMEOUT=$DECLARED_TIMEOUT"
   else
-    ok "unit documents DB_QUEUE_RETRY_AFTER default 90"
+    ok "unit --timeout equals declared WORKER_TIMEOUT=$DECLARED_TIMEOUT"
   fi
-  margin=$((DOCUMENTED_RETRY_AFTER - WORKER_TIMEOUT))
-  if [ "$margin" -lt "$MIN_MARGIN" ]; then
-    bad "worker --timeout=$WORKER_TIMEOUT must be at least ${MIN_MARGIN}s below documented retry_after=$DOCUMENTED_RETRY_AFTER (margin=$margin)"
+  if [ -n "$DECLARED_RETRY" ] && [ -n "$DECLARED_MARGIN" ]; then
+    margin=$((DECLARED_RETRY - WORKER_TIMEOUT))
+    if [ "$margin" -lt "$DECLARED_MARGIN" ]; then
+      bad "worker --timeout=$WORKER_TIMEOUT must be at least ${DECLARED_MARGIN}s below declared retry_after=$DECLARED_RETRY (margin=$margin)"
+    else
+      ok "worker --timeout=$WORKER_TIMEOUT is ${margin}s below declared retry_after=$DECLARED_RETRY (min margin ${DECLARED_MARGIN}s)"
+    fi
+  fi
+fi
+
+# host.env.example and backend/.env.example must lockstep with the contract.
+HOST_RETRY="$(conf_int "$INFRA/host.env.example" DB_QUEUE_RETRY_AFTER)"
+HOST_TIMEOUT="$(conf_int "$INFRA/host.env.example" ROYADARMAN_QUEUE_WORKER_TIMEOUT)"
+ENV_RETRY="$(conf_int "$ROOT/backend/.env.example" DB_QUEUE_RETRY_AFTER)"
+ENV_TIMEOUT="$(conf_int "$ROOT/backend/.env.example" ROYADARMAN_QUEUE_WORKER_TIMEOUT)"
+
+if [ -n "$DECLARED_RETRY" ] && [ -n "$DECLARED_TIMEOUT" ]; then
+  if [ "$HOST_RETRY" = "$DECLARED_RETRY" ] && [ "$HOST_TIMEOUT" = "$DECLARED_TIMEOUT" ]; then
+    ok "host.env.example lockstep DB_QUEUE_RETRY_AFTER=$HOST_RETRY ROYADARMAN_QUEUE_WORKER_TIMEOUT=$HOST_TIMEOUT"
   else
-    ok "worker --timeout=$WORKER_TIMEOUT is ${margin}s below documented retry_after=$DOCUMENTED_RETRY_AFTER (min margin ${MIN_MARGIN}s)"
+    bad "host.env.example must set DB_QUEUE_RETRY_AFTER=$DECLARED_RETRY and ROYADARMAN_QUEUE_WORKER_TIMEOUT=$DECLARED_TIMEOUT (got retry=${HOST_RETRY:-missing} timeout=${HOST_TIMEOUT:-missing})"
   fi
+  if [ "$ENV_RETRY" = "$DECLARED_RETRY" ] && [ "$ENV_TIMEOUT" = "$DECLARED_TIMEOUT" ]; then
+    ok "backend/.env.example lockstep DB_QUEUE_RETRY_AFTER=$ENV_RETRY ROYADARMAN_QUEUE_WORKER_TIMEOUT=$ENV_TIMEOUT"
+  else
+    bad "backend/.env.example must set DB_QUEUE_RETRY_AFTER=$DECLARED_RETRY and ROYADARMAN_QUEUE_WORKER_TIMEOUT=$DECLARED_TIMEOUT (got retry=${ENV_RETRY:-missing} timeout=${ENV_TIMEOUT:-missing})"
+  fi
+fi
+
+# deploy.md must run preflight before migrate --force (fail-fast config gate).
+preflight_line="$(grep -n 'artisan royadarman:preflight' "$INFRA/deploy.md" | head -n 1 | cut -d: -f1 || true)"
+migrate_line="$(grep -n 'artisan migrate --force' "$INFRA/deploy.md" | head -n 1 | cut -d: -f1 || true)"
+if [ -n "$preflight_line" ] && [ -n "$migrate_line" ] && [ "$preflight_line" -lt "$migrate_line" ]; then
+  ok "deploy.md runs preflight (line $preflight_line) before migrate --force (line $migrate_line)"
+else
+  bad "deploy.md must run royadarman:preflight before migrate --force"
+fi
+
+# Pint must use the documented PHP 8.3 binary, not the host default CLI.
+if grep -F -q '"$PHP" vendor/bin/pint --test' "$ROOT/backend/DEPLOYMENT.md"; then
+  ok "backend/DEPLOYMENT.md invokes pint via \"\$PHP\""
+else
+  bad "backend/DEPLOYMENT.md must use \"\$PHP\" vendor/bin/pint --test"
 fi
 
 # Secret material must not appear as assigned values in templates.

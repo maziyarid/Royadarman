@@ -67,7 +67,7 @@ PHP=/usr/local/bin/ea-php83  # or php >= 8.3 in CI
 "$PHP" artisan config:clear   # only in the clean test environment
 "$PHP" artisan migrate:fresh --force
 "$PHP" artisan test
-vendor/bin/pint --test
+"$PHP" vendor/bin/pint --test
 "$PHP" artisan route:list
 "$PHP" artisan route:cache && "$PHP" artisan route:clear
 "$PHP" artisan royadarman:preflight

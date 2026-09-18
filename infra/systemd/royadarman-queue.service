@@ -9,9 +9,11 @@
 # Jobs currently routed: scanning (ScanClinicalDocument), notifications
 # (ProcessOutboxEvent). otp and maintenance are reserved names from DEPLOYMENT.md.
 #
-# Timeout must stay several seconds below Laravel's DB_QUEUE_RETRY_AFTER
-# (default 90s). Otherwise a job whose reservation reaches the boundary can be
-# claimed by another worker before this process has exited.
+# Timeout must equal WORKER_TIMEOUT from infra/queue-timing.conf and stay
+# SAFETY_MARGIN seconds below Laravel DB_QUEUE_RETRY_AFTER. Do not assume the
+# Laravel default of 90s: the host .env can override DB_QUEUE_RETRY_AFTER
+# independently of this unit. Equal timeout/retry_after allows a second worker
+# to claim a still-running job.
 
 [Unit]
 Description=Royadarman Laravel queue worker

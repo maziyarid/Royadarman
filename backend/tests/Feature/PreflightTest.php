@@ -158,6 +158,32 @@ class PreflightTest extends TestCase
         $this->artisan('royadarman:preflight')->assertSuccessful();
     }
 
+    public function test_preflight_fails_when_queue_retry_after_lacks_worker_timeout_margin(): void
+    {
+        config()->set('royadarman.phone_hash_key', str_repeat('a', 64));
+        config()->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+        config()->set('royadarman.intake_enabled', false);
+        config()->set('queue.connections.database.retry_after', 85);
+        config()->set('royadarman.queue.worker_timeout_seconds', 85);
+        config()->set('royadarman.queue.retry_after_min_margin_seconds', 5);
+
+        $this->artisan('royadarman:preflight')
+            ->expectsOutputToContain('DB_QUEUE_RETRY_AFTER')
+            ->assertFailed();
+    }
+
+    public function test_preflight_accepts_documented_queue_retry_after_margin(): void
+    {
+        config()->set('royadarman.phone_hash_key', str_repeat('a', 64));
+        config()->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+        config()->set('royadarman.intake_enabled', false);
+        config()->set('queue.connections.database.retry_after', 90);
+        config()->set('royadarman.queue.worker_timeout_seconds', 85);
+        config()->set('royadarman.queue.retry_after_min_margin_seconds', 5);
+
+        $this->artisan('royadarman:preflight')->assertSuccessful();
+    }
+
     private function configureSafeTsmsIntake(bool $withCoordinator = true, bool $withClinician = true): void
     {
         config()->set('royadarman.phone_hash_key', str_repeat('a', 64));
