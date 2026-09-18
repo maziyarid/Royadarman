@@ -42,7 +42,18 @@ cd "$APP"
 # Provenance: set ROYADARMAN_RELEASE_COMMIT when there is no .git on the host.
 "$PHP" artisan royadarman:release-identity --write
 
-# Restart the already-installed unit. Installing the unit is a separate change.
+# LIVE unit gate (read-only). Preflight does not inspect systemd.
+# Require installed ExecStart PHP binary, --queue list, and --timeout to match
+# host.env.example + queue-timing.conf before any restart. See
+# infra/checks/live-unit-verify.md.
+systemctl cat royadarman-queue.service
+systemctl show -p ExecStart royadarman-queue.service
+# STOP if ExecStart PHP path != PHP_BIN, --queue list != QUEUE_NAMES, or
+# --timeout != WORKER_TIMEOUT. Apply the reviewed unit as a separate ticketed
+# host change; do not silently restart stale configuration.
+
+# Restart only after the live unit matches the reviewed contract.
+# Installing/replacing the unit is a separate change.
 sudo systemctl restart royadarman-queue.service
 ```
 
