@@ -13,8 +13,8 @@ sh infra/checks/static-guard.sh
 ```
 
 Must pass before a host operator copies templates. This checks placeholders,
-the PHP 8.3 binary, queue names, ClamAV path, `queue-timing.conf` lockstep,
-and the non-mutation contract.
+the parsed `PHP_BIN` / `CLAMSCAN` lockstep, queue names, `queue-timing.conf`
+lockstep, and the non-mutation contract.
 
 ## B. Clean-checkout (pre-deploy / CI) — needs PHP >= 8.3 + Composer
 

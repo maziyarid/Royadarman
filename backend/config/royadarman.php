@@ -43,6 +43,7 @@ return [
         'mime_types' => ['image/jpeg', 'image/png'],
         'scanner' => [
             'enabled' => (bool) env('ROYADARMAN_OPG_SCANNER_ENABLED', false),
+            // Keep the default lockstep with infra/host.env.example (CLAMSCAN).
             'command' => env('ROYADARMAN_OPG_SCANNER_COMMAND', '/usr/bin/clamscan'),
             'timeout_seconds' => (int) env('ROYADARMAN_OPG_SCANNER_TIMEOUT', 60),
         ],

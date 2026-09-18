@@ -14,7 +14,7 @@ redesign the AlmaLinux 9 / cPanel / Apache host.
 
 | Path | Purpose |
 |---|---|
-| `host.env.example` | Documented host paths and PHP 8.3 binary. Placeholders only. |
+| `host.env.example` | Documented host paths and PHP 8.3 binary. Placeholders only. `PHP_BIN` / `CLAMSCAN` are parsed by static-guard. |
 | `queue-timing.conf` | Non-secret source of truth for worker timeout vs `DB_QUEUE_RETRY_AFTER`. |
 | `systemd/royadarman-queue.service` | Supervised database queue worker (`otp,scanning,notifications,maintenance`). |
 | `cron/royadarman` | Minute scheduler: `artisan schedule:run` via `/usr/local/bin/ea-php83`. |
@@ -22,11 +22,11 @@ redesign the AlmaLinux 9 / cPanel / Apache host.
 | `deploy.md` | Additive deploy, rollback, and release-identity procedure. |
 | `checks/clean-checkout.md` | Staging/CI verification vs live smoke vs empty-step Actions (do not mix). |
 | `checks/ci-empty-step.md` | How to tell a 1–4s empty-step red X from PHPUnit. Not a pass. |
-| `checks/static-guard.sh` | Secret/placeholder/binary static check. Safe to run without PHP. |
+| `checks/static-guard.sh` | Secret/placeholder/binary static check. Parses `PHP_BIN`, `CLAMSCAN`, and `queue-timing.conf`. Safe without PHP. |
 
 ## Non-negotiables
 
-- PHP CLI, cron, and queue **must** use `/usr/local/bin/ea-php83`, never bare `php`.
+- PHP CLI, cron, and queue **must** use the `PHP_BIN` declared in `host.env.example` (currently `/usr/local/bin/ea-php83`), never bare `php`.
 - Secrets stay in the host `.env`. Never copy `APP_KEY`, phone-hash, SMS, or DB credentials into this tree.
 - Intake stays fail-closed until `royadarman:preflight` passes on production `.env`.
 - Owner has no clinical-document access. No autonomous diagnosis. No payments.

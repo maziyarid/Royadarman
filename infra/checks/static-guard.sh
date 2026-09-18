@@ -40,6 +40,26 @@ conf_int() {
   sed -n "s/^${key}=\([0-9][0-9]*\)[[:space:]]*$/\1/p" "$file" | head -n 1
 }
 
+# Parse KEY=/absolute/path from a conf/env file. Comments and blanks ignored.
+conf_path() {
+  file="$1"
+  key="$2"
+  if [ ! -f "$file" ]; then
+    return 0
+  fi
+  sed -n "s/^${key}=\(\/[^[:space:]#]*\)[[:space:]]*$/\1/p" "$file" | head -n 1
+}
+
+# First PHP=/absolute/path assignment in a markdown/shell file.
+first_php_assign() {
+  file="$1"
+  if [ ! -f "$file" ]; then
+    return 0
+  fi
+  sed -n 's/^[[:space:]]*PHP=\(\/[^[:space:]#]*\).*/\1/p' "$file" | head -n 1
+}
+
+
 # Files required for RPH-8 AC1–AC3.
 need "README.md"
 need "host.env.example"
@@ -53,17 +73,13 @@ need "checks/ci-empty-step.md"
 
 contains "README.md" "Committing or merging this directory does not mutate production."
 contains "README.md" "queue-timing.conf"
-contains "host.env.example" "/usr/local/bin/ea-php83"
 contains "host.env.example" "QUEUE_NAMES=otp,scanning,notifications,maintenance"
-contains "host.env.example" "/usr/bin/clamscan"
 contains "systemd/royadarman-queue.service" "COMMITTING THIS FILE DOES NOT INSTALL OR RESTART THE UNIT."
-contains "systemd/royadarman-queue.service" "/usr/local/bin/ea-php83"
 contains "systemd/royadarman-queue.service" "--queue=otp,scanning,notifications,maintenance"
 contains "systemd/royadarman-queue.service" "infra/queue-timing.conf"
 contains "cron/royadarman" "COMMITTING THIS FILE DOES NOT INSTALL CRON."
-contains "cron/royadarman" "/usr/local/bin/ea-php83 artisan schedule:run"
+contains "cron/royadarman" "artisan schedule:run"
 contains "clamav.md" "Committing this file does not install ClamAV"
-contains "clamav.md" "/usr/bin/clamscan"
 contains "deploy.md" "Committing this file does not deploy"
 contains "deploy.md" "artisan migrate --force"
 contains "deploy.md" "royadarman:release-identity --write"
@@ -192,6 +208,92 @@ if grep -F -q '"$PHP" vendor/bin/pint --test' "$ROOT/backend/DEPLOYMENT.md"; the
 else
   bad "backend/DEPLOYMENT.md must use \"\$PHP\" vendor/bin/pint --test"
 fi
+
+# PHP 8.3 binary contract (RPH-8 AC1): do not hard-code ea-php83.
+# Parse PHP_BIN from host.env.example and require systemd/cron/deploy docs
+# to use that exact absolute path. Bare `php` on this host may be 8.2.
+PHP_BIN="$(conf_path "$INFRA/host.env.example" PHP_BIN)"
+if [ -z "$PHP_BIN" ]; then
+  bad "host.env.example must declare absolute PHP_BIN=/path"
+elif ! printf '%s' "$PHP_BIN" | grep -Eq 'php83|php8\.3'; then
+  bad "host.env.example PHP_BIN=$PHP_BIN must be a PHP 8.3 binary (path contains php83 or php8.3)"
+else
+  ok "parsed host.env.example PHP_BIN=$PHP_BIN (PHP 8.3)"
+fi
+
+UNIT_PHP=""
+if [ -f "$UNIT" ]; then
+  UNIT_PHP="$(sed -n 's/^ExecStart=\(\/[^[:space:]]*\)[[:space:]].*/\1/p' "$UNIT" | head -n 1)"
+fi
+CRON_FILE="$INFRA/cron/royadarman"
+CRON_PHP=""
+if [ -f "$CRON_FILE" ]; then
+  CRON_PHP="$(grep -v '^[[:space:]]*#' "$CRON_FILE" | sed -n 's/.* && \(\/[^[:space:]]*\) artisan schedule:run.*/\1/p' | head -n 1)"
+fi
+DEPLOY_PHP="$(first_php_assign "$INFRA/deploy.md")"
+DOC_PHP="$(first_php_assign "$ROOT/backend/DEPLOYMENT.md")"
+
+if [ -n "$PHP_BIN" ]; then
+  if [ "$UNIT_PHP" = "$PHP_BIN" ]; then
+    ok "systemd ExecStart uses PHP_BIN=$PHP_BIN"
+  else
+    bad "systemd ExecStart must use host.env.example PHP_BIN=$PHP_BIN (got ${UNIT_PHP:-missing})"
+  fi
+  if [ "$CRON_PHP" = "$PHP_BIN" ]; then
+    ok "cron schedule:run uses PHP_BIN=$PHP_BIN"
+  else
+    bad "cron/royadarman schedule:run must use host.env.example PHP_BIN=$PHP_BIN (got ${CRON_PHP:-missing})"
+  fi
+  if [ "$DEPLOY_PHP" = "$PHP_BIN" ]; then
+    ok "deploy.md PHP= uses PHP_BIN=$PHP_BIN"
+  else
+    bad "deploy.md PHP= must use host.env.example PHP_BIN=$PHP_BIN (got ${DEPLOY_PHP:-missing})"
+  fi
+  if [ "$DOC_PHP" = "$PHP_BIN" ]; then
+    ok "backend/DEPLOYMENT.md PHP= uses PHP_BIN=$PHP_BIN"
+  else
+    bad "backend/DEPLOYMENT.md PHP= must use host.env.example PHP_BIN=$PHP_BIN (got ${DOC_PHP:-missing})"
+  fi
+fi
+
+# ClamAV command contract (RPH-8 AC1): do not hard-code /usr/bin/clamscan.
+# Parse CLAMSCAN from host.env.example; Laravel default and .env.example
+# must lockstep. Preflight still fail-closes on empty command when intake
+# is on. This check does not inspect a live clamscan binary.
+CLAMSCAN="$(conf_path "$INFRA/host.env.example" CLAMSCAN)"
+ENV_CLAM="$(conf_path "$ROOT/backend/.env.example" ROYADARMAN_OPG_SCANNER_COMMAND)"
+PHP_CLAM="$(sed -n "s/.*env('ROYADARMAN_OPG_SCANNER_COMMAND', *'\\([^']*\\)').*/\\1/p" "$ROOT/backend/config/royadarman.php" | head -n 1)"
+
+if [ -z "$CLAMSCAN" ]; then
+  bad "host.env.example must declare absolute CLAMSCAN=/path"
+else
+  ok "parsed host.env.example CLAMSCAN=$CLAMSCAN"
+  if grep -F -q -- "$CLAMSCAN" "$INFRA/clamav.md"; then
+    ok "clamav.md documents CLAMSCAN=$CLAMSCAN"
+  else
+    bad "clamav.md must document host.env.example CLAMSCAN=$CLAMSCAN"
+  fi
+  if [ "$ENV_CLAM" = "$CLAMSCAN" ]; then
+    ok "backend/.env.example ROYADARMAN_OPG_SCANNER_COMMAND=$ENV_CLAM"
+  else
+    bad "backend/.env.example ROYADARMAN_OPG_SCANNER_COMMAND must be $CLAMSCAN (got ${ENV_CLAM:-missing})"
+  fi
+  if [ "$PHP_CLAM" = "$CLAMSCAN" ]; then
+    ok "backend/config/royadarman.php scanner command default=$PHP_CLAM"
+  else
+    bad "backend/config/royadarman.php env('ROYADARMAN_OPG_SCANNER_COMMAND') default must be $CLAMSCAN (got ${PHP_CLAM:-missing})"
+  fi
+fi
+
+if [ -f "$PREFLIGHT" ] \
+  && grep -F -q "config('royadarman.opg.scanner.enabled')" "$PREFLIGHT" \
+  && grep -F -q "config('royadarman.opg.scanner.command')" "$PREFLIGHT" \
+  && grep -F -q 'scanner command is empty' "$PREFLIGHT"; then
+  ok "Preflight fail-closed OPG scanner invariant is present"
+else
+  bad "Preflight.php must fail-closed when intake is on and the OPG scanner is disabled or empty"
+fi
+
 
 # Secret material must not appear as assigned values in templates.
 # Placeholders, commented names, and this script's own regex are allowed.
