@@ -177,7 +177,11 @@ final class SessionInventoryTest extends TestCase
 
     public function test_connection_resolver_matches_audit_event_not_hardcoded_default(): void
     {
-        config(['session.connection' => null, 'database.default' => 'sqlite']);
+        config([
+            'session.connection' => null,
+            'database.default' => 'sqlite',
+            'database.connections.sqlite.database' => ':memory:',
+        ]);
         $service = app(SessionInventoryService::class);
         $this->assertTrue($service->sharesAuditConnection());
         $this->assertSame('sqlite', $service->resolvedSessionConnectionName());
