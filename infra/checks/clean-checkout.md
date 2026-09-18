@@ -44,7 +44,8 @@ RPH-5 still requires this evidence for `SessionInventoryTest`,
 - `/fa/`, `/ar/`, `/en/` `lang`/`dir`
 - `"$PHP" artisan royadarman:preflight` against production `.env`
 - confirm live `config('queue.connections.database.retry_after')` vs `infra/queue-timing.conf`
-- queue unit + cron are running with `ea-php83`
+- queue unit + cron are running with the declared `PHP_BIN`
+- live `ExecStart` matches `host.env.example` + `queue-timing.conf` (see [`live-unit-verify.md`](live-unit-verify.md)); do not restart a stale unit
 - no HTTP 5xx spike; no new `failed_jobs`
 
 Forbidden on live: `migrate:fresh`, `php artisan test`, `config:clear` merely
