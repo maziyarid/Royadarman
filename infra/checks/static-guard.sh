@@ -46,7 +46,6 @@ contains "host.env.example" "/usr/bin/clamscan"
 contains "systemd/royadarman-queue.service" "COMMITTING THIS FILE DOES NOT INSTALL OR RESTART THE UNIT."
 contains "systemd/royadarman-queue.service" "/usr/local/bin/ea-php83"
 contains "systemd/royadarman-queue.service" "--queue=otp,scanning,notifications,maintenance"
-contains "systemd/royadarman-queue.service" "--timeout=85"
 contains "systemd/royadarman-queue.service" "DB_QUEUE_RETRY_AFTER"
 contains "cron/royadarman" "COMMITTING THIS FILE DOES NOT INSTALL CRON."
 contains "cron/royadarman" "/usr/local/bin/ea-php83 artisan schedule:run"
@@ -57,6 +56,38 @@ contains "deploy.md" "artisan migrate --force"
 contains "deploy.md" "royadarman:release-identity --write"
 contains "deploy.md" "Keep additive schema in place"
 contains "checks/clean-checkout.md" "migrate:fresh --force # throwaway schema only"
+
+# Queue reservation boundary (Greptile P1):
+# Worker --timeout must sit several seconds below Laravel's DB_QUEUE_RETRY_AFTER
+# (documented default 90). Presence of the tokens alone is insufficient: equal
+# values allow a second worker to claim a still-running job.
+UNIT="$INFRA/systemd/royadarman-queue.service"
+WORKER_TIMEOUT=""
+if [ -f "$UNIT" ]; then
+  # Extract the first --timeout=N from ExecStart (digits only).
+  WORKER_TIMEOUT="$(sed -n 's/.*--timeout=\([0-9][0-9]*\).*/\1/p' "$UNIT" | head -n 1)"
+fi
+DOCUMENTED_RETRY_AFTER=90
+MIN_MARGIN=5
+if [ -z "$WORKER_TIMEOUT" ]; then
+  bad "systemd/royadarman-queue.service missing parseable --timeout=N"
+elif ! printf '%s' "$WORKER_TIMEOUT" | grep -Eq '^[0-9]+$'; then
+  bad "systemd/royadarman-queue.service --timeout is not an integer: $WORKER_TIMEOUT"
+else
+  ok "parsed worker --timeout=$WORKER_TIMEOUT"
+  # Require documented default retry_after mentioned in the unit comments.
+  if ! grep -F -q "default 90" "$UNIT" && ! grep -F -q "default 90s" "$UNIT"; then
+    bad "unit must document Laravel DB_QUEUE_RETRY_AFTER default 90 so operators know the floor"
+  else
+    ok "unit documents DB_QUEUE_RETRY_AFTER default 90"
+  fi
+  margin=$((DOCUMENTED_RETRY_AFTER - WORKER_TIMEOUT))
+  if [ "$margin" -lt "$MIN_MARGIN" ]; then
+    bad "worker --timeout=$WORKER_TIMEOUT must be at least ${MIN_MARGIN}s below documented retry_after=$DOCUMENTED_RETRY_AFTER (margin=$margin)"
+  else
+    ok "worker --timeout=$WORKER_TIMEOUT is ${margin}s below documented retry_after=$DOCUMENTED_RETRY_AFTER (min margin ${MIN_MARGIN}s)"
+  fi
+fi
 
 # Secret material must not appear as assigned values in templates.
 # Placeholders, commented names, and this script's own regex are allowed.
