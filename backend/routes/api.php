@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\HomeServiceController;
 use App\Http\Controllers\Api\V1\NotificationCallbackController;
 use App\Http\Controllers\Api\V1\PolicyController;
 use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\PublicDiscoveryController;
 use App\Http\Controllers\Api\V1\ReferralController;
 use App\Http\Controllers\Api\V1\SessionController;
 use App\Http\Controllers\Api\V1\StaffCaseController;
@@ -33,6 +34,7 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
     Route::post('/auth/otp/challenge', [AuthController::class, 'challenge'])->middleware('throttle:otp-challenge');
     Route::post('/auth/otp/verify', [AuthController::class, 'verify'])->middleware('throttle:otp-verify');
     Route::get('/policies/{key}', [PolicyController::class, 'show']);
+    Route::get('/public/discovery/clinics', [PublicDiscoveryController::class, 'clinics']);
 
     Route::middleware(['auth', EnsureActiveUser::class])->group(function (): void {
         Route::post('/auth/logout', [AuthController::class, 'logout']);

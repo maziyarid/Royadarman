@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Cases\Enums\ServiceType;
+use App\Domain\Discovery\NeshanMapConfig;
+use App\Domain\Discovery\PublicClinicMapPayload;
+use App\Domain\Discovery\Services\TehranSuitabilityDiscovery;
 use App\Models\MarketingPage;
+use App\Support\DomainException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -159,7 +164,9 @@ final class PublicPageController extends Controller
 
     public function referrals(string $locale): Response
     {
-        return $this->serviceStory('referrals', $locale, 'referrals', ['home-dentistry', 'opg']);
+        return $this->serviceStory('referrals', $locale, 'referrals', ['home-dentistry', 'opg'], [
+            'discovery' => $this->discoveryViewData($locale),
+        ]);
     }
 
     public function contact(string $locale): Response
@@ -175,7 +182,7 @@ final class PublicPageController extends Controller
         return $this->story($locale, $key, $content, $extra);
     }
 
-    private function serviceStory(string $slug, string $locale, string $key, array $relatedKeys): Response
+    private function serviceStory(string $slug, string $locale, string $key, array $relatedKeys, array $extra = []): Response
     {
         $page = $this->published($slug, $locale);
         $details = trans('site.service_pages.'.$key);
@@ -186,7 +193,7 @@ final class PublicPageController extends Controller
         $metaTitle = $page?->meta_title ?: (is_array($marketing) ? ($marketing['meta_title'] ?? $title) : $title);
         $metaDescription = $page?->meta_description ?: (is_array($marketing) ? ($marketing['meta_description'] ?? $excerpt) : $excerpt);
 
-        return $this->publicResponse('public.story', [
+        return $this->publicResponse('public.story', array_merge([
             'pageKey' => $key === 'home_dentistry' ? 'home-dentistry' : $key,
             'locale' => $locale,
             'title' => $title,
@@ -209,7 +216,7 @@ final class PublicPageController extends Controller
                 ['href' => $this->url('how', $locale), 'label' => __('site.nav.how'), 'style' => 'ghost'],
             ],
             'schemaType' => 'WebPage',
-        ]);
+        ], $extra));
     }
 
     private function story(string $locale, string $key, array $content, array $extra = []): Response
@@ -248,6 +255,48 @@ final class PublicPageController extends Controller
         }
 
         return $out;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function discoveryViewData(string $locale): array
+    {
+        $ids = array_column(config('royadarman.tehran_neighborhoods', []), 'id');
+        $requested = (string) request()->query('neighborhood_id', 'vanak');
+        $neighborhoodId = in_array($requested, $ids, true) ? $requested : 'vanak';
+
+        $neighborhoods = [];
+        foreach (config('royadarman.tehran_neighborhoods', []) as $n) {
+            $neighborhoods[] = [
+                'id' => (string) $n['id'],
+                'label' => (string) ($n[$locale] ?? $n['en'] ?? $n['id']),
+            ];
+        }
+
+        $matches = [];
+        $origin = ['lat' => 35.7572, 'lng' => 51.4103];
+        try {
+            $discovery = app(TehranSuitabilityDiscovery::class);
+            $origin = $discovery->neighborhoodOrigin($neighborhoodId);
+            $result = $discovery->search($neighborhoodId, ServiceType::GuidanceReferral);
+            $payload = PublicClinicMapPayload::fromResult($result, $origin, NeshanMapConfig::enabled());
+            $matches = $payload['matches'];
+        } catch (DomainException) {
+            $matches = [];
+        }
+
+        return [
+            'endpoint' => url('/api/v1/public/discovery/clinics'),
+            'neighborhoods' => $neighborhoods,
+            'neighborhood_id' => $neighborhoodId,
+            'service_type' => ServiceType::GuidanceReferral->value,
+            'origin' => ['lat' => $origin['lat'], 'lng' => $origin['lng']],
+            'matches' => $matches,
+            'map_enabled' => NeshanMapConfig::enabled(),
+            'map_api_key' => NeshanMapConfig::apiKey() ?? '',
+            'vite_ready' => NeshanMapConfig::viteEntryBuilt(),
+        ];
     }
 
     private function published(string $slug, string $locale): ?MarketingPage

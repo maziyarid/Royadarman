@@ -17,7 +17,14 @@ final readonly class DiscoveryCandidate
         public ?SuitabilityStatus $suitabilityStatus,
         public bool $locationFresh,
         public bool $capabilityFresh,
+        public ?float $latitude = null,
+        public ?float $longitude = null,
     ) {}
+
+    public function hasPlottableCoordinates(): bool
+    {
+        return $this->latitude !== null && $this->longitude !== null;
+    }
 
     /** @return array<string, mixed> */
     public function toArray(): array

@@ -93,6 +93,8 @@ final class TehranSuitabilityDiscovery
                     suitabilityStatus: $status,
                     locationFresh: $locationFresh,
                     capabilityFresh: $capabilityFresh,
+                    latitude: $lat,
+                    longitude: $lng,
                 );
 
                 continue;
@@ -109,6 +111,8 @@ final class TehranSuitabilityDiscovery
                     suitabilityStatus: $status,
                     locationFresh: $locationFresh,
                     capabilityFresh: $capabilityFresh,
+                    latitude: $lat,
+                    longitude: $lng,
                 );
 
                 continue;
@@ -124,6 +128,8 @@ final class TehranSuitabilityDiscovery
                 suitabilityStatus: $status,
                 locationFresh: true,
                 capabilityFresh: true,
+                latitude: $lat,
+                longitude: $lng,
             );
         }
 

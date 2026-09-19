@@ -45,6 +45,12 @@ return [
         'capability_freshness_days' => 180,
     ],
 
+    'neshan' => [
+        // Client MapLibre SDK key. Empty fails closed: list/directions still work.
+        // Domain-restrict the key in the Neshan panel. Never commit a real value.
+        'map_api_key' => env('NESHAN_MAP_API_KEY'),
+    ],
+
     'opg' => [
         'disk' => env('ROYADARMAN_OPG_DISK', 'private-opg'),
         'quarantine_disk' => env('ROYADARMAN_OPG_QUARANTINE_DISK', 'opg-quarantine'),

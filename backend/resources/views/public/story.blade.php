@@ -50,7 +50,7 @@
     @endif
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/assets/font.css?v=20260915">
-    <link rel="stylesheet" href="/assets/site.css?v=20260917">
+    <link rel="stylesheet" href="/assets/site.css?v=20260919">
     <script src="/assets/site.js?v=20260917" defer></script>
     <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
     @if(!empty($faqSchema))
@@ -188,6 +188,8 @@
             </div>
         </section>
     @endif
+
+    @include('public.partials.discovery-map')
 
     @if(!empty($pageFaqs))
         <section class="section white">
