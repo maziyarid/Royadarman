@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Schema;
  * VARCHAR(200) is enough on SQLite (which ignores length) and fails on MariaDB
  * strict mode as soon as a short reason such as "patient_confirmed" is encrypted.
  * case_status_events.reason / audit_events.reason are already TEXT.
+ *
+ * down() is intentionally a no-op: restoring VARCHAR(200) is data-destructive
+ * once any encrypted value has been written (strict 1406, or silent truncation
+ * that makes ciphertext undecryptable). Keep these columns TEXT.
  */
 return new class extends Migration
 {
@@ -29,16 +33,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('home_service_status_events', function (Blueprint $table): void {
-            $table->string('reason', 200)->nullable()->change();
-        });
-
-        Schema::table('home_service_requests', function (Blueprint $table): void {
-            $table->string('cancel_reason', 200)->nullable()->change();
-        });
-
-        Schema::table('support_status_events', function (Blueprint $table): void {
-            $table->string('reason', 200)->nullable()->change();
-        });
+        // no-op: encrypted reason / cancel_reason columns must remain TEXT
     }
 };

@@ -24,6 +24,7 @@ visible before merge.
 | Schema | `royadarman_iso_test` |
 | User | `iso_test` / `iso_test_not_prod` (throwaway; same class as the phpunit APP_KEY) |
 | PHPUnit config | `backend/phpunit.mariadb.xml` (`force=true` so a checkout `.env` cannot leak) |
+| Wrapper | `infra/checks/mariadb-isolated.sh` (fail-closed pin; refuses any other target) |
 
 ## Runner (isolated machine with PHP >= 8.3 + pdo_mysql)
 
@@ -31,13 +32,20 @@ visible before merge.
    `utf8mb4`, collation `utf8mb4_unicode_ci`.
 2. `CREATE DATABASE royadarman_iso_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
 3. Grant only that schema to `iso_test`.
-4. From `backend/`:
+4. From the **repo root** (never a bare `artisan migrate:fresh` — that
+   reads ambient `.env` and can rebuild the wrong database):
 
 ```bash
 PHP=/usr/local/bin/ea-php83   # or any php >= 8.3 on the isolated runner
-"$PHP" artisan migrate:fresh --force   # throwaway schema only; env must match phpunit.mariadb.xml
-"$PHP" artisan test --compact -c phpunit.mariadb.xml
+sh infra/checks/mariadb-isolated.sh check     # pin/allowlist only; no migrate
+sh infra/checks/mariadb-isolated.sh           # migrate:fresh + phpunit, pinned
 ```
+
+The wrapper loads `backend/phpunit.mariadb.xml`, requires it to match
+`127.0.0.1` / `3307` / `royadarman_iso_test` / `iso_test`, exports those
+values into the process (so a checkout `.env` cannot retarget
+`migrate:fresh --force`), then runs artisan. Subcommands: `check`,
+`migrate`, `test`, `all` (default).
 
 5. `DROP DATABASE royadarman_iso_test;` and stop/destroy the throwaway
    datadir. Do not leave it running.

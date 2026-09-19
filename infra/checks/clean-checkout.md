@@ -38,7 +38,10 @@ RPH-5 still requires this evidence for `SessionInventoryTest`,
 `StaffProvisioningTest`, and `PreflightTest`. This hour did not execute it.
 
 Isolated MariaDB (RPH-9 AC5) is the same regime with a throwaway schema.
-See [`mariadb-isolated.md`](mariadb-isolated.md). Never `migrate:fresh` on
+See [`mariadb-isolated.md`](mariadb-isolated.md). Run
+`sh infra/checks/mariadb-isolated.sh` so `migrate:fresh --force` is pinned
+to `127.0.0.1:3307/royadarman_iso_test`. Never a bare
+`artisan migrate:fresh` against ambient `.env`. Never `migrate:fresh` on
 the production VPS.
 
 ## C. Live-production smoke (post-deploy, non-destructive)
