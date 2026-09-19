@@ -36,6 +36,20 @@
     @endforelse
 </div>
 <div class="card">
+    <h2 class="card-head">{{ __('ui.dashboard.referral_sla') }}</h2>
+    @forelse(($data['referral_sla'] ?? []) as $r)
+        <article class="task-card">
+            <div class="task-card-main">
+                <a class="case-link" href="{{ route('panel.case', ['locale' => $locale, 'case' => $r['case_id']]) }}"><bdi>{{ $r['public_reference'] }}</bdi></a>
+            </div>
+            @include('dashboard.partials.wait-chip', ['minutes' => $r['wait_minutes'] ?? null, 'band' => $r['sla_band'] ?? 'unknown'])
+            <a class="btn sm" href="{{ route('panel.case', ['locale' => $locale, 'case' => $r['case_id']]) }}">{{ __('ui.dashboard.task_open') }}</a>
+        </article>
+    @empty
+        <div class="empty">{{ __('ui.dashboard.no_referral_sla') }}</div>
+    @endforelse
+</div>
+<div class="card">
     <h2 class="card-head">{{ __('ui.dashboard.home_service_requests') }}</h2>
     @forelse($data['home_service_requests'] as $h)
         <article class="task-card">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Consent\Services\ConsentService;
+use App\Domain\Coordination\Services\ReferralLifecycle;
 use App\Domain\Operations\Services\Outbox;
 use App\Http\Controllers\Controller;
 use App\Models\PatientCase;
@@ -14,7 +15,7 @@ use Illuminate\Support\Str;
 
 final class ReferralController extends Controller
 {
-    public function decide(Request $request, PatientCase $case, ReferralProposal $proposal, Outbox $outbox, ConsentService $consent): JsonResponse
+    public function decide(Request $request, PatientCase $case, ReferralProposal $proposal, Outbox $outbox, ConsentService $consent, ReferralLifecycle $lifecycle): JsonResponse
     {
         abort_unless($proposal->case_id === $case->id && (int) $case->patient_user_id === (int) $request->user()->id, 404);
         $data = $request->validate([
@@ -23,7 +24,7 @@ final class ReferralController extends Controller
             'content_hash' => ['nullable', 'required_if:decision,accepted', 'string', 'max:64'],
         ]);
 
-        return DB::transaction(function () use ($request, $case, $proposal, $data, $outbox, $consent): JsonResponse {
+        return DB::transaction(function () use ($request, $case, $proposal, $data, $outbox, $consent, $lifecycle): JsonResponse {
             $locked = ReferralProposal::query()->lockForUpdate()->findOrFail($proposal->id);
             if ($locked->status !== 'proposed' || $locked->withdrawn_at) {
                 return response()->json(['error' => ['code' => 'referral.not_available'], 'request_id' => $request->attributes->get('request_id')], 422);
@@ -57,6 +58,7 @@ final class ReferralController extends Controller
 
             // Only mutate the proposal once every prerequisite has passed.
             $locked->update(['status' => $data['decision'], 'decided_at' => now()]);
+            $lifecycle->recordDecision($locked, $request->user(), $data['decision']);
 
             if ($data['decision'] === 'accepted') {
                 $policy = $consent->resolvePolicy('referral_sharing', $data['policy_version'], $locked->source_language);

@@ -12,7 +12,7 @@ final class WaitClock
             return null;
         }
 
-        return (int) max(0, round(abs($at->getTimestamp() - time()) / 60));
+        return (int) max(0, round(abs($at->getTimestamp() - now()->getTimestamp()) / 60));
     }
 
     public static function band(?int $minutes): string
@@ -36,7 +36,7 @@ final class WaitClock
             return null;
         }
 
-        return (int) round(($expiresAt->getTimestamp() - time()) / 60);
+        return (int) round(($expiresAt->getTimestamp() - now()->getTimestamp()) / 60);
     }
 
     public static function expiryBand(?int $remainingMinutes): string

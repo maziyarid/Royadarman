@@ -6,6 +6,8 @@ use App\Domain\Cases\Enums\CaseStatus;
 use App\Domain\Cases\Enums\HomeServiceStatus;
 use App\Domain\Cases\Enums\ServiceType;
 use App\Domain\CMS\Enums\PostStatus;
+use App\Domain\Coordination\Enums\ReferralLifecycleEventType;
+use App\Domain\Coordination\Services\ReferralLifecycle;
 use App\Domain\Identity\Enums\CredentialStatus;
 use App\Domain\Identity\Enums\UserRole;
 use App\Domain\Support\Enums\ConversationStatus;
@@ -28,6 +30,8 @@ use Illuminate\Support\Facades\Schema;
 
 final class DashboardService
 {
+    public function __construct(private readonly ReferralLifecycle $referralLifecycle) {}
+
     public function build(User $user, bool $isDemo = false): array
     {
         return match ($user->role) {
@@ -55,7 +59,11 @@ final class DashboardService
             ->whereHas('case', fn ($q) => $q->where('patient_user_id', $user->id)
                 ->when($isDemo, fn ($case) => $this->demoCases($case)))
             ->where('status', 'proposed')
-            ->count();
+            ->whereNull('withdrawn_at')
+            ->with('case:id,public_reference')
+            ->orderBy('proposed_at')
+            ->limit(20)
+            ->get();
         $support = $user->supportConversations()
             ->when($isDemo, fn ($q) => $q->where(function ($inner): void {
                 $inner->whereNull('case_id')->orWhereHas('case', fn ($case) => $this->demoCases($case));
@@ -76,7 +84,8 @@ final class DashboardService
                 'has_published_review' => $c->reviewRevisions->contains(fn ($r) => $r->isPublished()),
                 ...WaitClock::waiting($c->updated_at ?? $c->created_at),
             ]),
-            'open_referral_proposals' => $openReferrals,
+            'open_referral_proposals' => $openReferrals->count(),
+            'referral_sla' => $openReferrals->map(fn (ReferralProposal $p) => $this->referralLifecycle->dashboardRow($p))->values(),
             'home_service_requests' => $user->homeServiceRequests()
                 ->when($isDemo, fn ($q) => $q->whereHas('case', fn ($case) => $this->demoCases($case)))
                 ->latest()->limit(5)->get(['id', 'status', 'tehran_area', 'created_at'])
@@ -201,6 +210,22 @@ final class DashboardService
             ->where('status', 'open')
             ->count();
 
+        $referralProposals = ReferralProposal::query()
+            ->whereHas('case', fn ($q) => $q->where('current_coordinator_id', $user->id)
+                ->when($isDemo, fn ($case) => $this->demoCases($case)))
+            ->whereNull('withdrawn_at')
+            ->where(function ($q): void {
+                $q->where('status', 'proposed')
+                    ->orWhereHas('lifecycleEvents', fn ($e) => $e->whereIn('event_type', [
+                        ReferralLifecycleEventType::Expired->value,
+                        ReferralLifecycleEventType::SilentLoss->value,
+                    ]));
+            })
+            ->with('case:id,public_reference,current_coordinator_id')
+            ->latest('proposed_at')
+            ->limit(50)
+            ->get();
+
         return [
             'role' => UserRole::Coordinator->value,
             'case_queue' => $myQueue->map(fn ($c) => [
@@ -221,6 +246,7 @@ final class DashboardService
                 ->when($isDemo, fn ($q) => $q->whereHas('case', fn ($case) => $this->demoCases($case)))
                 ->whereIn('status', ['requested', 'area_verified', 'coordinator_review'])
                 ->count(),
+            'referral_sla' => $referralProposals->map(fn (ReferralProposal $p) => $this->referralLifecycle->dashboardRow($p))->values(),
         ];
     }
 

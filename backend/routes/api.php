@@ -113,6 +113,8 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
         Route::post('/staff/cases/{case}/assignments', [StaffCaseController::class, 'assign']);
         Route::patch('/staff/cases/{case}/status', [StaffCaseController::class, 'status']);
         Route::post('/staff/cases/{case}/referral-proposals', [StaffCaseController::class, 'proposeReferral']);
+        Route::post('/staff/cases/{case}/referral-proposals/{proposal}/reassign', [StaffCaseController::class, 'reassignReferral']);
+        Route::post('/staff/cases/{case}/referral-proposals/{proposal}/override', [StaffCaseController::class, 'overrideReferral']);
         Route::post('/staff/cases/{case}/reviews', [StaffCaseController::class, 'createReview']);
         Route::post('/staff/cases/{case}/reviews/{review}/publish', [StaffCaseController::class, 'publishReview']);
 

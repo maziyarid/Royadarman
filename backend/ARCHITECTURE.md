@@ -31,7 +31,7 @@ Royadarman provides 24/7 dental guidance and coordination, Tehran-only home dent
 | Intake | Draft/submit workflow, optimistic version checks, idempotency |
 | Consent | Versioned locale-specific policy text and immutable acceptance event |
 | Documents | JPEG/PNG OPG validation, quarantine, scanning, retention, access audit |
-| Coordination | Assignment, explicit status transitions, referral proposals/grants |
+| Coordination | Assignment, explicit status transitions, referral proposals/grants, append-only referral SLA events |
 | Clinical | Append-only review revisions; publish only by assigned licensed clinician |
 | Operations | Transactional outbox, locale-aware notifications, signed callbacks, purge jobs |
 

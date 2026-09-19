@@ -64,6 +64,9 @@ return [
     ],
     'referral' => [
         'grant_ttl_minutes' => ($ttl = env('ROYADARMAN_REFERRAL_GRANT_TTL_MINUTES')) === '' ? null : $ttl,
+        // Unanswered-proposal SLA for coordinator surfacing. Default 1440 minutes.
+        // Blank/missing env uses the default; grant TTL remains the intake gate.
+        'proposal_sla_minutes' => ($sla = env('ROYADARMAN_REFERRAL_PROPOSAL_SLA_MINUTES')) === '' || $sla === null ? 1440 : $sla,
     ],
     'retention' => [
         // `.env.example` used to assign FOO= which Laravel env() reads as "" not null.

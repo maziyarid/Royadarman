@@ -31,5 +31,31 @@
         @endforeach
     @endif
 </div>
+<div class="card">
+    <div class="card-head">{{ __('ui.dashboard.referral_sla') }}</div>
+    @if(count($data['referral_sla'] ?? []) === 0)
+        <div class="empty">{{ __('ui.dashboard.no_referral_sla') }}</div>
+    @else
+        @foreach($data['referral_sla'] as $r)
+            <article class="task-card">
+                <div class="task-card-main">
+                    <a class="case-link" href="{{ route('panel.case', ['locale' => $locale, 'case' => $r['case_id']]) }}"><bdi>{{ $r['public_reference'] }}</bdi></a>
+                    <div class="task-meta">
+                        @if(($r['expiry_state'] ?? null) === 'silent_loss')
+                            <span class="badge overdue">{{ __('ui.dashboard.silent_loss') }}</span>
+                        @elseif(($r['expiry_state'] ?? null) === 'expired')
+                            <span class="badge overdue">{{ __('ui.dashboard.referral_expired') }}</span>
+                        @else
+                            <span class="badge">{{ __('ui.dashboard.open_referrals') }}</span>
+                        @endif
+                    </div>
+                </div>
+                @include('dashboard.partials.wait-chip', ['minutes' => $r['wait_minutes'] ?? null, 'band' => $r['sla_band'] ?? 'unknown'])
+                <a class="btn sm" href="{{ route('panel.case', ['locale' => $locale, 'case' => $r['case_id']]) }}">{{ __('ui.dashboard.task_open') }}</a>
+            </article>
+        @endforeach
+    @endif
+</div>
 <p class="hint">{{ __('ui.dashboard.wait_note') }}</p>
+<p class="hint">{{ __('ui.dashboard.referral_wait_note') }}</p>
 @endsection
