@@ -151,7 +151,7 @@ final class SessionInventoryService
 
     public function resolvedAuditConnectionName(): string
     {
-        return (new AuditEvent())->getConnectionName() ?? (string) config('database.default');
+        return (new AuditEvent)->getConnectionName() ?? (string) config('database.default');
     }
 
     public function sharesAuditConnection(): bool

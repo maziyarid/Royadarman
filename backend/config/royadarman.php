@@ -63,10 +63,12 @@ return [
         ],
     ],
     'referral' => [
-        'grant_ttl_minutes' => env('ROYADARMAN_REFERRAL_GRANT_TTL_MINUTES'),
+        'grant_ttl_minutes' => ($ttl = env('ROYADARMAN_REFERRAL_GRANT_TTL_MINUTES')) === '' ? null : $ttl,
     ],
     'retention' => [
-        'document_days' => env('ROYADARMAN_DOCUMENT_RETENTION_DAYS'),
+        // `.env.example` used to assign FOO= which Laravel env() reads as "" not null.
+        // Blank must stay fail-closed: no invented retention duration.
+        'document_days' => ($days = env('ROYADARMAN_DOCUMENT_RETENTION_DAYS')) === '' ? null : $days,
     ],
     'cms' => [
         'media' => [
