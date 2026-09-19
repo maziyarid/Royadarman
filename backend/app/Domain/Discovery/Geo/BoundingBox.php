@@ -5,13 +5,14 @@ namespace App\Domain\Discovery\Geo;
 /**
  * Axis-aligned lat/lng window that is a superset of a great-circle radius.
  *
- * 1 degree of latitude ≈ 111.32 km. Longitude degrees shrink by cos(lat).
- * Candidates outside this box cannot lie inside the circle, so they are
- * excluded before any Haversine evaluation.
+ * The degree conversion is coupled to the same 6371 km sphere used by
+ * Haversine so this box remains an enclosing superset of the search circle.
+ * Longitude degrees shrink by cos(lat). Candidates outside this box cannot
+ * lie inside the circle, so they are excluded before any Haversine evaluation.
  */
 final readonly class BoundingBox
 {
-    public const KM_PER_DEGREE_LATITUDE = 111.32;
+    public const KM_PER_DEGREE_LATITUDE = 111.19492664455873;
 
     public function __construct(
         public float $minLat,

@@ -55,6 +55,45 @@ final class TehranSuitabilityDiscovery
         $locationDays = (int) config('royadarman.discovery.location_freshness_days', 180);
         $capabilityDays = (int) config('royadarman.discovery.capability_freshness_days', 180);
 
+        $unlocated = Clinic::query()
+            ->where('is_active', true)
+            ->where(function ($query): void {
+                $query->whereNull('latitude')->orWhereNull('longitude');
+            })
+            ->where(function ($query) use ($origin): void {
+                $query->where('area_code', $origin['area'])->orWhereNull('area_code');
+            })
+            ->with(['serviceCapabilities' => fn ($q) => $q->where('service_type', $serviceType->value)])
+            ->orderBy('id')
+            ->get();
+
+        foreach ($unlocated as $clinic) {
+            $capability = $clinic->serviceCapabilities->first();
+            $rawStatus = $capability?->suitability_status;
+            $status = match (true) {
+                $rawStatus instanceof SuitabilityStatus => $rawStatus,
+                is_string($rawStatus) => SuitabilityStatus::tryFrom($rawStatus),
+                default => null,
+            };
+            $capabilityFresh = $capability !== null
+                && $capability->attested_at instanceof DateTimeInterface
+                && $capability->attested_at->gte($at->copy()->subDays($capabilityDays));
+
+            $insufficient[] = new DiscoveryCandidate(
+                clinicId: $clinic->id,
+                name: $clinic->name,
+                city: $clinic->city,
+                areaCode: $clinic->area_code,
+                distanceKm: null,
+                outcome: DiscoveryOutcome::InsufficientData,
+                suitabilityStatus: $status,
+                locationFresh: false,
+                capabilityFresh: $capabilityFresh,
+                latitude: null,
+                longitude: null,
+            );
+        }
+
         foreach ($bounded as $clinic) {
             $lat = (float) $clinic->latitude;
             $lng = (float) $clinic->longitude;
@@ -184,6 +223,14 @@ final class TehranSuitabilityDiscovery
 
     private function stableByDistance(DiscoveryCandidate $a, DiscoveryCandidate $b): int
     {
+        if ($a->distanceKm === null || $b->distanceKm === null) {
+            if ($a->distanceKm === null && $b->distanceKm === null) {
+                return $a->clinicId <=> $b->clinicId;
+            }
+
+            return $a->distanceKm === null ? 1 : -1;
+        }
+
         $cmp = $a->distanceKm <=> $b->distanceKm;
         if ($cmp !== 0) {
             return $cmp;

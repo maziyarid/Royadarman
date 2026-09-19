@@ -179,6 +179,7 @@ final class ReferralLifecycleTest extends TestCase
             ->first();
         $this->assertNotNull($reassigned);
         $this->assertSame($coordinator->id, $reassigned->actor_user_id);
+        $this->assertSame($other->id, $reassigned->clinic_id);
         $this->assertSame('clinic closed Fridays', $reassigned->reason);
 
         $this->actingAs($coordinator)
@@ -386,6 +387,22 @@ final class ReferralLifecycleTest extends TestCase
             'proposal_id' => $expired->id,
             'event_type' => ReferralLifecycleEventType::Expired->value,
         ]);
+
+        $this->actingAs($coordinator)->getJson('/api/v1/dashboard')->assertOk();
+        $this->assertSame(1, ReferralLifecycleEvent::query()
+            ->where('proposal_id', $silent->id)
+            ->whereIn('event_type', [
+                ReferralLifecycleEventType::SilentLoss->value,
+                ReferralLifecycleEventType::Expired->value,
+            ])
+            ->count());
+        $this->assertSame(1, ReferralLifecycleEvent::query()
+            ->where('proposal_id', $expired->id)
+            ->whereIn('event_type', [
+                ReferralLifecycleEventType::SilentLoss->value,
+                ReferralLifecycleEventType::Expired->value,
+            ])
+            ->count());
 
         CarbonImmutable::setTestNow();
         Carbon::setTestNow();

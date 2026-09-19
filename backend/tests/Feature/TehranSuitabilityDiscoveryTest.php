@@ -78,7 +78,28 @@ final class TehranSuitabilityDiscoveryTest extends TestCase
         $result = app(TehranSuitabilityDiscovery::class)->search('vanak', ServiceType::GuidanceReferral, 15.0);
 
         $this->assertSame([], $result->matches);
-        $this->assertSame([], $result->insufficientData);
+        $this->assertCount(1, $result->insufficientData);
+        $this->assertSame($clinic->id, $result->insufficientData[0]->clinicId);
+        $this->assertNull($result->insufficientData[0]->distanceKm);
+        $this->assertFalse($result->insufficientData[0]->locationFresh);
+        $this->assertSame(DiscoveryOutcome::InsufficientData, $result->insufficientData[0]->outcome);
+    }
+
+    public function test_bbox_includes_candidate_just_inside_haversine_radius(): void
+    {
+        $originLat = 35.7572;
+        $originLng = 51.4103;
+        $distanceKm = 14.999;
+        $latitude = $originLat + rad2deg($distanceKm / 6371.0);
+
+        $clinic = $this->makeClinic('North edge', $latitude, $originLng);
+        $this->attest($clinic, SuitabilityStatus::Suitable);
+
+        $result = app(TehranSuitabilityDiscovery::class)->search('vanak', ServiceType::GuidanceReferral, 15.0);
+
+        $this->assertCount(1, $result->matches);
+        $this->assertSame($clinic->id, $result->matches[0]->clinicId);
+        $this->assertLessThanOrEqual(15.0, $result->matches[0]->distanceKm);
     }
 
     public function test_stale_location_is_insufficient_data_not_a_match(): void

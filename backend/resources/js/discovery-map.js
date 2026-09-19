@@ -181,6 +181,8 @@ function initRoot(root) {
   let selectedId = null;
   let map = null;
   let markers = [];
+  let activeNeighborhoodId = root.getAttribute("data-neighborhood-id") || select?.value || "";
+  let requestSerial = 0;
 
   function currentOrigin() {
     return ephemeralOrigin || neighborhoodOrigin;
@@ -231,11 +233,24 @@ function initRoot(root) {
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const neighborhoodId = select.value;
-      root.setAttribute("data-neighborhood-id", neighborhoodId);
+      const serial = ++requestSerial;
       try {
         const payload = await loadMatches(endpoint, neighborhoodId, serviceType);
+        if (serial !== requestSerial) {
+          return;
+        }
         applyMatches(payload);
+        activeNeighborhoodId = payload.neighborhood_id || neighborhoodId;
+        root.setAttribute("data-neighborhood-id", activeNeighborhoodId);
+        select.value = activeNeighborhoodId;
       } catch {
+        if (serial !== requestSerial) {
+          return;
+        }
+        if (activeNeighborhoodId) {
+          select.value = activeNeighborhoodId;
+          root.setAttribute("data-neighborhood-id", activeNeighborhoodId);
+        }
         setStatus(root, text(copy, "map_unavailable"));
       }
     });

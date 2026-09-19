@@ -38,7 +38,7 @@ return [
     'discovery' => [
         // Mean Earth radius (km). Application Haversine; no PostGIS.
         'earth_radius_km' => 6371.0,
-        'km_per_degree_latitude' => 111.32,
+        'km_per_degree_latitude' => 111.19492664455873,
         'default_radius_km' => 15.0,
         'max_radius_km' => 40.0,
         'location_freshness_days' => 180,

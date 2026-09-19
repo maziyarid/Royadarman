@@ -44,13 +44,17 @@ final class ReferralLifecycle
 
     public function recordViewed(ReferralProposal $proposal, User $actor): void
     {
-        if ($proposal->status !== 'proposed' || $proposal->withdrawn_at) {
-            return;
-        }
-        if ($this->hasEvent($proposal, ReferralLifecycleEventType::Viewed)) {
-            return;
-        }
-        $this->record($proposal, ReferralLifecycleEventType::Viewed, $actor);
+        DB::transaction(function () use ($proposal, $actor): void {
+            /** @var ReferralProposal $locked */
+            $locked = ReferralProposal::query()->lockForUpdate()->findOrFail($proposal->id);
+            if ($locked->status !== 'proposed' || $locked->withdrawn_at) {
+                return;
+            }
+            if ($this->hasEvent($locked, ReferralLifecycleEventType::Viewed)) {
+                return;
+            }
+            $this->record($locked, ReferralLifecycleEventType::Viewed, $actor);
+        });
     }
 
     public function recordDecision(ReferralProposal $proposal, User $actor, string $decision): void
@@ -71,8 +75,8 @@ final class ReferralLifecycle
             if ($locked->status !== 'proposed' || $locked->withdrawn_at) {
                 throw new DomainException('referral.not_available');
             }
-            $this->record($locked, ReferralLifecycleEventType::Reassigned, $actor, $reason);
             $locked->update(['clinic_id' => $clinicId]);
+            $this->record($locked, ReferralLifecycleEventType::Reassigned, $actor, $reason);
 
             return $locked->refresh();
         });
@@ -95,34 +99,38 @@ final class ReferralLifecycle
 
     public function surfaceExpiry(ReferralProposal $proposal): ?ReferralLifecycleEvent
     {
-        if ($proposal->status !== 'proposed' || $proposal->withdrawn_at) {
-            return null;
-        }
-        if ($this->hasEvent($proposal, ReferralLifecycleEventType::Expired)
-            || $this->hasEvent($proposal, ReferralLifecycleEventType::SilentLoss)) {
-            return null;
-        }
+        return DB::transaction(function () use ($proposal): ?ReferralLifecycleEvent {
+            /** @var ReferralProposal $locked */
+            $locked = ReferralProposal::query()->lockForUpdate()->findOrFail($proposal->id);
+            if ($locked->status !== 'proposed' || $locked->withdrawn_at) {
+                return null;
+            }
+            if ($this->hasEvent($locked, ReferralLifecycleEventType::Expired)
+                || $this->hasEvent($locked, ReferralLifecycleEventType::SilentLoss)) {
+                return null;
+            }
 
-        $origin = $this->slaOrigin($proposal);
-        if ($origin === null) {
-            return null;
-        }
+            $origin = $this->slaOrigin($locked);
+            if ($origin === null) {
+                return null;
+            }
 
-        $sla = (int) config('royadarman.referral.proposal_sla_minutes', 1440);
-        if ($sla <= 0) {
-            return null;
-        }
+            $sla = (int) config('royadarman.referral.proposal_sla_minutes', 1440);
+            if ($sla <= 0) {
+                return null;
+            }
 
-        $wait = WaitClock::minutes($origin);
-        if ($wait === null || $wait < $sla) {
-            return null;
-        }
+            $wait = WaitClock::minutes($origin);
+            if ($wait === null || $wait < $sla) {
+                return null;
+            }
 
-        $type = $this->hasEvent($proposal, ReferralLifecycleEventType::Viewed)
-            ? ReferralLifecycleEventType::Expired
-            : ReferralLifecycleEventType::SilentLoss;
+            $type = $this->hasEvent($locked, ReferralLifecycleEventType::Viewed)
+                ? ReferralLifecycleEventType::Expired
+                : ReferralLifecycleEventType::SilentLoss;
 
-        return $this->record($proposal, $type, null);
+            return $this->record($locked, $type, null);
+        });
     }
 
     public function slaOrigin(ReferralProposal $proposal): ?DateTimeInterface

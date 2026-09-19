@@ -164,5 +164,8 @@ final class PublicDiscoveryMapTest extends TestCase
         $this->assertStringNotContainsString('sessionStorage', $js);
         $this->assertStringNotContainsString('sendBeacon', $js);
         $this->assertStringContainsString('searchParams.delete(key)', $js);
+        $this->assertStringContainsString('activeNeighborhoodId', $js);
+        $this->assertStringContainsString('select.value = activeNeighborhoodId', $js);
+        $this->assertStringContainsString('serial !== requestSerial', $js);
     }
 }
