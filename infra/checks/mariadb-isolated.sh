@@ -5,6 +5,8 @@
 # Fail-closed: artisan migrate:fresh --force is allowed only against
 # 127.0.0.1:3307/royadarman_iso_test. Ambient checkout .env cannot retarget
 # it. phpunit.mariadb.xml must match the same allowlist or we refuse.
+# bootstrap/cache/config.php is also refused: Laravel would honour the
+# cached database target over the process env we export.
 set -eu
 
 ROOT="$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)"
@@ -110,6 +112,12 @@ esac
 [ -x "$PHP" ] || die "PHP is not executable: $PHP"
 
 cd "$BACKEND"
+
+# Cached config wins over the process env we just exported. Refuse
+# rather than boot artisan config:clear (that would itself use the cache).
+if [ -e bootstrap/cache/config.php ]; then
+  die "refusing bootstrap/cache/config.php (cached Laravel config can retarget migrate:fresh; delete that file without booting artisan, then retry)"
+fi
 
 case "$cmd" in
   migrate|all)

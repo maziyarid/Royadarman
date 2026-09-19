@@ -44,8 +44,11 @@ sh infra/checks/mariadb-isolated.sh           # migrate:fresh + phpunit, pinned
 The wrapper loads `backend/phpunit.mariadb.xml`, requires it to match
 `127.0.0.1` / `3307` / `royadarman_iso_test` / `iso_test`, exports those
 values into the process (so a checkout `.env` cannot retarget
-`migrate:fresh --force`), then runs artisan. Subcommands: `check`,
-`migrate`, `test`, `all` (default).
+`migrate:fresh --force`), then runs artisan. It also refuses if
+`backend/bootstrap/cache/config.php` exists: Laravel would honour the
+cached database target over the exported env. Delete that file without
+booting artisan, then retry. Subcommands: `check`, `migrate`, `test`,
+`all` (default).
 
 5. `DROP DATABASE royadarman_iso_test;` and stop/destroy the throwaway
    datadir. Do not leave it running.
