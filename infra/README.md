@@ -23,6 +23,7 @@ redesign the AlmaLinux 9 / cPanel / Apache host.
 | `checks/clean-checkout.md` | Staging/CI verification vs live smoke vs empty-step Actions (do not mix). |
 | `checks/ci-empty-step.md` | How to tell a 1–4s empty-step red X from PHPUnit. Not a pass. |
 | `checks/live-unit-verify.md` | Operator-only read-only check that installed systemd ExecStart matches the contract before restart. |
+| `checks/mariadb-isolated.md` | Throwaway MariaDB lane (`phpunit.mariadb.xml`). Never the production VPS. |
 | `checks/static-guard.sh` | Secret/placeholder/binary static check. Parses `PHP_BIN`, `CLAMSCAN`, and `queue-timing.conf`. Safe without PHP. |
 
 ## Non-negotiables

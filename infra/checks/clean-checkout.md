@@ -37,6 +37,10 @@ cd backend
 RPH-5 still requires this evidence for `SessionInventoryTest`,
 `StaffProvisioningTest`, and `PreflightTest`. This hour did not execute it.
 
+Isolated MariaDB (RPH-9 AC5) is the same regime with a throwaway schema.
+See [`mariadb-isolated.md`](mariadb-isolated.md). Never `migrate:fresh` on
+the production VPS.
+
 ## C. Live-production smoke (post-deploy, non-destructive)
 
 - `GET /up` or `/fa/` → 200
