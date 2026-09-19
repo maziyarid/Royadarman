@@ -106,6 +106,7 @@ Route::prefix('{locale}')->whereIn('locale', ['fa', 'ar', 'en'])->middleware(Set
             Route::post('/practitioners/{user}', [NetworkAdminController::class, 'savePractitioner'])->whereNumber('user')->name('network.practitioner.save');
             Route::post('/memberships', [NetworkAdminController::class, 'storeMembership'])->name('network.membership.store');
             Route::delete('/memberships/{membership}', [NetworkAdminController::class, 'revokeMembership'])->name('network.membership.revoke');
+            Route::post('/capabilities', [NetworkAdminController::class, 'saveCapability'])->name('network.capability.save');
         });
     });
 });

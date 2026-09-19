@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\CmsSeoMetadataController;
 use App\Http\Controllers\Api\V1\CmsTagController;
 use App\Http\Controllers\Api\V1\ConsentController;
 use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\DiscoveryController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\HomeServiceController;
 use App\Http\Controllers\Api\V1\NotificationCallbackController;
@@ -43,6 +44,7 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
         Route::post('/me/sessions/revoke-all', [SessionController::class, 'destroyAll']);
 
         Route::get('/dashboard', [DashboardController::class, 'show']);
+        Route::get('/staff/discovery/clinics', [DiscoveryController::class, 'clinics']);
 
         Route::get('/support', [SupportController::class, 'index']);
         Route::post('/support', [SupportController::class, 'store']);
