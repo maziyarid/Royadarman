@@ -61,7 +61,8 @@ to satisfy this list.
 ## D. GitHub Actions red X (do not mix with A/B/C)
 
 See [`ci-empty-step.md`](ci-empty-step.md). A `ci` job that completes in
-about 1–4 seconds with empty steps is host/Actions policy (RPH-9),
-**not an application-test failure** and **not a pass**. It is not PHPUnit
-evidence and not a merge signal.
+about 1–4 seconds with empty steps is the `maziyarid` GitHub billing lock
+("account is locked due to a billing issue"), **not an application-test
+failure** and **not a pass**. It is not PHPUnit evidence and not a merge
+signal. Do not rewrite `.github/workflows/ci.yml` for this pattern.
 
