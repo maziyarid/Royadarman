@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Coordination\Services\ReferralLifecycle;
 use App\Domain\Identity\Enums\UserRole;
 use App\Models\PatientCase;
+use App\Models\ReferralProposal;
 use App\Support\PanelDemoRegistry;
 use App\Support\WorkspaceView;
 use Illuminate\Contracts\View\View;
@@ -23,7 +25,7 @@ final class PanelCaseController extends Controller
         }
 
         $data = match ($role) {
-            UserRole::Patient => $this->patientData($case),
+            UserRole::Patient => $this->patientData($request, $case),
             UserRole::Coordinator => $this->coordinatorData($case),
             UserRole::Clinician => $this->clinicianData($request, $case),
             UserRole::ClinicRepresentative => $this->clinicRepresentativeData($request, $case),
@@ -41,8 +43,16 @@ final class PanelCaseController extends Controller
         ]);
     }
 
-    private function patientData(PatientCase $case): array
+    private function patientData(Request $request, PatientCase $case): array
     {
+        $lifecycle = app(ReferralLifecycle::class);
+        ReferralProposal::query()
+            ->where('case_id', $case->id)
+            ->where('status', 'proposed')
+            ->whereNull('withdrawn_at')
+            ->get()
+            ->each(fn (ReferralProposal $proposal) => $lifecycle->recordViewed($proposal, $request->user()));
+
         return [
             'documents' => DB::table('clinical_documents')->where('case_id', $case->id)->whereNull('deleted_at')
                 ->orderByDesc('created_at')->get(['id', 'original_name', 'status', 'created_at']),

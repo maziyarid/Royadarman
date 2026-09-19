@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ReferralProposal extends Model
 {
@@ -40,5 +41,10 @@ class ReferralProposal extends Model
     public function grant()
     {
         return $this->hasOne(ReferralGrant::class, 'proposal_id');
+    }
+
+    public function lifecycleEvents(): HasMany
+    {
+        return $this->hasMany(ReferralLifecycleEvent::class, 'proposal_id');
     }
 }

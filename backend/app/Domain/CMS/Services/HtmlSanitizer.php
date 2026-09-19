@@ -12,6 +12,9 @@ final class HtmlSanitizer
     ];
 
     /** @var list<string> */
+    private const STRUCTURAL_TAGS = ['html', 'head', 'body'];
+
+    /** @var list<string> */
     private const ALLOWED_ATTRS = ['href', 'src', 'alt', 'title', 'class', 'width', 'height', 'loading'];
 
     public function sanitize(string $html): string
@@ -22,14 +25,31 @@ final class HtmlSanitizer
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $html = '<?xml encoding="UTF-8">'.$html;
         libxml_use_internal_errors(true);
-        $dom->loadHTML($html, \LIBXML_HTML_NOIMPLIED | \LIBXML_HTML_NODEFDTD);
+        // LIBXML_HTML_NOIMPLIED keeps only the first root node, so a later safe
+        // <a href="https://..."> after a stripped javascript: link would vanish.
+        $dom->loadHTML($html, \LIBXML_HTML_NODEFDTD);
         libxml_clear_errors();
 
         $this->stripDisallowedNodes($dom);
         $this->stripDisallowedAttrs($dom);
         $this->enforceSafeLinks($dom);
 
-        return trim($dom->saveHTML());
+        return $this->bodyInnerHtml($dom);
+    }
+
+    private function bodyInnerHtml(\DOMDocument $dom): string
+    {
+        $body = $dom->getElementsByTagName('body')->item(0);
+        if (! $body instanceof \DOMElement) {
+            return '';
+        }
+
+        $out = '';
+        foreach ($body->childNodes as $child) {
+            $out .= $dom->saveHTML($child);
+        }
+
+        return trim($out);
     }
 
     private function stripDisallowedNodes(\DOMDocument $dom): void
@@ -41,6 +61,9 @@ final class HtmlSanitizer
                 continue;
             }
             $tag = strtolower($node->nodeName);
+            if (in_array($tag, self::STRUCTURAL_TAGS, true)) {
+                continue;
+            }
             if (! in_array($tag, self::ALLOWED_TAGS, true)) {
                 if ($tag === 'script' || $tag === 'style' || $tag === 'iframe' || $tag === 'object') {
                     $node->parentNode?->removeChild($node);

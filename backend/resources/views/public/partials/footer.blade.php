@@ -25,6 +25,9 @@
             <strong>{{ __('site.footer_trust') }}</strong>
             <a href="{{ $pub('privacy') }}">{{ __('site.links.privacy') }}</a>
             <a href="{{ $pub('faq') }}">{{ __('site.nav.faq') }}</a>
+            @unless(app()->environment('production'))
+                <a href="{{ url('/pres') }}">{{ __('ui.pres.title') }}</a>
+            @endunless
             <a href="{{ route('login',['locale'=>$locale]) }}">{{ __('site.links.login') }}</a>
         </div>
     </div>

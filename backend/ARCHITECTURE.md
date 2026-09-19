@@ -31,7 +31,8 @@ Royadarman provides 24/7 dental guidance and coordination, Tehran-only home dent
 | Intake | Draft/submit workflow, optimistic version checks, idempotency |
 | Consent | Versioned locale-specific policy text and immutable acceptance event |
 | Documents | JPEG/PNG OPG validation, quarantine, scanning, retention, access audit |
-| Coordination | Assignment, explicit status transitions, referral proposals/grants |
+| Coordination | Assignment, explicit status transitions, referral proposals/grants, append-only referral SLA events |
+| Discovery | Tehran neighbourhood-centroid origin; bounding-box prefilter then application Haversine (R=6371.0 km); explicit capability/freshness; missing/stale → `insufficient_data`. No PostGIS. No patient GPS. |
 | Clinical | Append-only review revisions; publish only by assigned licensed clinician |
 | Operations | Transactional outbox, locale-aware notifications, signed callbacks, purge jobs |
 
@@ -53,7 +54,9 @@ Persian is default (`fa`, RTL); Arabic is RTL; English is LTR. Locale is capture
 - Secure, HTTP-only, SameSite=Lax session cookie; session ID regenerated after authentication.
 - OTPs are short-lived, hashed, single-use, rate-limited, and have bounded attempts.
 - Stable error codes and request IDs are returned without leaking internal 5xx messages.
-- Audit and outbox records exclude document bytes, OTPs, notification bodies, and unnecessary PII.
+| Coordination | Assignment, explicit status transitions, referral proposals/grants, append-only referral SLA events |
+| Discovery | Tehran neighbourhood-centroid origin; bounding-box prefilter then application Haversine (R=6371.0 km); explicit capability/freshness; missing/stale → `insufficient_data`. No PostGIS. No patient GPS. |
+| Clinical | Append-only review revisions; publish only by assigned licensed clinician |
 - Retention deletes private objects and records the outcome without indefinite retry.
 - Intake remains disabled until SMS delivery, ClamAV, queue supervision, approved consent copy, retention period, and operator staffing are confirmed.
 

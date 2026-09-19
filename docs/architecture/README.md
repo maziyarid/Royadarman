@@ -3,7 +3,9 @@
 ## Current authority
 1. [`2026-09-16-canonical-architecture.md`](./2026-09-16-canonical-architecture.md) — reconciled current/target architecture.
 2. [`2026-09-16-implementation-plan.md`](./2026-09-16-implementation-plan.md) — execution order and acceptance criteria.
-3. [`../../backend/ARCHITECTURE.md`](../../backend/ARCHITECTURE.md) — implemented Laravel production architecture.
+3. [`2026-09-16-gap-table.md`](./2026-09-16-gap-table.md) — audit of `main` versus the canonical plan; living implementation tracker.
+4. [`2026-09-16-progress.md`](./2026-09-16-progress.md) — hourly rescue log for `presentation-rescue-2026-09-16`.
+5. [`../../backend/ARCHITECTURE.md`](../../backend/ARCHITECTURE.md) — implemented Laravel production architecture.
 
 ## Source/provenance
 - [`2026-09-16-suggested-architecture-source.md`](./2026-09-16-suggested-architecture-source.md) — normalized repository reconciliation of the user-provided architecture DOCX. It preserves the document’s core product, security, UX and audit findings while explicitly distinguishing the obsolete generic stack proposal from the later repository-grounded correction.

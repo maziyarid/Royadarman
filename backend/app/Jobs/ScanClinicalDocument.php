@@ -100,6 +100,7 @@ class ScanClinicalDocument implements ShouldQueue
 
         DB::transaction(function () use ($document, $approvedDisk, $result): void {
             $retentionDays = config('royadarman.retention.document_days');
+            $hasRetention = is_numeric($retentionDays) && (int) $retentionDays > 0;
             $document->forceFill([
                 'storage_disk' => $approvedDisk,
                 'status' => DocumentStatus::Approved,
@@ -108,10 +109,10 @@ class ScanClinicalDocument implements ShouldQueue
                 'scan_result' => ['verdict' => 'clean'],
                 'scan_completed_at' => now(),
                 'approved_at' => now(),
-                'retention_until' => is_numeric($retentionDays) ? now()->addDays((int) $retentionDays) : null,
+                'retention_until' => $hasRetention ? now()->addDays((int) $retentionDays) : null,
             ])->save();
 
-            if (is_numeric($retentionDays)) {
+            if ($hasRetention) {
                 DB::table('retention_jobs')->insertOrIgnore([
                     'id' => (string) Str::ulid(),
                     'resource_type' => ClinicalDocument::class,

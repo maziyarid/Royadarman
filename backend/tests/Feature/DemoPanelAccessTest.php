@@ -417,7 +417,12 @@ final class DemoPanelAccessTest extends TestCase
             ->assertSee(PanelDemoRegistry::OPG_CASE_REFERENCE)
             ->assertSee(PanelDemoRegistry::HOME_CASE_REFERENCE);
 
-        $this->get('/en/panel/cases/new')->assertForbidden();
+        $this->get('/en/panel/cases/new')
+            ->assertOk()
+            ->assertSee('id="request-form"', false)
+            ->assertSee('data-demo="1"', false)
+            ->assertSee(__('request.demo_readonly'), false);
+
         $this->get('/en/panel/marketing')->assertForbidden();
         $this->get('/en/panel/network')->assertForbidden();
     }
@@ -430,7 +435,7 @@ final class DemoPanelAccessTest extends TestCase
 
         DB::table('patient_cases')->insert([
             'id' => (string) Str::ulid(),
-            'public_reference' => 'LIVE-OWNER-MUST-NOT-COUNT',
+            'public_reference' => 'LIVE-OWNER-NO-COUNT',
             'patient_user_id' => null,
             'service_type' => 'guidance_referral',
             'status' => 'submitted',
@@ -468,11 +473,11 @@ final class DemoPanelAccessTest extends TestCase
 
         $this->get('/en/dashboard')
             ->assertOk()
-            ->assertDontSee('LIVE-OWNER-MUST-NOT-COUNT')
+            ->assertDontSee('LIVE-OWNER-NO-COUNT')
             ->assertDontSee('Live Partner Clinic');
         $this->get('/en/panel')
             ->assertOk()
-            ->assertDontSee('LIVE-OWNER-MUST-NOT-COUNT')
+            ->assertDontSee('LIVE-OWNER-NO-COUNT')
             ->assertDontSee('/en/panel/marketing', false)
             ->assertDontSee('/en/panel/network', false);
     }

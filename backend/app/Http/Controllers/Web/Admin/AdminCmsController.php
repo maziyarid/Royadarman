@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web\Admin;
 
 use App\Domain\CMS\Enums\PostStatus;
 use App\Domain\CMS\Enums\PostType;
+use App\Domain\CMS\Services\CmsMediaSanitizer;
 use App\Domain\CMS\Services\HtmlSanitizer;
 use App\Domain\Identity\Enums\UserRole;
 use App\Http\Controllers\Controller;
@@ -23,7 +24,10 @@ use Illuminate\Validation\Rule;
 
 final class AdminCmsController extends Controller
 {
-    public function __construct(private readonly HtmlSanitizer $sanitizer) {}
+    public function __construct(
+        private readonly HtmlSanitizer $sanitizer,
+        private readonly CmsMediaSanitizer $mediaSanitizer,
+    ) {}
 
     public function index(Request $request)
     {
@@ -353,24 +357,25 @@ final class AdminCmsController extends Controller
     public function mediaStore(Request $request)
     {
         $this->guardManage($request);
-        $data = $request->validate([
-            'file' => ['required', 'image', 'max:8192'],
+        $request->validate([
+            'file' => ['required', 'file', 'max:'.$this->mediaSanitizer->maxKilobytes()],
         ]);
 
-        $file = $request->file('file');
-        $storageKey = $file->store('media', 'public-cms');
-        [$width, $height] = @getimagesize($file->getRealPath()) ?: [null, null];
+        $sanitized = $this->mediaSanitizer->sanitize($request->file('file'));
+        $disk = (string) config('royadarman.cms.media.disk', 'public-cms');
+        $storageKey = 'media/'.$sanitized->filename;
+        \Storage::disk($disk)->put($storageKey, $sanitized->binary);
 
         $media = Media::query()->create([
             'uploaded_by_user_id' => $request->user()->id,
-            'disk' => 'public-cms',
+            'disk' => $disk,
             'storage_key' => $storageKey,
-            'original_filename' => $file->getClientOriginalName(),
-            'mime_type' => $file->getMimeType(),
-            'byte_size' => $file->getSize(),
-            'sha256' => hash_file('sha256', $file->getRealPath()),
-            'width' => $width,
-            'height' => $height,
+            'original_filename' => $sanitized->originalFilename,
+            'mime_type' => $sanitized->mimeType,
+            'byte_size' => $sanitized->byteSize,
+            'sha256' => $sanitized->sha256,
+            'width' => $sanitized->width,
+            'height' => $sanitized->height,
         ]);
 
         foreach (['fa', 'ar', 'en'] as $locale) {

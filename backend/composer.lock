@@ -75,7 +75,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:90]",
+                "url": "https://api.github.com/repos/CarbonPHP/carbon-doctrine-types/zipball/18ba5ddfec8976260ead6e866180bd5d2f71aa1d",
                 "reference": "18ba5ddfec8976260ead6e866180bd5d2f71aa1d",
                 "shasum": ""
             },
@@ -144,7 +144,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:90]",
+                "url": "https://api.github.com/repos/dflydev/dflydev-dot-access-data/zipball/a23a2bf4f31d3518f3ecb38660c95715dfead60f",
                 "reference": "a23a2bf4f31d3518f3ecb38660c95715dfead60f",
                 "shasum": ""
             },
@@ -219,7 +219,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:77]",
+                "url": "https://api.github.com/repos/doctrine/inflector/zipball/6d6c96277ea252fc1304627204c3d5e6e15faa3b",
                 "reference": "6d6c96277ea252fc1304627204c3d5e6e15faa3b",
                 "shasum": ""
             },
@@ -386,7 +386,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:88]",
+                "url": "https://api.github.com/repos/dragonmantank/cron-expression/zipball/d61a8a9604ec1f8c3d150d09db6ce98b32675013",
                 "reference": "d61a8a9604ec1f8c3d150d09db6ce98b32675013",
                 "shasum": ""
             },
@@ -450,7 +450,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:81]",
+                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/d42c8731f0624ad6bdc8d3e5e9a4524f68801cfa",
                 "reference": "d42c8731f0624ad6bdc8d3e5e9a4524f68801cfa",
                 "shasum": ""
             },
@@ -517,7 +517,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:77]",
+                "url": "https://api.github.com/repos/fruitcake/php-cors/zipball/38aaa6c3fd4c157ffe2a4d10aa8b9b16ba8de379",
                 "reference": "38aaa6c3fd4c157ffe2a4d10aa8b9b16ba8de379",
                 "shasum": ""
             },
@@ -588,7 +588,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:85]",
+                "url": "https://api.github.com/repos/GrahamCampbell/Result-Type/zipball/adccca3324eece92ca35463648c12b9e6293c05b",
                 "reference": "adccca3324eece92ca35463648c12b9e6293c05b",
                 "shasum": ""
             },
@@ -776,7 +776,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:74]",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/42118e66a53c492effaf92bc357e931985d5c6f9",
                 "reference": "42118e66a53c492effaf92bc357e931985d5c6f9",
                 "shasum": ""
             },
@@ -978,7 +978,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:78]",
+                "url": "https://api.github.com/repos/guzzle/uri-template/zipball/7a466ad606491eb6528c717482f7cca77f1851f3",
                 "reference": "7a466ad606491eb6528c717482f7cca77f1851f3",
                 "shasum": ""
             },
@@ -1064,7 +1064,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:76]",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/6e2c363716964d8238cee7097b258119a984f0cf",
                 "reference": "6e2c363716964d8238cee7097b258119a984f0cf",
                 "shasum": ""
             },
@@ -1411,7 +1411,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:73]",
+                "url": "https://api.github.com/repos/laravel/tinker/zipball/4faba77764bd33411735936acdf30446d058c78b",
                 "reference": "4faba77764bd33411735936acdf30446d058c78b",
                 "shasum": ""
             },
@@ -1480,7 +1480,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:82]",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/d2d1aa8b35e072966c89bc0c66cf926e56767dc4",
                 "reference": "d2d1aa8b35e072966c89bc0c66cf926e56767dc4",
                 "shasum": ""
             },
@@ -1587,7 +1587,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:78]",
+                "url": "https://api.github.com/repos/thephpleague/config/zipball/754b3604fb2984c71f4af4a9cbe7b57f346ec1f3",
                 "reference": "754b3604fb2984c71f4af4a9cbe7b57f346ec1f3",
                 "shasum": ""
             },
@@ -1669,7 +1669,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:81]",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/5fc8404762179ae514678487b23494fd69b2309c",
                 "reference": "5fc8404762179ae514678487b23494fd69b2309c",
                 "shasum": ""
             },
@@ -1752,7 +1752,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:87]",
+                "url": "https://api.github.com/repos/thephpleague/flysystem-local/zipball/a099b24dce160f3b2239043d13d47c4a1a214ea4",
                 "reference": "a099b24dce160f3b2239043d13d47c4a1a214ea4",
                 "shasum": ""
             },
@@ -1801,7 +1801,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:91]",
+                "url": "https://api.github.com/repos/thephpleague/mime-type-detection/zipball/f5f47eff7c48ed1003069a2ca67f316fb4021c76",
                 "reference": "f5f47eff7c48ed1003069a2ca67f316fb4021c76",
                 "shasum": ""
             },
@@ -1857,7 +1857,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:75]",
+                "url": "https://api.github.com/repos/thephpleague/uri/zipball/08cf38e3924d4f56238125547b5720496fac8fd4",
                 "reference": "08cf38e3924d4f56238125547b5720496fac8fd4",
                 "shasum": ""
             },
@@ -1955,7 +1955,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:86]",
+                "url": "https://api.github.com/repos/thephpleague/uri-interfaces/zipball/85d5c77c5d6d3af6c54db4a78246364908f3c928",
                 "reference": "85d5c77c5d6d3af6c54db4a78246364908f3c928",
                 "shasum": ""
             },
@@ -2039,7 +2039,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:74]",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/b321dd6749f0bf7189444158a3ce785cc16d69b0",
                 "reference": "b321dd6749f0bf7189444158a3ce785cc16d69b0",
                 "shasum": ""
             },
@@ -2142,7 +2142,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:75]",
+                "url": "https://api.github.com/repos/CarbonPHP/carbon/zipball/a1c54919f5fff9800cd03c32bd01defd5a4061cb",
                 "reference": "a1c54919f5fff9800cd03c32bd01defd5a4061cb",
                 "shasum": ""
             },
@@ -2247,7 +2247,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:71]",
+                "url": "https://api.github.com/repos/nette/schema/zipball/c54350438cd6914616f790a49cb424605f421562",
                 "reference": "c54350438cd6914616f790a49cb424605f421562",
                 "shasum": ""
             },
@@ -2314,7 +2314,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:70]",
+                "url": "https://api.github.com/repos/nette/utils/zipball/b043439dbdf954e6c28b5ea7e34b0100f83165e0",
                 "reference": "b043439dbdf954e6c28b5ea7e34b0100f83165e0",
                 "shasum": ""
             },
@@ -2405,7 +2405,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:75]",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/044a6a392ff8ad0d61f14370a5fbbd0a0107152f",
                 "reference": "044a6a392ff8ad0d61f14370a5fbbd0a0107152f",
                 "shasum": ""
             },
@@ -2462,7 +2462,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:78]",
+                "url": "https://api.github.com/repos/nunomaduro/termwind/zipball/712a31b768f5daea284c2169a7d227031001b9a8",
                 "reference": "712a31b768f5daea284c2169a7d227031001b9a8",
                 "shasum": ""
             },
@@ -2549,7 +2549,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:80]",
+                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/67b192b6a42ec03944b972d6e633ddec78ad2c6d",
                 "reference": "67b192b6a42ec03944b972d6e633ddec78ad2c6d",
                 "shasum": ""
             },
@@ -2624,7 +2624,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:72]",
+                "url": "https://api.github.com/repos/php-fig/clock/zipball/e41a24703d4560fd0acb709162f73b8adfc3aa0d",
                 "reference": "e41a24703d4560fd0acb709162f73b8adfc3aa0d",
                 "shasum": ""
             },
@@ -2672,7 +2672,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:76]",
+                "url": "https://api.github.com/repos/php-fig/container/zipball/c71ecc56dfe541dbd90c5360474fbc405f8d5963",
                 "reference": "c71ecc56dfe541dbd90c5360474fbc405f8d5963",
                 "shasum": ""
             },
@@ -2725,7 +2725,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:83]",
+                "url": "https://api.github.com/repos/php-fig/event-dispatcher/zipball/dbefd12671e8a14ec7f180cab83036ed26714bb0",
                 "reference": "dbefd12671e8a14ec7f180cab83036ed26714bb0",
                 "shasum": ""
             },
@@ -2775,7 +2775,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:78]",
+                "url": "https://api.github.com/repos/php-fig/http-client/zipball/bb5906edc1c324c9a05aa0873d40117941e5fa90",
                 "reference": "bb5906edc1c324c9a05aa0873d40117941e5fa90",
                 "shasum": ""
             },
@@ -2827,7 +2827,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:79]",
+                "url": "https://api.github.com/repos/php-fig/http-factory/zipball/2b4765fddfe3b508ac62f829e852b1501d3f6e8a",
                 "reference": "2b4765fddfe3b508ac62f829e852b1501d3f6e8a",
                 "shasum": ""
             },
@@ -2882,7 +2882,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:79]",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/402d35bcb92c70c026d1a6a9883f06b2ead23d71",
                 "reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71",
                 "shasum": ""
             },
@@ -2935,7 +2935,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:70]",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/f16e1d5863e37f8d8c2a01719f5b34baa2b714d3",
                 "reference": "f16e1d5863e37f8d8c2a01719f5b34baa2b714d3",
                 "shasum": ""
             },
@@ -2985,7 +2985,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:79]",
+                "url": "https://api.github.com/repos/php-fig/simple-cache/zipball/764e0b3939f5ca87cb904f570ef9be2d78a07865",
                 "reference": "764e0b3939f5ca87cb904f570ef9be2d78a07865",
                 "shasum": ""
             },
@@ -3115,7 +3115,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:76]",
+                "url": "https://api.github.com/repos/ramsey/collection/zipball/344572933ad0181accbf4ba763e85a0306a8c5e2",
                 "reference": "344572933ad0181accbf4ba763e85a0306a8c5e2",
                 "shasum": ""
             },
@@ -3191,7 +3191,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:70]",
+                "url": "https://api.github.com/repos/ramsey/uuid/zipball/1df15849d00943a67d677dc9cfd80795f038c9f8",
                 "reference": "1df15849d00943a67d677dc9cfd80795f038c9f8",
                 "shasum": ""
             },
@@ -3269,7 +3269,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:72]",
+                "url": "https://api.github.com/repos/symfony/clock/zipball/674fa3b98e21531dd040e613479f5f6fa8f32111",
                 "reference": "674fa3b98e21531dd040e613479f5f6fa8f32111",
                 "shasum": ""
             },
@@ -3347,7 +3347,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:74]",
+                "url": "https://api.github.com/repos/symfony/console/zipball/23d6f88a29f6d0eac45bd77d70307adf83ba7ab0",
                 "reference": "23d6f88a29f6d0eac45bd77d70307adf83ba7ab0",
                 "shasum": ""
             },
@@ -3514,7 +3514,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:88]",
+                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/f3202fa1b5097b0af062dc978b32ecf63404e31d",
                 "reference": "f3202fa1b5097b0af062dc978b32ecf63404e31d",
                 "shasum": ""
             },
@@ -3585,7 +3585,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:80]",
+                "url": "https://api.github.com/repos/symfony/error-handler/zipball/8373921e231e190a88e2ad526951bbaa791576fa",
                 "reference": "8373921e231e190a88e2ad526951bbaa791576fa",
                 "shasum": ""
             },
@@ -3667,7 +3667,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:83]",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/d269974ee93c61d03620ffee358355bfdb471d66",
                 "reference": "d269974ee93c61d03620ffee358355bfdb471d66",
                 "shasum": ""
             },
@@ -3752,7 +3752,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:93]",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher-contracts/zipball/c7de7a00ffb67842132da02ea92988a39ccd9f4e",
                 "reference": "c7de7a00ffb67842132da02ea92988a39ccd9f4e",
                 "shasum": ""
             },
@@ -3832,7 +3832,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:73]",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/5ce28827081f6d1f0c32eaf3882750f19cb5bbe6",
                 "reference": "5ce28827081f6d1f0c32eaf3882750f19cb5bbe6",
                 "shasum": ""
             },
@@ -3900,7 +3900,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:82]",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/d070b716a32fbe3bf04204db0f58ace73b86d133",
                 "reference": "d070b716a32fbe3bf04204db0f58ace73b86d133",
                 "shasum": ""
             },
@@ -3982,7 +3982,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:78]",
+                "url": "https://api.github.com/repos/symfony/http-kernel/zipball/275d2d2d24530f2a0eaf17704a3a93860a036351",
                 "reference": "275d2d2d24530f2a0eaf17704a3a93860a036351",
                 "shasum": ""
             },
@@ -4101,7 +4101,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:73]",
+                "url": "https://api.github.com/repos/symfony/mailer/zipball/b17c9bf3a551d5f635638a3b6c05f06c4dc87584",
                 "reference": "b17c9bf3a551d5f635638a3b6c05f06c4dc87584",
                 "shasum": ""
             },
@@ -4185,7 +4185,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:71]",
+                "url": "https://api.github.com/repos/symfony/mime/zipball/bf328d82105831db3e409195db0540ff57f27c80",
                 "reference": "bf328d82105831db3e409195db0540ff57f27c80",
                 "shasum": ""
             },
@@ -4274,7 +4274,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:81]",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/141046a8f9477948ff284fa65be2095baafb94f2",
                 "reference": "141046a8f9477948ff284fa65be2095baafb94f2",
                 "shasum": ""
             },
@@ -4357,7 +4357,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:89]",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-grapheme/zipball/bb899c1db0aa8127dc3afe8cda4a67eb24915f8d",
                 "reference": "bb899c1db0aa8127dc3afe8cda4a67eb24915f8d",
                 "shasum": ""
             },
@@ -4439,7 +4439,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:84]",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-idn/zipball/51b5ff5ba85452b31ec6f55490b08148612339d9",
                 "reference": "51b5ff5ba85452b31ec6f55490b08148612339d9",
                 "shasum": ""
             },
@@ -4526,7 +4526,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:91]",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-normalizer/zipball/aa20edea75bd9c48cfecc8360922e5a6e5c44502",
                 "reference": "aa20edea75bd9c48cfecc8360922e5a6e5c44502",
                 "shasum": ""
             },
@@ -4611,7 +4611,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:84]",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6",
                 "reference": "d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6",
                 "shasum": ""
             },
@@ -4696,7 +4696,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:81]",
+                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
                 "reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
                 "shasum": ""
             },
@@ -4780,7 +4780,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:81]",
+                "url": "https://api.github.com/repos/symfony/polyfill-php82/zipball/002dc0cfe5fd4ed6033d48f27d4f19a486c4b04b",
                 "reference": "002dc0cfe5fd4ed6033d48f27d4f19a486c4b04b",
                 "shasum": ""
             },
@@ -4860,7 +4860,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:81]",
+                "url": "https://api.github.com/repos/symfony/polyfill-php83/zipball/5ea99087fb99c273a9b9236ed4c31e78b16103c6",
                 "reference": "5ea99087fb99c273a9b9236ed4c31e78b16103c6",
                 "shasum": ""
             },
@@ -4940,7 +4940,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:81]",
+                "url": "https://api.github.com/repos/symfony/polyfill-php84/zipball/f4e1dfaee5b74aba5964fe1fd4dfc7ba5e3085fa",
                 "reference": "f4e1dfaee5b74aba5964fe1fd4dfc7ba5e3085fa",
                 "shasum": ""
             },
@@ -5020,7 +5020,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:81]",
+                "url": "https://api.github.com/repos/symfony/polyfill-php85/zipball/255fab485aaa1006ed411040c42aecd7b5302d7a",
                 "reference": "255fab485aaa1006ed411040c42aecd7b5302d7a",
                 "shasum": ""
             },
@@ -5100,7 +5100,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:81]",
+                "url": "https://api.github.com/repos/symfony/polyfill-php86/zipball/6bc356ed3d8dbfeea8f0de235e34d670704e880e",
                 "reference": "6bc356ed3d8dbfeea8f0de235e34d670704e880e",
                 "shasum": ""
             },
@@ -5180,7 +5180,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:80]",
+                "url": "https://api.github.com/repos/symfony/polyfill-uuid/zipball/26dfec253c4cf3e51b541b52ddf7e42cb0908e94",
                 "reference": "26dfec253c4cf3e51b541b52ddf7e42cb0908e94",
                 "shasum": ""
             },
@@ -5263,7 +5263,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:74]",
+                "url": "https://api.github.com/repos/symfony/process/zipball/058d17fc284cce14efb2385783b55014a461b176",
                 "reference": "058d17fc284cce14efb2385783b55014a461b176",
                 "shasum": ""
             },
@@ -5328,7 +5328,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:74]",
+                "url": "https://api.github.com/repos/symfony/routing/zipball/ddd558991e98f693ae6bf5063cc1b0362c6bbec3",
                 "reference": "ddd558991e98f693ae6bf5063cc1b0362c6bbec3",
                 "shasum": ""
             },
@@ -5413,7 +5413,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:84]",
+                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/15e6a07ec2a2c75ceb1b21dd98105ee8456d2257",
                 "reference": "15e6a07ec2a2c75ceb1b21dd98105ee8456d2257",
                 "shasum": ""
             },
@@ -5500,7 +5500,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:73]",
+                "url": "https://api.github.com/repos/symfony/string/zipball/e394af32256bf9e7bf80849d95e589167c10097b",
                 "reference": "e394af32256bf9e7bf80849d95e589167c10097b",
                 "shasum": ""
             },
@@ -5691,7 +5691,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:88]",
+                "url": "https://api.github.com/repos/symfony/translation-contracts/zipball/ccb206b98faccc511ebae8e5fad50f2dc0b30621",
                 "reference": "ccb206b98faccc511ebae8e5fad50f2dc0b30621",
                 "shasum": ""
             },
@@ -5773,7 +5773,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:70]",
+                "url": "https://api.github.com/repos/symfony/uid/zipball/69d732355a139c6f8881337d28515aa01f12b8be",
                 "reference": "69d732355a139c6f8881337d28515aa01f12b8be",
                 "shasum": ""
             },
@@ -5851,7 +5851,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:77]",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/e088da50b813f32473a76871616cbb8fa54653a8",
                 "reference": "e088da50b813f32473a76871616cbb8fa54653a8",
                 "shasum": ""
             },
@@ -5938,7 +5938,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:89]",
+                "url": "https://api.github.com/repos/tijsverkoyen/CssToInlineStyles/zipball/f0292ccf0ec75843d65027214426b6b163b48b41",
                 "reference": "f0292ccf0ec75843d65027214426b6b163b48b41",
                 "shasum": ""
             },
@@ -5993,7 +5993,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:75]",
+                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/301c07936b16d88628b126b01d082ba153cf4c40",
                 "reference": "301c07936b16d88628b126b01d082ba153cf4c40",
                 "shasum": ""
             },
@@ -6077,7 +6077,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:78]",
+                "url": "https://api.github.com/repos/voku/portable-ascii/zipball/8e1051fe39379367aecf014f41744ce7539a856f",
                 "reference": "8e1051fe39379367aecf014f41744ce7539a856f",
                 "shasum": ""
             },
@@ -6287,7 +6287,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:80]",
+                "url": "https://api.github.com/repos/hamcrest/hamcrest-php/zipball/b61cd040da1a4925bc90a51c074f5297e7c0fa52",
                 "reference": "b61cd040da1a4925bc90a51c074f5297e7c0fa52",
                 "shasum": ""
             },
@@ -6342,7 +6342,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:81]",
+                "url": "https://api.github.com/repos/laravel/agent-detector/zipball/90694b9256099591cf9e55d08c18ba7a00bf099f",
                 "reference": "90694b9256099591cf9e55d08c18ba7a00bf099f",
                 "shasum": ""
             },
@@ -6569,7 +6569,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:71]",
+                "url": "https://api.github.com/repos/laravel/pint/zipball/fe4148c503a0e266353d61396b79bbf7f35122df",
                 "reference": "fe4148c503a0e266353d61396b79bbf7f35122df",
                 "shasum": ""
             },
@@ -6781,7 +6781,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:79]",
+                "url": "https://api.github.com/repos/nunomaduro/collision/zipball/fb53eacd509a1d303858e2d20cfebf2d630254ec",
                 "reference": "fb53eacd509a1d303858e2d20cfebf2d630254ec",
                 "shasum": ""
             },
@@ -6877,7 +6877,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:75]",
+                "url": "https://api.github.com/repos/phar-io/manifest/zipball/54750ef60c58e43759730615a392c31c80e23176",
                 "reference": "54750ef60c58e43759730615a392c31c80e23176",
                 "shasum": ""
             },
@@ -6944,7 +6944,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:74]",
+                "url": "https://api.github.com/repos/phar-io/version/zipball/4f7fd7836c6f332bb2933569e566a0d6c4cbed74",
                 "reference": "4f7fd7836c6f332bb2933569e566a0d6c4cbed74",
                 "shasum": ""
             },
@@ -6995,7 +6995,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:94]",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/186dab580576598076de6818596d12b61801880e",
                 "reference": "186dab580576598076de6818596d12b61801880e",
                 "shasum": ""
             },
@@ -7083,7 +7083,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:94]",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/a248d1640ab059b075f53a2ef0f9856e864e06b5",
                 "reference": "a248d1640ab059b075f53a2ef0f9856e864e06b5",
                 "shasum": ""
             },
@@ -7156,7 +7156,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:88]",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-invoker/zipball/12b54e689b07a25a9b41e57736dfab6ec9ae5406",
                 "reference": "12b54e689b07a25a9b41e57736dfab6ec9ae5406",
                 "shasum": ""
             },
@@ -7220,7 +7220,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:94]",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-text-template/zipball/e1367a453f0eda562eedb4f659e13aa900d66c53",
                 "reference": "e1367a453f0eda562eedb4f659e13aa900d66c53",
                 "shasum": ""
             },
@@ -7280,7 +7280,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:86]",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-timer/zipball/f258ce36aa457f3aa3339f9ed4c81fc66dc8c2cc",
                 "reference": "f258ce36aa457f3aa3339f9ed4c81fc66dc8c2cc",
                 "shasum": ""
             },
@@ -7340,7 +7340,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:84]",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/6cbff63d670de92cb1cb3d2ff9f40327e9da9c7f",
                 "reference": "6cbff63d670de92cb1cb3d2ff9f40327e9da9c7f",
                 "shasum": ""
             },
@@ -7430,7 +7430,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:87]",
+                "url": "https://api.github.com/repos/sebastianbergmann/cli-parser/zipball/7d05781b13f7dec9043a629a21d086ed74582a15",
                 "reference": "7d05781b13f7dec9043a629a21d086ed74582a15",
                 "shasum": ""
             },
@@ -7499,7 +7499,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:87]",
+                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/7c65c1e79836812819705b473a90c12399542485",
                 "reference": "7c65c1e79836812819705b473a90c12399542485",
                 "shasum": ""
             },
@@ -7591,7 +7591,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:87]",
+                "url": "https://api.github.com/repos/sebastianbergmann/complexity/zipball/bad4316aba5303d0221f43f8cee37eb58d384bbb",
                 "reference": "bad4316aba5303d0221f43f8cee37eb58d384bbb",
                 "shasum": ""
             },
@@ -7728,7 +7728,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:88]",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/9d32c685773823b1983e256ae4ecd48a10d6e439",
                 "reference": "9d32c685773823b1983e256ae4ecd48a10d6e439",
                 "shasum": ""
             },
@@ -7894,7 +7894,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:89]",
+                "url": "https://api.github.com/repos/sebastianbergmann/global-state/zipball/b164d3274d6537ab462591c5755f76a8f5b1aae9",
                 "reference": "b164d3274d6537ab462591c5755f76a8f5b1aae9",
                 "shasum": ""
             },
@@ -7968,7 +7968,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:90]",
+                "url": "https://api.github.com/repos/sebastianbergmann/lines-of-code/zipball/d543b8ef219dcd8da262cbb958639a96bedba10e",
                 "reference": "d543b8ef219dcd8da262cbb958639a96bedba10e",
                 "shasum": ""
             },
@@ -8038,7 +8038,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:94]",
+                "url": "https://api.github.com/repos/sebastianbergmann/object-enumerator/zipball/1effe8e9b8e068e9ae228e542d5d11b5d16db894",
                 "reference": "1effe8e9b8e068e9ae228e542d5d11b5d16db894",
                 "shasum": ""
             },
@@ -8096,7 +8096,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:93]",
+                "url": "https://api.github.com/repos/sebastianbergmann/object-reflector/zipball/4bfa827c969c98be1e527abd576533293c634f6a",
                 "reference": "4bfa827c969c98be1e527abd576533293c634f6a",
                 "shasum": ""
             },
@@ -8152,7 +8152,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:94]",
+                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/0b01998a7d5b1f122911a66bebcb8d46f0c82d8c",
                 "reference": "0b01998a7d5b1f122911a66bebcb8d46f0c82d8c",
                 "shasum": ""
             },
@@ -8228,7 +8228,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:81]",
+                "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/82ff822c2edc46724be9f7411d3163021f602773",
                 "reference": "82ff822c2edc46724be9f7411d3163021f602773",
                 "shasum": ""
             },
@@ -8297,7 +8297,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:84]",
+                "url": "https://api.github.com/repos/sebastianbergmann/version/zipball/3e6ccf7657d4f0a59200564b08cead899313b53c",
                 "reference": "3e6ccf7657d4f0a59200564b08cead899313b53c",
                 "shasum": ""
             },
@@ -8351,7 +8351,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:87]",
+                "url": "https://api.github.com/repos/staabm/side-effects-detector/zipball/d8334211a140ce329c13726d4a715adbddd0a163",
                 "reference": "d8334211a140ce329c13726d4a715adbddd0a163",
                 "shasum": ""
             },
@@ -8403,7 +8403,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.[REDACTED:entropy:76]",
+                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/7989e43bf381af0eac72e4f0ca5bcbfa81658be4",
                 "reference": "7989e43bf381af0eac72e4f0ca5bcbfa81658be4",
                 "shasum": ""
             },

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Domain\Identity\Enums\UserRole;
+use App\Domain\Identity\Services\SessionInventoryService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +14,7 @@ final class Preflight extends Command
 
     protected $description = 'Refuse unsafe production configuration before deployment or release.';
 
-    public function handle(): int
+    public function handle(SessionInventoryService $sessions): int
     {
         $env = (string) config('app.env');
         $isProduction = $env === 'production';
@@ -107,6 +108,24 @@ final class Preflight extends Command
 
         if (config('session.encrypt') === false && $isProduction) {
             $failures[] = 'SESSION_ENCRYPT is false in production.';
+        }
+
+        if (! $sessions->sharesAuditConnection()) {
+            $resolvedSessionConnection = $sessions->resolvedSessionConnectionName();
+            $auditConnection = $sessions->resolvedAuditConnectionName();
+            $splitMessage = "SESSION_CONNECTION '{$resolvedSessionConnection}' is split from the AuditEvent connection '{$auditConnection}'. Split-store session audit is best-effort only (no XA). Production must share the audit connection, or a durable outbox must exist before merge.";
+            if ($isProduction) {
+                $failures[] = $splitMessage;
+            } else {
+                $this->warn($splitMessage);
+            }
+        }
+
+        $retryAfter = (int) config('queue.connections.database.retry_after');
+        $workerTimeout = (int) config('royadarman.queue.worker_timeout_seconds');
+        $margin = (int) config('royadarman.queue.retry_after_min_margin_seconds');
+        if ($retryAfter - $workerTimeout < $margin) {
+            $failures[] = "DB_QUEUE_RETRY_AFTER ({$retryAfter}) must exceed ROYADARMAN_QUEUE_WORKER_TIMEOUT ({$workerTimeout}) by at least {$margin}s so a still-running job cannot be reclaimed. See infra/queue-timing.conf.";
         }
 
         if ($failures !== []) {
