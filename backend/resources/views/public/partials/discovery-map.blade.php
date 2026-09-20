@@ -6,15 +6,14 @@
         $copy = trans('site.discovery');
         $selected = $discovery['neighborhood_id'];
         $formAction = $locale === 'fa' ? route('public.referrals.fa') : route('public.referrals', ['locale' => $locale]);
-        $showMap = !empty($discovery['map_enabled']) && !empty($discovery['vite_ready']);
+        $enhancementReady = !empty($discovery['vite_ready']);
     @endphp
     <section class="section white" data-discovery-root
              data-endpoint="{{ $discovery['endpoint'] }}"
              data-service-type="{{ $discovery['service_type'] }}"
              data-neighborhood-id="{{ $selected }}"
              data-origin-lat="{{ $discovery['origin']['lat'] }}"
-             data-origin-lng="{{ $discovery['origin']['lng'] }}"
-             data-api-key="{{ $showMap ? $discovery['map_api_key'] : '' }}">
+             data-origin-lng="{{ $discovery['origin']['lng'] }}">
         <script type="application/json" data-discovery-copy>{!! json_encode($copy, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
         <div class="shell">
             <div class="section-heading">
@@ -66,15 +65,12 @@
                     <p class="discovery-note">{{ $copy['insufficient_note'] }}</p>
                 </div>
                 <div>
-                    <div id="discovery-map" class="discovery-map{{ $showMap ? '' : ' is-unavailable' }}" data-discovery-map role="region" aria-label="{{ $copy['title'] }}" @if(!$showMap) hidden @endif></div>
-                    @unless($showMap)
-                        <p class="discovery-map-fallback">{{ $copy['map_unavailable'] }}</p>
-                    @endunless
+                    <p class="discovery-map-fallback">{{ $copy['map_unavailable'] }}</p>
                 </div>
             </div>
         </div>
     </section>
-    @if($showMap)
+    @if($enhancementReady)
         @vite(['resources/js/discovery-map.js'])
     @endif
 @endif

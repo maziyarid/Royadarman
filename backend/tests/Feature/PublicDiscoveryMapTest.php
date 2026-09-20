@@ -151,7 +151,7 @@ final class PublicDiscoveryMapTest extends TestCase
         }
 
         $package = File::get(base_path('package.json'));
-        $this->assertStringContainsString('@neshan-maps-platform/maplibre-sdk', $package);
+        $this->assertStringNotContainsString('@neshan-maps-platform/maplibre-sdk', $package);
         $vite = File::get(base_path('vite.config.js'));
         $this->assertStringContainsString('resources/js/discovery-map.js', $vite);
         $gitignore = File::get(base_path('.gitignore'));
@@ -163,6 +163,7 @@ final class PublicDiscoveryMapTest extends TestCase
         $this->assertStringNotContainsString('localStorage', $js);
         $this->assertStringNotContainsString('sessionStorage', $js);
         $this->assertStringNotContainsString('sendBeacon', $js);
+        $this->assertStringNotContainsString('maplibre', strtolower($js));
         $this->assertStringContainsString('searchParams.delete(key)', $js);
         $this->assertStringContainsString('activeNeighborhoodId', $js);
         $this->assertStringContainsString('select.value = activeNeighborhoodId', $js);

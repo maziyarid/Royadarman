@@ -15,8 +15,5 @@
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.1"
-    },
-    "dependencies": {
-        "@neshan-maps-platform/maplibre-sdk": "^5.24.4"
     }
 }
