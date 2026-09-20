@@ -4,6 +4,9 @@
     $pub = fn (string $name, ?string $l = null): string => \App\Support\PublicUrl::to($name, $l ?? $locale);
 @endphp
 <a class="skip-link" href="#main">{{ __('ui.skip') }}</a>
+@unless(app()->environment('production'))
+<div class="staging-banner" role="status">{{ __('ui.staging_banner') }}<small>{{ __('ui.staging_hint') }}</small></div>
+@endunless
 <header class="site-header">
     <div class="shell header-row">
         <a class="brand" href="{{ $pub('home') }}">

@@ -19,32 +19,27 @@
     @if(count($data['assigned_reviews']) === 0)
         <div class="empty">{{ __('ui.dashboard.no_reviews') }}</div>
     @else
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">{{ __('panel.table.reference') }}</th>
-                        <th scope="col">{{ __('ui.dashboard.col_status') }}</th>
-                        <th scope="col">{{ __('ui.dashboard.col_published') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($data['assigned_reviews'] as $r)
-                        <tr>
-                            <td>
-                                @if(!empty($r['public_reference']))
-                                    <a class="case-link" href="{{ route('panel.case', ['locale' => $locale, 'case' => $r['case_id']]) }}"><bdi>{{ $r['public_reference'] }}</bdi></a>
-                                @else
-                                    {{ $r['case_id'] }}
-                                @endif
-                            </td>
-                            <td><span class="badge {{ $r['case_status'] ?? '' }}">{{ __('ui.dashboard.status.'.$r['case_status']) }}</span></td>
-                            <td>@if($r['is_published'])<span class="ok">{{ __('ui.dashboard.yes') }}</span>@else<span class="muted">{{ __('ui.dashboard.no') }}</span>@endif</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+        @foreach($data['assigned_reviews'] as $r)
+            <article class="task-card">
+                <div class="task-card-main">
+                    @if(!empty($r['public_reference']))
+                        <a class="case-link" href="{{ route('panel.case', ['locale' => $locale, 'case' => $r['case_id']]) }}"><bdi>{{ $r['public_reference'] }}</bdi></a>
+                    @else
+                        <strong>{{ $r['case_id'] }}</strong>
+                    @endif
+                    <div class="task-meta">
+                        <span class="badge {{ $r['case_status'] ?? '' }}">{{ __('ui.dashboard.status.'.$r['case_status']) }}</span>
+                        {{ __('ui.dashboard.col_published') }}:
+                        @if($r['is_published'])<span class="ok">{{ __('ui.dashboard.yes') }}</span>@else<span class="muted">{{ __('ui.dashboard.no') }}</span>@endif
+                    </div>
+                </div>
+                @include('dashboard.partials.wait-chip', ['minutes' => $r['wait_minutes'] ?? null, 'band' => $r['sla_band'] ?? 'unknown'])
+                @if(!empty($r['case_id']))
+                    <a class="btn sm" href="{{ route('panel.case', ['locale' => $locale, 'case' => $r['case_id']]) }}">{{ __('ui.dashboard.next_reviews') }}</a>
+                @endif
+            </article>
+        @endforeach
     @endif
 </div>
+<p class="hint">{{ __('ui.dashboard.wait_note') }}</p>
 @endsection

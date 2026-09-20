@@ -1,0 +1,21 @@
+# Royadarman scheduler.
+#
+# COMMITTING THIS FILE DOES NOT INSTALL CRON.
+# Either:
+#   - drop a copy into /etc/cron.d/royadarman as root (user field present), or
+#   - paste the user-crontab line into the cPanel account crontab (no user field).
+#
+# Laravel schedule (backend/routes/console.php):
+#   outbox:dispatch  every minute
+#   retention:run    hourly
+# Retention duration stays fail-closed until ROYADARMAN_DOCUMENT_RETENTION_DAYS
+# is an operator-approved positive integer.
+
+MAILTO=""
+SHELL=/bin/bash
+
+# system crontab / /etc/cron.d form (includes user):
+* * * * * royadarman cd /home/royadarman/apps/royadarman-backend && /usr/local/bin/ea-php83 artisan schedule:run >/dev/null 2>&1
+
+# cPanel user crontab form (no user field) — do not use both:
+# * * * * * cd /home/royadarman/apps/royadarman-backend && /usr/local/bin/ea-php83 artisan schedule:run >/dev/null 2>&1

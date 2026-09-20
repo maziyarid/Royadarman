@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Cases\Enums\CaseStatus;
 use App\Domain\Cases\Services\CaseWorkflow;
+use App\Domain\Coordination\Services\ReferralLifecycle;
 use App\Domain\Documents\Enums\DocumentStatus;
 use App\Domain\Identity\Enums\UserRole;
 use App\Http\Controllers\Controller;
@@ -114,7 +115,7 @@ final class StaffCaseController extends Controller
             ->header('Cache-Control', 'private, no-store');
     }
 
-    public function proposeReferral(Request $request, PatientCase $case): JsonResponse
+    public function proposeReferral(Request $request, PatientCase $case, ReferralLifecycle $lifecycle): JsonResponse
     {
         abort_unless($request->user()->role === UserRole::Coordinator && $request->user()->can('view', $case), 404);
         $data = $request->validate([
@@ -123,17 +124,59 @@ final class StaffCaseController extends Controller
             'source_language' => ['required', 'in:fa,ar,en'],
         ]);
 
-        $proposal = ReferralProposal::query()->create([
-            'case_id' => $case->id,
-            'clinic_id' => $data['clinic_id'],
-            'proposed_by_user_id' => $request->user()->id,
-            'status' => 'proposed',
-            'reasoning' => $data['reasoning'],
-            'source_language' => $data['source_language'],
-            'proposed_at' => now(),
-        ]);
+        $proposal = DB::transaction(function () use ($request, $case, $data, $lifecycle): ReferralProposal {
+            $created = ReferralProposal::query()->create([
+                'case_id' => $case->id,
+                'clinic_id' => $data['clinic_id'],
+                'proposed_by_user_id' => $request->user()->id,
+                'status' => 'proposed',
+                'reasoning' => $data['reasoning'],
+                'source_language' => $data['source_language'],
+                'proposed_at' => now(),
+            ]);
+            $lifecycle->recordProposed($created, $request->user());
+
+            return $created;
+        });
 
         return response()->json(['data' => ['id' => $proposal->id, 'status' => $proposal->status]], 201)
+            ->header('Cache-Control', 'private, no-store');
+    }
+
+    public function reassignReferral(Request $request, PatientCase $case, ReferralProposal $proposal, ReferralLifecycle $lifecycle): JsonResponse
+    {
+        abort_unless($request->user()->role === UserRole::Coordinator && $request->user()->can('view', $case), 404);
+        abort_unless($proposal->case_id === $case->id, 404);
+        $data = $request->validate([
+            'clinic_id' => ['required', Rule::exists('clinics', 'id')->where(fn ($query) => $query->where('is_active', true))],
+            'reason' => ['required', 'string', 'min:1', 'max:1000'],
+        ]);
+
+        try {
+            $updated = $lifecycle->reassign($proposal, $request->user(), $data['clinic_id'], $data['reason']);
+        } catch (\DomainException $e) {
+            return response()->json(['error' => ['code' => $e->getMessage()], 'request_id' => $request->attributes->get('request_id')], 422);
+        }
+
+        return response()->json(['data' => ['id' => $updated->id, 'clinic_id' => $updated->clinic_id, 'status' => $updated->status]])
+            ->header('Cache-Control', 'private, no-store');
+    }
+
+    public function overrideReferral(Request $request, PatientCase $case, ReferralProposal $proposal, ReferralLifecycle $lifecycle): JsonResponse
+    {
+        abort_unless($request->user()->role === UserRole::Coordinator && $request->user()->can('view', $case), 404);
+        abort_unless($proposal->case_id === $case->id, 404);
+        $data = $request->validate([
+            'reason' => ['required', 'string', 'min:1', 'max:1000'],
+        ]);
+
+        try {
+            $updated = $lifecycle->overrideWithdraw($proposal, $request->user(), $data['reason']);
+        } catch (\DomainException $e) {
+            return response()->json(['error' => ['code' => $e->getMessage()], 'request_id' => $request->attributes->get('request_id')], 422);
+        }
+
+        return response()->json(['data' => ['id' => $updated->id, 'status' => $updated->status, 'withdrawn' => $updated->withdrawn_at !== null]])
             ->header('Cache-Control', 'private, no-store');
     }
 

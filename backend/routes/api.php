@@ -12,12 +12,15 @@ use App\Http\Controllers\Api\V1\CmsSeoMetadataController;
 use App\Http\Controllers\Api\V1\CmsTagController;
 use App\Http\Controllers\Api\V1\ConsentController;
 use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\DiscoveryController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\HomeServiceController;
 use App\Http\Controllers\Api\V1\NotificationCallbackController;
 use App\Http\Controllers\Api\V1\PolicyController;
 use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\PublicDiscoveryController;
 use App\Http\Controllers\Api\V1\ReferralController;
+use App\Http\Controllers\Api\V1\SessionController;
 use App\Http\Controllers\Api\V1\StaffCaseController;
 use App\Http\Controllers\Api\V1\SupportController;
 use App\Http\Middleware\EnsureActiveUser;
@@ -31,13 +34,19 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
     Route::post('/auth/otp/challenge', [AuthController::class, 'challenge'])->middleware('throttle:otp-challenge');
     Route::post('/auth/otp/verify', [AuthController::class, 'verify'])->middleware('throttle:otp-verify');
     Route::get('/policies/{key}', [PolicyController::class, 'show']);
+    Route::get('/public/discovery/clinics', [PublicDiscoveryController::class, 'clinics']);
 
     Route::middleware(['auth', EnsureActiveUser::class])->group(function (): void {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [ProfileController::class, 'show']);
         Route::patch('/me/preferences', [ProfileController::class, 'update']);
+        Route::get('/me/sessions', [SessionController::class, 'index']);
+        Route::delete('/me/sessions/{session}', [SessionController::class, 'destroy']);
+        Route::post('/me/sessions/revoke-others', [SessionController::class, 'destroyOthers']);
+        Route::post('/me/sessions/revoke-all', [SessionController::class, 'destroyAll']);
 
         Route::get('/dashboard', [DashboardController::class, 'show']);
+        Route::get('/staff/discovery/clinics', [DiscoveryController::class, 'clinics']);
 
         Route::get('/support', [SupportController::class, 'index']);
         Route::post('/support', [SupportController::class, 'store']);
@@ -108,6 +117,8 @@ Route::prefix('api/v1')->middleware(['web', SetLocale::class])->group(function (
         Route::post('/staff/cases/{case}/assignments', [StaffCaseController::class, 'assign']);
         Route::patch('/staff/cases/{case}/status', [StaffCaseController::class, 'status']);
         Route::post('/staff/cases/{case}/referral-proposals', [StaffCaseController::class, 'proposeReferral']);
+        Route::post('/staff/cases/{case}/referral-proposals/{proposal}/reassign', [StaffCaseController::class, 'reassignReferral']);
+        Route::post('/staff/cases/{case}/referral-proposals/{proposal}/override', [StaffCaseController::class, 'overrideReferral']);
         Route::post('/staff/cases/{case}/reviews', [StaffCaseController::class, 'createReview']);
         Route::post('/staff/cases/{case}/reviews/{review}/publish', [StaffCaseController::class, 'publishReview']);
 

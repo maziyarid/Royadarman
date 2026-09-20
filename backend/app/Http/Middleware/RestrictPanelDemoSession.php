@@ -41,7 +41,7 @@ final class RestrictPanelDemoSession
             abort(403, 'Demo sessions are restricted to the read-only role panel.');
         }
 
-        if ($request->routeIs('panel', 'dashboard', 'panel.profile', 'panel.support.index', 'panel.home-service.index')) {
+        if ($request->routeIs('panel', 'dashboard', 'panel.profile', 'panel.support.index', 'panel.home-service.index', 'patient.request.create')) {
             return $next($request);
         }
 

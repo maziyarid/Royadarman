@@ -6,6 +6,7 @@ use App\Http\Controllers\NetworkAdminController;
 use App\Http\Controllers\PanelCaseController;
 use App\Http\Controllers\PanelController;
 use App\Http\Controllers\PatientRequestController;
+use App\Http\Controllers\PresentationPortalController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\Web\Admin\AdminCmsController;
 use App\Http\Controllers\Web\BlogController;
@@ -33,6 +34,10 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.i
 Route::get('/sitemap-{locale}.xml', [SitemapController::class, 'locale'])->whereIn('locale', ['fa', 'ar', 'en'])->name('sitemap.locale');
 Route::get('/robots.txt', RobotsController::class)->name('robots');
 Route::get('/cms-media/{media}', [CmsMediaServeController::class, 'show'])->name('cms.media.serve');
+Route::get('/pres', [PresentationPortalController::class, 'show'])->name('public.pres');
+Route::post('/pres/reseed', [PresentationPortalController::class, 'reseed'])
+    ->middleware(['auth', EnsureActiveUser::class])
+    ->name('public.pres.reseed');
 
 Route::get('/', [PublicPageController::class, 'homePersian'])->name('public.home.fa');
 Route::get('/services', [PublicPageController::class, 'servicesPersian'])->name('public.services.fa');
@@ -83,6 +88,9 @@ Route::prefix('{locale}')->whereIn('locale', ['fa', 'ar', 'en'])->middleware(Set
         Route::post('/panel/home-service/{homeService}/confirm', [HomeServiceWorkspaceController::class, 'confirm'])->name('panel.home-service.confirm');
         Route::get('/panel/profile', [ProfileWorkspaceController::class, 'show'])->name('panel.profile');
         Route::patch('/panel/profile', [ProfileWorkspaceController::class, 'update'])->name('panel.profile.update');
+        Route::delete('/panel/profile/sessions/{session}', [ProfileWorkspaceController::class, 'revokeSession'])->name('panel.profile.sessions.revoke');
+        Route::post('/panel/profile/sessions/revoke-others', [ProfileWorkspaceController::class, 'revokeOthers'])->name('panel.profile.sessions.revoke_others');
+        Route::post('/panel/profile/sessions/revoke-all', [ProfileWorkspaceController::class, 'revokeAll'])->name('panel.profile.sessions.revoke_all');
         Route::prefix('panel/marketing')->group(function (): void {
             Route::get('/', [MarketingContentController::class, 'index'])->name('marketing.index');
             Route::get('/create', [MarketingContentController::class, 'create'])->name('marketing.create');
@@ -98,6 +106,7 @@ Route::prefix('{locale}')->whereIn('locale', ['fa', 'ar', 'en'])->middleware(Set
             Route::post('/practitioners/{user}', [NetworkAdminController::class, 'savePractitioner'])->whereNumber('user')->name('network.practitioner.save');
             Route::post('/memberships', [NetworkAdminController::class, 'storeMembership'])->name('network.membership.store');
             Route::delete('/memberships/{membership}', [NetworkAdminController::class, 'revokeMembership'])->name('network.membership.revoke');
+            Route::post('/capabilities', [NetworkAdminController::class, 'saveCapability'])->name('network.capability.save');
         });
     });
 });
@@ -167,7 +176,7 @@ Route::get('/services/{slug}', [PageController::class, 'showPersianService'])
     ->where('slug', '[a-z0-9\-]+')
     ->name('public.service.show.fa');
 Route::get('/{slug}', [PageController::class, 'showPersianPage'])
-    ->where('slug', '^(?!(?:fa|ar|en|admin|dashboard|up|sitemap|robots|cms-media)$)[a-z0-9\-]+$')
+    ->where('slug', '^(?!(?:fa|ar|en|admin|dashboard|up|sitemap|robots|cms-media|pres)$)[a-z0-9\-]+$')
     ->name('public.page.show.fa');
 Route::get('/{locale}/services/{slug}', [PageController::class, 'showService'])
     ->whereIn('locale', ['ar', 'en'])

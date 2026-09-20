@@ -31,6 +31,9 @@
                         <div class="field"><label>{{ __('network.name') }}</label><input name="name" value="{{ $clinic->name }}" required></div>
                         <div class="field"><label>{{ __('network.city') }}</label><input name="city" value="{{ $clinic->city }}" required></div>
                         <div class="field"><label>{{ __('network.area') }}</label><input name="area_code" value="{{ $clinic->area_code }}"></div>
+                        <div class="field"><label>{{ __('network.latitude') }}</label><input name="latitude" inputmode="decimal" value="{{ $clinic->latitude }}"></div>
+                        <div class="field"><label>{{ __('network.longitude') }}</label><input name="longitude" inputmode="decimal" value="{{ $clinic->longitude }}"></div>
+                        <p class="hint">{{ __('network.location_hint') }}</p>
                         <div class="field">
                             <label>{{ __('network.active') }}</label>
                             <select name="is_active">
@@ -52,7 +55,10 @@
                 <div class="field"><label>{{ __('network.name') }}</label><input name="name" required></div>
                 <div class="field"><label>{{ __('network.city') }}</label><input name="city" value="Tehran" required></div>
                 <div class="field"><label>{{ __('network.area') }}</label><input name="area_code"></div>
+                <div class="field"><label>{{ __('network.latitude') }}</label><input name="latitude" inputmode="decimal"></div>
+                <div class="field"><label>{{ __('network.longitude') }}</label><input name="longitude" inputmode="decimal"></div>
             </div>
+            <p class="hint">{{ __('network.location_hint') }}</p>
             <div class="actions"><button class="btn primary" type="submit">{{ __('network.new_clinic') }}</button></div>
         </form>
     </section>
@@ -153,4 +159,48 @@
         <div class="actions"><button class="btn primary" type="submit">{{ __('network.add_membership') }}</button></div>
     </form>
 </section>
+    <section class="card pad">
+        <h2>{{ __('network.capabilities') }}</h2>
+        <p class="hint">{{ __('network.capability_hint') }}</p>
+        @forelse($capabilities as $cap)
+            <div class="row">
+                <strong>{{ $cap->clinic_name }}</strong>
+                <div class="meta">{{ $cap->service_type }} · {{ $cap->suitability_status }} · {{ $cap->attested_at }}</div>
+            </div>
+        @empty
+            <p class="meta">{{ __('network.none') }}</p>
+        @endforelse
+        <form class="row" method="post" action="{{ route('network.capability.save', ['locale' => $locale]) }}">
+            @csrf
+            <strong>{{ __('network.attest_capability') }}</strong>
+            <div class="fields">
+                <div class="field">
+                    <label>{{ __('network.clinic') }}</label>
+                    <select name="clinic_id" required>
+                        @foreach($clinics->whereNull('synthetic_demo_key') as $clinic)
+                            <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="field">
+                    <label>{{ __('network.service_type') }}</label>
+                    <select name="service_type" required>
+                        @foreach($serviceTypes as $type)
+                            <option value="{{ $type->value }}">{{ $type->value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="field">
+                    <label>{{ __('network.suitability') }}</label>
+                    <select name="suitability_status" required>
+                        @foreach($suitabilityStatuses as $status)
+                            <option value="{{ $status->value }}">{{ __('network.suitability_states.'.$status->value) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="actions"><button class="btn" type="submit">{{ __('network.attest_capability') }}</button></div>
+        </form>
+    </section>
+
 @endsection
