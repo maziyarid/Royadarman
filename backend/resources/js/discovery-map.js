@@ -57,7 +57,7 @@ function renderList(root, matches, copy, origin) {
       "<p data-claim></p>" +
       '<div class="discovery-card-actions">' +
       '<a class="button primary" data-directions-link rel="noopener noreferrer" target="_blank"></a>' +
-      '<button type="button" class="button ghost" data-select-clinic></button>' +
+      '<a class="button ghost" data-request-link></a>' +
       "</div></article>";
 
     const card = item.querySelector(".discovery-card");
@@ -72,7 +72,9 @@ function renderList(root, matches, copy, origin) {
     const link = item.querySelector("[data-directions-link]");
     link.href = clinic.directions_url || directionsUrl(origin, clinic);
     link.textContent = text(copy, "directions");
-    item.querySelector("[data-select-clinic]").textContent = text(copy, "select_clinic");
+    const requestLink = item.querySelector("[data-request-link]");
+    requestLink.href = root.getAttribute("data-request-url") || "/fa/login";
+    requestLink.textContent = text(copy, "select_clinic");
 
     fragment.append(item);
   });
@@ -128,19 +130,11 @@ function initRoot(root) {
   };
   let ephemeralOrigin = null;
   let matches = [];
-  let selectedId = null;
   let activeNeighborhoodId = root.getAttribute("data-neighborhood-id") || select?.value || "";
   let requestSerial = 0;
 
   function currentOrigin() {
     return ephemeralOrigin || neighborhoodOrigin;
-  }
-
-  function highlight(id) {
-    selectedId = id;
-    root.querySelectorAll(".discovery-card").forEach((card) => {
-      card.classList.toggle("is-selected", card.dataset.clinicId === id);
-    });
   }
 
   function applyMatches(payload) {
@@ -152,19 +146,7 @@ function initRoot(root) {
     renderList(root, matches, copy, currentOrigin());
     applyOriginToLinks(root, currentOrigin());
 
-    if (selectedId && !matches.some((row) => row.clinic_id === selectedId)) {
-      selectedId = null;
-    }
   }
-
-  root.addEventListener("click", (event) => {
-    const selectBtn = event.target.closest("[data-select-clinic]");
-    const card = event.target.closest(".discovery-card");
-
-    if (selectBtn && card) {
-      highlight(card.dataset.clinicId);
-    }
-  });
 
   if (form && select) {
     form.addEventListener("submit", async (event) => {
