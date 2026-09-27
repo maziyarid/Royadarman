@@ -6,6 +6,12 @@ return [
     'supported_locales' => ['fa', 'ar', 'en'],
     'display_timezone' => 'Asia/Tehran',
     'panel_demo_access' => filter_var(env('PANEL_DEMO_ACCESS', false), FILTER_VALIDATE_BOOL),
+    'public_contact' => [
+        'phone' => '09122701201',
+        'whatsapp' => env('ROYADARMAN_PUBLIC_WHATSAPP_URL'),
+        'instagram' => env('ROYADARMAN_PUBLIC_INSTAGRAM_URL'),
+        'linkedin' => env('ROYADARMAN_PUBLIC_LINKEDIN_URL'),
+    ],
 
     'tehran_areas' => [
         'north',

@@ -36,3 +36,4 @@
         <span>{{ __('ui.boundary') }}</span>
     </div>
 </footer>
+@include('public.partials.contact-launcher')

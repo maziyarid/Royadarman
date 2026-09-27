@@ -10,6 +10,7 @@
     @endphp
     <section class="section white" data-discovery-root
              data-endpoint="{{ $discovery['endpoint'] }}"
+             data-request-url="{{ route('login', ['locale' => $locale]) }}"
              data-service-type="{{ $discovery['service_type'] }}"
              data-neighborhood-id="{{ $selected }}"
              data-origin-lat="{{ $discovery['origin']['lat'] }}"
@@ -54,7 +55,7 @@
                                     <p>{{ $copy['not_available_claim'] }}</p>
                                     <div class="discovery-card-actions">
                                         <a class="button primary" data-directions-link href="{{ $clinic['directions_url'] }}" rel="noopener noreferrer" target="_blank">{{ $copy['directions'] }}</a>
-                                        <button type="button" class="button ghost" data-select-clinic>{{ $copy['select_clinic'] }}</button>
+                                        <a class="button ghost" href="{{ route('login', ['locale' => $locale]) }}">{{ $copy['select_clinic'] }}</a>
                                     </div>
                                 </article>
                             </li>
