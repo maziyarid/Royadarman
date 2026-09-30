@@ -67,7 +67,12 @@ the live application. Use backend/public with a private synthetic environment.
 Do not expose a public staging site or copy production environment values.
 
 Connector repository access differs from Git push authentication on the VPS.
-The final Agiflow handover records tested access and any auth limitation.
+A VPS HTTPS Git push dry-run failed because no credential helper authenticated
+the account; gh auth status was also unauthenticated. Git clone/fetch works.
+Until the owner configures a scoped publisher, use a GitHub-connected agent to
+publish reviewed branch changes; Perplexity with SentinelX alone cannot push.
+Do not paste tokens into chat or embed credentials in remote URLs.
+The final Agiflow handover records the exact head and tested access.
 A successful public clone does not prove push access.
 
 Direct-root deployment after backup is authorised, but this is not an automatic
@@ -86,3 +91,10 @@ SHA and deployment state separately in Agiflow RPH-49/RPH-57.
 - Pattern scan of exported source/pending package found no recognised credential
   patterns. A bounded scan, not a guarantee against secrets.
 - No production application/schema/queue change made by the sync.
+
+## Captured build artifacts
+
+The live backend .gitignore excludes public/build. The 14 captured build files
+are explicitly tracked in this reconciliation so a fresh clone matches all 445
+manifest entries. New builds must be reviewed before adding generated outputs;
+do not assume ignored new filenames will be committed automatically.
