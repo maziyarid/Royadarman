@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Identity\Services\OtpService;
+use App\Domain\Identity\Services\SessionAssurance;
 use App\Domain\Identity\Services\StaffMfaService;
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -31,19 +32,20 @@ final class AuthController extends Controller
         ], 202);
     }
 
-    public function verify(Request $request, OtpService $service): JsonResponse
+    public function verify(Request $request, OtpService $service, SessionAssurance $assurance): JsonResponse
     {
         $otpLength = (int) config('royadarman.sms.otp.length', 6);
         $data = $request->validate(['challenge_id' => ['required', 'string'], 'code' => ['required', 'string', 'size:'.$otpLength], 'totp_code' => ['nullable', 'string'], 'recovery_code' => ['nullable', 'string', 'max:100']]);
         $user = $service->verify($data['challenge_id'], DigitNormalizer::latin($data['code']), $data['totp_code'] ?? null, $data['recovery_code'] ?? null);
         Auth::login($user);
         $request->session()->put('auth_method', 'otp');
+        $assurance->mark($request->session(), 'otp');
         $request->session()->regenerate();
 
         return response()->json(['data' => ['role' => $user->role->value, 'locale' => $user->locale]]);
     }
 
-    public function password(Request $request, StaffMfaService $mfa): JsonResponse
+    public function password(Request $request, StaffMfaService $mfa, SessionAssurance $assurance): JsonResponse
     {
         $data = $request->validate([
             'username' => ['required', 'string', 'max:32'],
@@ -73,13 +75,17 @@ final class AuthController extends Controller
         $user->forceFill(['last_authenticated_at' => now(), 'locale' => $data['locale']])->save();
         Auth::login($user);
         $request->session()->put('auth_method', 'password');
+        $assurance->mark($request->session(), 'password');
         $request->session()->regenerate();
 
         return response()->json(['data' => ['role' => $user->role->value, 'locale' => $user->locale]]);
     }
 
-    public function logout(Request $request): JsonResponse
+    public function logout(Request $request, SessionAssurance $assurance): JsonResponse
     {
+        if ($request->hasSession()) {
+            $assurance->clear($request->session());
+        }
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
