@@ -12,7 +12,7 @@ final class PolicyController extends Controller
     public function show(Request $request, string $key): JsonResponse
     {
         $locale = app()->getLocale();
-        $policy = PolicyVersion::query()->where('policy_key', $key)->where('locale', $locale)->whereNotNull('published_at')->latest('published_at')->first();
+        $policy = PolicyVersion::query()->productionEligible()->where('policy_key', $key)->where('locale', $locale)->whereNotNull('published_at')->latest('published_at')->first();
         if (! $policy) {
             return response()->json(['error' => ['code' => 'error.consent.translation_unavailable'], 'request_id' => $request->attributes->get('request_id')], 503);
         }

@@ -2,7 +2,7 @@
 @section('title', __('panel.roles.'.$panelKey.'.title'))
 @section('heading', __('panel.roles.'.$panelKey.'.title'))
 @section('actions')
-    @if(!$isDemo && $panelKey === 'patient')
+    @if($panelKey === 'patient')
         <a class="btn primary" href="{{ route('patient.request.create', ['locale' => app()->getLocale()]) }}">{{ __('request.title') }}</a>
     @endif
 @endsection

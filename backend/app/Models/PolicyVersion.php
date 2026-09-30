@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use LogicException;
@@ -9,6 +10,9 @@ use LogicException;
 class PolicyVersion extends Model
 {
     use HasUlids;
+
+    /** @var list<string> */
+    private const DEMO_VERSION_PREFIXES = ['panel-demo-', 'demo-panel-'];
 
     protected $guarded = [];
 
@@ -25,6 +29,26 @@ class PolicyVersion extends Model
                 throw new LogicException('Published policy versions cannot be deleted because consent history references them.');
             }
         });
+    }
+
+    public function scopeProductionEligible(Builder $query): Builder
+    {
+        foreach (self::DEMO_VERSION_PREFIXES as $prefix) {
+            $query->where('version', 'not like', $prefix.'%');
+        }
+
+        return $query;
+    }
+
+    public function isSyntheticDemo(): bool
+    {
+        foreach (self::DEMO_VERSION_PREFIXES as $prefix) {
+            if (str_starts_with((string) $this->version, $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function casts(): array

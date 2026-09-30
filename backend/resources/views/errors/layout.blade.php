@@ -13,7 +13,7 @@
     <title>{{ __('ui.errors.'.$code.'_title') }}</title>
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/assets/font.css?v=20260915">
-    <link rel="stylesheet" href="/assets/site.css?v=20260915">
+    <link rel="stylesheet" href="/assets/site.css?v=20260929-contact-1">
 </head>
 <body>
 @include('public.partials.header')

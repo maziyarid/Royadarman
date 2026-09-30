@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web\Admin;
 
 use App\Domain\CMS\Enums\PostStatus;
 use App\Domain\CMS\Enums\PostType;
+use App\Domain\CMS\Services\CmsMediaSanitizer;
 use App\Domain\CMS\Services\HtmlSanitizer;
 use App\Domain\Identity\Enums\UserRole;
 use App\Http\Controllers\Controller;
@@ -11,8 +12,11 @@ use App\Models\Cms\Category;
 use App\Models\Cms\CategoryTranslation;
 use App\Models\Cms\Comment;
 use App\Models\Cms\Media;
+use App\Models\Cms\MediaTranslation;
 use App\Models\Cms\Menu;
 use App\Models\Cms\MenuItem;
+use App\Models\Cms\MenuItemTranslation;
+use App\Models\Cms\MenuTranslation;
 use App\Models\Cms\Post;
 use App\Models\Cms\PostTranslation;
 use App\Models\Cms\Redirect;
@@ -23,7 +27,36 @@ use Illuminate\Validation\Rule;
 
 final class AdminCmsController extends Controller
 {
-    public function __construct(private readonly HtmlSanitizer $sanitizer) {}
+    public function __construct(
+        private readonly HtmlSanitizer $sanitizer,
+        private readonly CmsMediaSanitizer $mediaSanitizer,
+    ) {}
+
+    public function dashboard(Request $request)
+    {
+        $this->guardManage($request);
+
+        return view('admin.cms.dashboard', [
+            'counts' => [
+                'posts' => Post::query()->where('type', PostType::Post)->count(),
+                'pages' => Post::query()->where('type', PostType::Page)->count(),
+                'services' => Post::query()->where('type', PostType::Service)->count(),
+                'drafts' => Post::query()->whereIn('status', [PostStatus::Draft, PostStatus::InReview])->count(),
+                'published' => Post::query()->where('status', PostStatus::Published)->count(),
+                'media' => Media::query()->count(),
+                'categories' => Category::query()->count(),
+                'tags' => Tag::query()->count(),
+                'menus' => Menu::query()->count(),
+                'redirects' => Redirect::query()->where('is_active', true)->count(),
+                'pending_comments' => Comment::query()->where('status', 'pending')->count(),
+            ],
+            'recentPosts' => Post::query()
+                ->with(['translations', 'author:id,name'])
+                ->latest('updated_at')
+                ->limit(6)
+                ->get(),
+        ]);
+    }
 
     public function index(Request $request)
     {
@@ -339,7 +372,11 @@ final class AdminCmsController extends Controller
         $this->guardManage($request);
 
         $media = Media::query()
-            ->when($request->input('q'), fn ($q, $t) => $q->whereHas('translations', fn ($qt) => $qt->where('alt', 'like', '%'.$t.'%')))
+            ->with('translations')
+            ->when($request->input('q'), fn ($q, $t) => $q->whereHas('translations', fn ($qt) => $qt
+                ->where('alt_text', 'like', '%'.$t.'%')
+                ->orWhere('caption', 'like', '%'.$t.'%')
+                ->orWhere('description', 'like', '%'.$t.'%')))
             ->orderByDesc('created_at')
             ->paginate(20, ['*'], 'page', $request->integer('page', 1))
             ->withQueryString();
@@ -353,28 +390,55 @@ final class AdminCmsController extends Controller
     public function mediaStore(Request $request)
     {
         $this->guardManage($request);
-        $data = $request->validate([
-            'file' => ['required', 'image', 'max:8192'],
+        $request->validate([
+            'file' => ['required', 'file', 'max:'.$this->mediaSanitizer->maxKilobytes()],
         ]);
 
-        $file = $request->file('file');
-        $storageKey = $file->store('media', 'public-cms');
-        [$width, $height] = @getimagesize($file->getRealPath()) ?: [null, null];
+        $sanitized = $this->mediaSanitizer->sanitize($request->file('file'));
+        $disk = (string) config('royadarman.cms.media.disk', 'public-cms');
+        $storageKey = 'media/'.$sanitized->filename;
+        \Storage::disk($disk)->put($storageKey, $sanitized->binary);
 
         $media = Media::query()->create([
             'uploaded_by_user_id' => $request->user()->id,
-            'disk' => 'public-cms',
+            'disk' => $disk,
             'storage_key' => $storageKey,
-            'original_filename' => $file->getClientOriginalName(),
-            'mime_type' => $file->getMimeType(),
-            'byte_size' => $file->getSize(),
-            'sha256' => hash_file('sha256', $file->getRealPath()),
-            'width' => $width,
-            'height' => $height,
+            'original_filename' => $sanitized->originalFilename,
+            'mime_type' => $sanitized->mimeType,
+            'byte_size' => $sanitized->byteSize,
+            'sha256' => $sanitized->sha256,
+            'width' => $sanitized->width,
+            'height' => $sanitized->height,
         ]);
 
         foreach (['fa', 'ar', 'en'] as $locale) {
             $media->translations()->create(['locale' => $locale, 'alt_text' => '', 'caption' => null, 'description' => null]);
+        }
+
+        return redirect()->route('admin.cms.media.index')->with('status', __('saved'));
+    }
+
+    public function mediaUpdate(Request $request, Media $media)
+    {
+        $this->guardManage($request);
+
+        $data = $request->validate([
+            'translations' => ['required', 'array'],
+            'translations.*.locale' => ['required', 'in:fa,ar,en'],
+            'translations.*.alt_text' => ['nullable', 'string', 'max:300'],
+            'translations.*.caption' => ['nullable', 'string', 'max:500'],
+            'translations.*.description' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        foreach ($data['translations'] as $translation) {
+            MediaTranslation::query()->updateOrCreate(
+                ['media_id' => $media->id, 'locale' => $translation['locale']],
+                [
+                    'alt_text' => $translation['alt_text'] ?? null,
+                    'caption' => $translation['caption'] ?? null,
+                    'description' => $translation['description'] ?? null,
+                ],
+            );
         }
 
         return redirect()->route('admin.cms.media.index')->with('status', __('saved'));
@@ -402,16 +466,63 @@ final class AdminCmsController extends Controller
     public function menusStore(Request $request)
     {
         $this->guardManage($request);
-        $data = $request->validate([
-            'slug' => ['required', 'string', 'max:60', 'unique:cms_menus,slug'],
-            'location' => ['required', 'string', 'max:40'],
-            'title_fa' => ['required', 'string', 'max:120'],
+        $data = $this->validateMenu($request);
+
+        $menu = Menu::query()->create([
+            'slug' => $data['slug'],
+            'location' => $data['location'],
         ]);
 
-        $menu = Menu::query()->create(['slug' => $data['slug'], 'location' => $data['location']]);
-        $menu->translations()->create(['locale' => 'fa', 'title' => $data['title_fa']]);
+        foreach ($data['translations'] as $translation) {
+            $menu->translations()->create($translation);
+        }
 
         return redirect()->route('admin.cms.menus.index')->with('status', __('saved'));
+    }
+
+    public function menusUpdate(Request $request, Menu $menu)
+    {
+        $this->guardManage($request);
+        $data = $this->validateMenu($request, $menu);
+
+        $menu->update([
+            'slug' => $data['slug'],
+            'location' => $data['location'],
+        ]);
+
+        foreach ($data['translations'] as $translation) {
+            MenuTranslation::query()->updateOrCreate(
+                ['menu_id' => $menu->id, 'locale' => $translation['locale']],
+                ['title' => $translation['title']],
+            );
+        }
+
+        return redirect()->route('admin.cms.menus.index')->with('status', __('saved'));
+    }
+
+    private function validateMenu(Request $request, ?Menu $menu = null): array
+    {
+        $rules = [
+            'slug' => ['required', 'string', 'max:60', Rule::unique('cms_menus', 'slug')->ignore($menu?->id)],
+            'location' => ['required', 'string', 'max:40'],
+        ];
+
+        if ($request->has('translations')) {
+            $rules += [
+                'translations' => ['required', 'array', 'size:3'],
+                'translations.*.locale' => ['required', Rule::in(['fa', 'ar', 'en'])],
+                'translations.*.title' => ['required', 'string', 'max:120'],
+            ];
+        } else {
+            $rules['title_fa'] = ['required', 'string', 'max:120'];
+        }
+
+        $data = $request->validate($rules);
+        if (! isset($data['translations'])) {
+            $data['translations'] = [['locale' => 'fa', 'title' => $data['title_fa']]];
+        }
+
+        return $data;
     }
 
     public function menusDestroy(Request $request, Menu $menu)
@@ -425,26 +536,95 @@ final class AdminCmsController extends Controller
     public function menuItemsStore(Request $request, Menu $menu)
     {
         $this->guardManage($request);
-        $data = $request->validate([
-            'label_fa' => ['required', 'string', 'max:120'],
-            'url' => ['nullable', 'string', 'max:500'],
-            'parent_id' => ['nullable', 'integer', 'exists:cms_menu_items,id'],
-            'sort_order' => ['nullable', 'integer'],
-        ]);
+        $data = $this->validateMenuItem($request, $menu);
 
         $item = $menu->items()->create([
             'parent_id' => $data['parent_id'] ?? null,
             'url' => $data['url'] ?? null,
-            'sort_order' => $data['sort_order'] ?? 0,
+            'target' => $data['target'],
+            'is_active' => $data['is_active'],
+            'sort_order' => $data['sort_order'],
         ]);
-        $item->translations()->create(['locale' => 'fa', 'label' => $data['label_fa']]);
+
+        foreach ($data['translations'] as $translation) {
+            $item->translations()->create($translation);
+        }
 
         return redirect()->route('admin.cms.menus.index')->with('status', __('saved'));
+    }
+
+    public function menuItemsUpdate(Request $request, Menu $menu, MenuItem $item)
+    {
+        $this->guardManage($request);
+        abort_unless($item->menu_id === $menu->id, 404);
+
+        $data = $this->validateMenuItem($request, $menu, $item);
+
+        $item->update([
+            'parent_id' => $data['parent_id'] ?? null,
+            'url' => $data['url'] ?? null,
+            'target' => $data['target'],
+            'is_active' => $data['is_active'],
+            'sort_order' => $data['sort_order'],
+        ]);
+
+        foreach ($data['translations'] as $translation) {
+            MenuItemTranslation::query()->updateOrCreate(
+                ['menu_item_id' => $item->id, 'locale' => $translation['locale']],
+                ['label' => $translation['label']],
+            );
+        }
+
+        return redirect()->route('admin.cms.menus.index')->with('status', __('saved'));
+    }
+
+    private function validateMenuItem(Request $request, Menu $menu, ?MenuItem $item = null): array
+    {
+        $rules = [
+            'url' => ['nullable', 'string', 'max:500'],
+            'parent_id' => ['nullable', 'integer'],
+            'target' => ['nullable', Rule::in(['_self', '_blank'])],
+            'is_active' => ['nullable', 'boolean'],
+            'sort_order' => ['nullable', 'integer', 'min:0', 'max:10000'],
+        ];
+
+        if ($request->has('translations')) {
+            $rules += [
+                'translations' => ['required', 'array', 'size:3'],
+                'translations.*.locale' => ['required', Rule::in(['fa', 'ar', 'en'])],
+                'translations.*.label' => ['required', 'string', 'max:120'],
+            ];
+        } else {
+            $rules['label_fa'] = ['required', 'string', 'max:120'];
+        }
+
+        $data = $request->validate($rules);
+        if (! isset($data['translations'])) {
+            $data['translations'] = [['locale' => 'fa', 'label' => $data['label_fa']]];
+        }
+        $data['target'] = $data['target'] ?? '_self';
+        $data['is_active'] = $data['is_active'] ?? true;
+        $data['sort_order'] = $data['sort_order'] ?? 0;
+
+        if (! empty($data['parent_id'])) {
+            $parent = $menu->items()->find($data['parent_id']);
+            abort_unless($parent, 422);
+            abort_if($item && $parent->id === $item->id, 422);
+        }
+
+        $url = trim((string) ($data['url'] ?? ''));
+        if ($url !== '' && ! str_starts_with($url, '/') && ! str_starts_with($url, 'https://')) {
+            abort(422, __('ui.admin.safe_url_required'));
+        }
+        $data['url'] = $url === '' ? null : $url;
+
+        return $data;
     }
 
     public function menuItemsDestroy(Request $request, Menu $menu, MenuItem $item)
     {
         $this->guardDelete($request);
+        abort_unless($item->menu_id === $menu->id, 404);
         $item->delete();
 
         return redirect()->route('admin.cms.menus.index')->with('status', __('deleted'));

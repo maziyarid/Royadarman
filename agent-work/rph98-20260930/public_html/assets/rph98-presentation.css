@@ -1,0 +1,394 @@
+/* RPH-98 Worker B — additive operations-calendar presentation.
+   Scoped to .rph98-calendar. Does not replace workspace.css.
+   Blue/teal follows the live Royadarman tokens, not the lavender reference. */
+
+.rph98-calendar {
+    --rph98-brand: #2947a3;
+    --rph98-brand-ink: #ffffff;
+    --rph98-teal: #0b6e78;
+    --rph98-teal-soft: #e5f4f6;
+    --rph98-ink: #18233c;
+    --rph98-muted: #3e4a5f;
+    --rph98-line: #d5dbe8;
+    --rph98-surface: #ffffff;
+    --rph98-soft: #f4f6fb;
+    --rph98-friday: #fff6ee;
+    --rph98-today: #e7eefc;
+    --rph98-task: #2947a3;
+    --rph98-home: #146b42;
+    --rph98-referral: #8a5a10;
+    --rph98-focus: #0b6e78;
+    color: var(--rph98-ink);
+}
+
+.rph98-calendar [hidden] {
+    display: none !important;
+}
+
+.rph98-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.rph98-hero,
+.rph98-agenda-card,
+.rph98-stat,
+.rph98-day,
+.rph98-empty {
+    background: var(--rph98-surface);
+    border: 1px solid var(--rph98-line);
+    border-radius: 18px;
+}
+
+.rph98-hero {
+    padding: 22px 24px;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #eef4fb 58%, #e7f6f7 100%);
+}
+
+.rph98-hero h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.45rem, 2.4vw, 2rem);
+    line-height: 1.35;
+}
+
+.rph98-hero p,
+.rph98-note,
+.rph98-empty p {
+    margin: 0;
+    color: var(--rph98-muted);
+    max-width: 72ch;
+}
+
+.rph98-toolbar,
+.rph98-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+}
+
+.rph98-month {
+    flex: 1 1 12rem;
+    margin: 0;
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.rph98-btn,
+.rph98-filter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--rph98-line);
+    background: var(--rph98-surface);
+    color: var(--rph98-ink);
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    line-height: 1.3;
+}
+
+.rph98-filter[aria-pressed="true"] {
+    background: var(--rph98-brand);
+    border-color: var(--rph98-brand);
+    color: var(--rph98-brand-ink);
+}
+
+.rph98-btn:focus-visible,
+.rph98-filter:focus-visible,
+.rph98-event:focus-visible,
+.rph98-agenda-row:focus-visible {
+    outline: 3px solid var(--rph98-focus);
+    outline-offset: 2px;
+}
+
+.rph98-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0 0 16px;
+}
+
+.rph98-stat {
+    padding: 14px 16px;
+    min-width: 0;
+}
+
+.rph98-stat-num {
+    font-size: 1.55rem;
+    font-weight: 800;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+
+.rph98-stat-label {
+    color: var(--rph98-muted);
+    font-size: 0.92rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.rph98-weekdays,
+.rph98-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.rph98-weekdays {
+    margin-bottom: 8px;
+}
+
+.rph98-weekday {
+    text-align: center;
+    color: var(--rph98-muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.rph98-month-grid {
+    margin: 0 0 18px;
+}
+
+.rph98-day {
+    position: relative;
+    min-height: 132px;
+    padding: 8px;
+    overflow: hidden;
+}
+
+.rph98-day-empty {
+    background: transparent;
+    border-style: dashed;
+    min-height: 72px;
+}
+
+.rph98-day.is-today {
+    background: var(--rph98-today);
+    border-color: var(--rph98-brand);
+    box-shadow: inset 0 0 0 1px var(--rph98-brand);
+}
+
+.rph98-day.is-friday {
+    background: var(--rph98-friday);
+}
+
+.rph98-day.is-today.is-friday {
+    background: linear-gradient(180deg, var(--rph98-today), var(--rph98-friday));
+}
+
+.rph98-day > header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+.rph98-day > header small {
+    color: var(--rph98-muted);
+    font-size: 0.72rem;
+}
+
+.rph98-events {
+    display: grid;
+    gap: 6px;
+}
+
+.rph98-event,
+.rph98-agenda-row {
+    color: inherit;
+    text-decoration: none;
+}
+
+.rph98-event {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1px 6px;
+    padding: 6px 7px;
+    border-radius: 10px;
+    background: var(--rph98-soft);
+    border: 1px solid var(--rph98-line);
+    border-inline-start-width: 4px;
+    font-size: 0.75rem;
+    line-height: 1.35;
+}
+
+.rph98-event-time {
+    grid-row: 1 / span 2;
+    color: var(--rph98-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.rph98-event-title,
+.rph98-event-meta,
+.rph98-agenda-copy strong,
+.rph98-agenda-copy span,
+.rph98-badge {
+    overflow-wrap: anywhere;
+}
+
+.rph98-event-meta {
+    grid-column: 2;
+    color: var(--rph98-muted);
+}
+
+.rph98-kind-task {
+    border-inline-start-color: var(--rph98-task);
+}
+
+.rph98-kind-home_service {
+    border-inline-start-color: var(--rph98-home);
+}
+
+.rph98-kind-referral_expiry {
+    border-inline-start-color: var(--rph98-referral);
+}
+
+.rph98-no-event {
+    color: #8b93a3;
+    font-size: 0.8rem;
+}
+
+.rph98-agenda-card {
+    padding: 8px 16px 12px;
+}
+
+.rph98-agenda-card h2 {
+    margin: 12px 0;
+    font-size: 1.05rem;
+}
+
+.rph98-agenda-row {
+    display: grid;
+    grid-template-columns: minmax(9.5rem, max-content) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rph98-line);
+}
+
+.rph98-agenda-row:last-child {
+    border-bottom: 0;
+}
+
+.rph98-agenda-copy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.rph98-agenda-copy span {
+    color: var(--rph98-muted);
+    font-size: 0.85rem;
+}
+
+.rph98-badge {
+    justify-self: start;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: var(--rph98-soft);
+    border-inline-start: 4px solid var(--rph98-line);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.rph98-empty {
+    padding: 16px;
+    margin: 8px 0 12px;
+}
+
+.rph98-note {
+    margin-top: 14px;
+    font-size: 0.92rem;
+}
+
+@media (max-width: 900px) {
+    .rph98-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .rph98-weekdays,
+    .rph98-grid {
+        gap: 4px;
+    }
+
+    .rph98-day {
+        min-height: 72px;
+        padding: 6px;
+    }
+
+    .rph98-weekday {
+        font-size: 0.68rem;
+    }
+
+    .rph98-event {
+        grid-template-columns: 1fr;
+        min-height: 36px;
+        align-content: center;
+    }
+
+    .rph98-event-time {
+        grid-row: auto;
+    }
+
+    .rph98-event-title,
+    .rph98-event-meta {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+}
+
+@media (max-width: 640px) {
+    .rph98-hero {
+        padding: 16px;
+    }
+
+    .rph98-day {
+        min-height: 68px;
+    }
+
+    .rph98-agenda-row {
+        grid-template-columns: 1fr;
+        align-items: start;
+        gap: 4px;
+    }
+
+    .rph98-filters .rph98-filter,
+    .rph98-toolbar .rph98-btn {
+        flex: 1 1 calc(50% - 8px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rph98-calendar * {
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}

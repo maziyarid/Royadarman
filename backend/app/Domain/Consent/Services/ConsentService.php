@@ -14,6 +14,7 @@ final class ConsentService
     public function resolvePolicy(string $policyKey, string $version, string $locale): ?PolicyVersion
     {
         return PolicyVersion::query()
+            ->productionEligible()
             ->where('policy_key', $policyKey)
             ->where('version', $version)
             ->where('locale', $locale)
@@ -24,6 +25,7 @@ final class ConsentService
     public function latestPublishedPolicy(string $policyKey, string $locale): ?PolicyVersion
     {
         return PolicyVersion::query()
+            ->productionEligible()
             ->where('policy_key', $policyKey)
             ->where('locale', $locale)
             ->whereNotNull('published_at')

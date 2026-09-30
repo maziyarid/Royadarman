@@ -16,7 +16,7 @@ use Illuminate\Validation\ValidationException;
 
 final class OtpService
 {
-    public function __construct(private readonly OtpSender $sender, private readonly TotpVerifier $totp, private readonly PhoneHasher $phoneHasher) {}
+    public function __construct(private readonly OtpSender $sender, private readonly StaffMfaService $mfa, private readonly PhoneHasher $phoneHasher) {}
 
     public function challenge(string $mobile, string $locale, string $ip): OtpChallenge
     {
@@ -31,20 +31,29 @@ final class OtpService
         }
 
         $ipHash = hash_hmac('sha256', $ip, (string) config('app.key'));
-        if (OtpChallenge::query()->where('phone_hash', $phoneHash)->where('created_at', '>=', now()->subHour())->count() >= 10) {
+        $phoneLimit = (int) config('royadarman.sms.otp.phone_limit_count', 3);
+        $phoneWindow = (int) config('royadarman.sms.otp.phone_limit_window_minutes', 10);
+        $ipLimit = (int) config('royadarman.sms.otp.ip_limit_count', 10);
+        $ipWindow = (int) config('royadarman.sms.otp.ip_limit_window_minutes', 60);
+        $resendCooldown = (int) config('royadarman.sms.otp.resend_cooldown_seconds', 60);
+        $length = (int) config('royadarman.sms.otp.length', 6);
+        $ttlSeconds = (int) config('royadarman.sms.otp.ttl_seconds', 300);
+
+        if (OtpChallenge::query()->where('phone_hash', $phoneHash)->where('created_at', '>=', now()->subMinutes($phoneWindow))->count() >= $phoneLimit) {
             abort(429);
         }
-        if (OtpChallenge::query()->where('request_ip_hash', $ipHash)->where('created_at', '>=', now()->subHour())->count() >= 20) {
+        if (OtpChallenge::query()->where('request_ip_hash', $ipHash)->where('created_at', '>=', now()->subMinutes($ipWindow))->count() >= $ipLimit) {
             abort(429);
         }
 
         $latest = OtpChallenge::query()->where('phone_hash', $phoneHash)->latest()->first();
-        if ($latest?->last_sent_at?->isAfter(now()->subMinute())) {
+        if ($latest?->last_sent_at?->isAfter(now()->subSeconds($resendCooldown))) {
             abort(429);
         }
 
-        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        $challenge = DB::transaction(function () use ($mobile, $locale, $phoneHash, $ipHash, $code): OtpChallenge {
+        $max = (10 ** $length) - 1;
+        $code = str_pad((string) random_int(0, $max), $length, '0', STR_PAD_LEFT);
+        $challenge = DB::transaction(function () use ($mobile, $locale, $phoneHash, $ipHash, $code, $ttlSeconds): OtpChallenge {
             // Acquire a durable serialization slot keyed by phone_hash + purpose.
             // The slot row always exists (created on first use), so locking it
             // serialises concurrent issuance transactions even when no existing
@@ -73,7 +82,7 @@ final class OtpService
 
             return OtpChallenge::query()->create([
                 'phone' => $mobile, 'phone_hash' => $phoneHash, 'code_hash' => Hash::make($code),
-                'locale' => $locale, 'purpose' => 'login', 'expires_at' => now()->addMinutes(5),
+                'locale' => $locale, 'purpose' => 'login', 'expires_at' => now()->addSeconds($ttlSeconds),
                 'last_sent_at' => now(), 'request_ip_hash' => $ipHash,
             ]);
         });
@@ -83,7 +92,13 @@ final class OtpService
         } catch (\Throwable $exception) {
             $challenge->delete();
             report($exception);
-            abort(503, __('ui.errors.otp_delivery'));
+
+            throw new DomainException(
+                503,
+                'auth.otp_delivery_unavailable',
+                trans('auth_ui.otp_unavailable', [], $locale),
+                $exception,
+            );
         }
 
         return $challenge;
@@ -93,7 +108,8 @@ final class OtpService
     {
         return DB::transaction(function () use ($challengeId, $code, $totpCode, $recoveryCode): User {
             $challenge = OtpChallenge::query()->lockForUpdate()->findOrFail($challengeId);
-            if ($challenge->used_at || $challenge->superseded_at || $challenge->expires_at->isPast() || $challenge->attempts >= 5) {
+            $maxAttempts = (int) config('royadarman.sms.otp.max_attempts', 5);
+            if ($challenge->used_at || $challenge->superseded_at || $challenge->expires_at->isPast() || $challenge->attempts >= $maxAttempts) {
                 throw ValidationException::withMessages(['code' => __('ui.errors.otp_invalid')]);
             }
             $challenge->increment('attempts');
@@ -115,7 +131,8 @@ final class OtpService
             if (! $user->is_active) {
                 abort(403);
             }
-            if ($user->role->isStaff() && ! $this->verifyStaffMfa($user, $totpCode, $recoveryCode)) {
+            if ($user->role->isStaff() && $this->mfa->isConfigured($user)
+                && ! $this->mfa->verifyAndConsume($user, $totpCode, $recoveryCode)) {
                 throw ValidationException::withMessages(['totp_code' => __('ui.errors.mfa_invalid')]);
             }
             $challenge->update(['used_at' => now()]);
@@ -123,26 +140,5 @@ final class OtpService
 
             return $user;
         });
-    }
-
-    private function verifyStaffMfa(User $user, ?string $totpCode, ?string $recoveryCode): bool
-    {
-        if ($user->totp_secret && $totpCode && $this->totp->verify($user->totp_secret, DigitNormalizer::latin($totpCode))) {
-            return true;
-        }
-        if (! $recoveryCode || ! is_array($user->mfa_recovery_codes)) {
-            return false;
-        }
-        foreach ($user->mfa_recovery_codes as $index => $hash) {
-            if (is_string($hash) && Hash::check($recoveryCode, $hash)) {
-                $codes = $user->mfa_recovery_codes;
-                unset($codes[$index]);
-                $user->update(['mfa_recovery_codes' => array_values($codes)]);
-
-                return true;
-            }
-        }
-
-        return false;
     }
 }

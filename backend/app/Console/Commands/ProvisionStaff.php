@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Domain\Identity\Enums\UserRole;
+use App\Domain\Identity\Services\SessionInventoryService;
 use App\Models\User;
 use App\Support\DigitNormalizer;
 use App\Support\PhoneHasher;
@@ -23,7 +24,7 @@ final class ProvisionStaff extends Command
 
     protected $description = 'Provision a Royadarman staff identity with TOTP MFA and one-time recovery codes.';
 
-    public function handle(PhoneHasher $phoneHasher): int
+    public function handle(PhoneHasher $phoneHasher, SessionInventoryService $sessions): int
     {
         $mobile = DigitNormalizer::iranianMobile((string) $this->argument('mobile'));
         $roleValue = (string) $this->argument('role');
@@ -72,6 +73,8 @@ final class ProvisionStaff extends Command
         }
 
         $created = false;
+        $roleChanged = false;
+        $reactivated = false;
         if (! $user) {
             $user = User::query()->create([
                 'phone' => $mobile,
@@ -83,33 +86,60 @@ final class ProvisionStaff extends Command
             ]);
             $created = true;
         } else {
-            $user->update([
+            $roleChanged = $user->role !== $role;
+            $reactivated = ! $user->is_active;
+        }
+
+        $needsMfa = $created || ! $user->totp_secret || (bool) $this->option('replace-mfa');
+
+        $secret = null;
+        $plainRecoveryCodes = [];
+        $hashedRecoveryCodes = [];
+        if ($needsMfa) {
+            $secret = $this->base32(random_bytes(20));
+            for ($i = 0; $i < 8; $i++) {
+                $code = strtoupper(Str::random(5).'-'.Str::random(5));
+                $plainRecoveryCodes[] = $code;
+                $hashedRecoveryCodes[] = Hash::make($code);
+            }
+        }
+
+        if ($created) {
+            if ($needsMfa) {
+                $user->update([
+                    'totp_secret' => $secret,
+                    'mfa_recovery_codes' => $hashedRecoveryCodes,
+                ]);
+            }
+        } else {
+            $attributes = [
                 'name' => $this->option('name') ?: $user->name,
                 'role' => $role,
                 'locale' => $locale,
                 'is_active' => true,
-            ]);
+            ];
+            if ($needsMfa) {
+                $attributes['totp_secret'] = $secret;
+                $attributes['mfa_recovery_codes'] = $hashedRecoveryCodes;
+            }
+
+            $shouldRevoke = $roleChanged || $needsMfa || $reactivated;
+            $reason = match (true) {
+                $roleChanged && $needsMfa => 'staff_role_change_and_mfa',
+                $roleChanged => 'staff_role_change',
+                $needsMfa => 'staff_mfa_replaced',
+                $reactivated => 'staff_reactivated',
+                default => 'staff_identity_update',
+            };
+
+            $this->commitIdentityChangeAndRevoke($user, $attributes, $sessions, $shouldRevoke, $reason);
         }
 
-        $needsMfa = $created || ! $user->totp_secret || (bool) $this->option('replace-mfa');
         if (! $needsMfa) {
             $this->info('Staff identity is active and already has MFA configured. No secret was displayed or changed.');
 
             return self::SUCCESS;
         }
-
-        $secret = $this->base32(random_bytes(20));
-        $plainRecoveryCodes = [];
-        $hashedRecoveryCodes = [];
-        for ($i = 0; $i < 8; $i++) {
-            $code = strtoupper(Str::random(5).'-'.Str::random(5));
-            $plainRecoveryCodes[] = $code;
-            $hashedRecoveryCodes[] = Hash::make($code);
-        }
-        $user->update([
-            'totp_secret' => $secret,
-            'mfa_recovery_codes' => $hashedRecoveryCodes,
-        ]);
 
         $label = rawurlencode('Royadarman:'.$mobile);
         $issuer = rawurlencode('Royadarman');
@@ -122,6 +152,45 @@ final class ProvisionStaff extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Persist a sensitive identity/MFA/reactivation change with session revocation.
+     *
+     * Revoke first inside the user/audit connection transaction so a same-connection
+     * audit failure cannot restore sessions after the role/MFA/active row has already
+     * been committed. Split SESSION_CONNECTION stores still delete first (no XA);
+     * identity then commits on the application connection.
+     *
+     * Inactive→active is a sensitive identity transition: dormant session rows can
+     * survive EnsureActiveUser (which only invalidates a request that actually
+     * presents an inactive session).
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    private function commitIdentityChangeAndRevoke(
+        User $user,
+        array $attributes,
+        SessionInventoryService $sessions,
+        bool $shouldRevoke,
+        string $reason,
+    ): void {
+        $connection = $user->getConnectionName() ?? (string) config('database.default');
+
+        DB::connection($connection)->transaction(function () use ($user, $attributes, $sessions, $shouldRevoke, $reason): void {
+            if ($shouldRevoke) {
+                $this->revokeSessionsAfterSecurityChange($sessions, $user, $reason);
+            }
+            $user->update($attributes);
+        });
+    }
+
+    private function revokeSessionsAfterSecurityChange(SessionInventoryService $sessions, User $user, string $reason): void
+    {
+        $deleted = $sessions->revokeAll($user, null, $reason);
+        if ($deleted > 0) {
+            $this->info("Revoked {$deleted} existing session(s) after identity/security change ({$reason}).");
+        }
     }
 
     private function base32(string $binary): string

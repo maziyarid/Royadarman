@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Cases\Enums\ServiceType;
+use App\Domain\Discovery\Enums\SuitabilityStatus;
 use App\Domain\Identity\Enums\UserRole;
+use App\Models\ClinicServiceCapability;
 use App\Support\PanelDemoRegistry;
 use App\Support\WorkspaceView;
 use Illuminate\Contracts\View\View;
@@ -47,11 +50,26 @@ final class NetworkAdminController extends Controller
                 'users.name as user_name', 'users.id as user_id', 'users.role as user_role',
             ]);
 
+        $capabilities = DB::table('clinic_service_capabilities')
+            ->join('clinics', 'clinics.id', '=', 'clinic_service_capabilities.clinic_id')
+            ->orderBy('clinics.name')->orderBy('clinic_service_capabilities.service_type')
+            ->get([
+                'clinic_service_capabilities.id',
+                'clinic_service_capabilities.clinic_id',
+                'clinic_service_capabilities.service_type',
+                'clinic_service_capabilities.suitability_status',
+                'clinic_service_capabilities.attested_at',
+                'clinics.name as clinic_name',
+            ]);
+
         return view('panel.network.index', [
             ...WorkspaceView::data($request, 'network'),
             'clinics' => $clinics,
             'staff' => $staff,
             'memberships' => $memberships,
+            'capabilities' => $capabilities,
+            'serviceTypes' => ServiceType::cases(),
+            'suitabilityStatuses' => SuitabilityStatus::cases(),
             'locale' => $locale,
             'search' => $q,
             'demoEmails' => array_column(PanelDemoRegistry::identities(), 'email'),
@@ -65,13 +83,19 @@ final class NetworkAdminController extends Controller
             'name' => ['required', 'string', 'max:180', Rule::notIn([PanelDemoRegistry::CLINIC_DISPLAY_NAME])],
             'city' => ['required', 'string', 'max:80'],
             'area_code' => ['nullable', 'string', 'max:80'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90', 'required_with:longitude'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180', 'required_with:latitude'],
         ]);
+        $coords = $this->coordinatesFrom($data);
 
         DB::table('clinics')->insert([
             'id' => (string) Str::ulid(),
             'name' => $data['name'],
             'city' => $data['city'],
             'area_code' => $data['area_code'] ?? null,
+            'latitude' => $coords['latitude'],
+            'longitude' => $coords['longitude'],
+            'location_recorded_at' => $coords['location_recorded_at'],
             'synthetic_demo_key' => null,
             'is_active' => true,
             'created_at' => now(),
@@ -92,13 +116,19 @@ final class NetworkAdminController extends Controller
             'city' => ['required', 'string', 'max:80'],
             'area_code' => ['nullable', 'string', 'max:80'],
             'is_active' => ['required', 'boolean'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90', 'required_with:longitude'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180', 'required_with:latitude'],
         ]);
+        $coords = $this->coordinatesFrom($data, $existing);
 
         DB::table('clinics')->where('id', $clinic)->update([
             'name' => $data['name'],
             'city' => $data['city'],
             'area_code' => $data['area_code'] ?? null,
             'is_active' => (bool) $data['is_active'],
+            'latitude' => $coords['latitude'],
+            'longitude' => $coords['longitude'],
+            'location_recorded_at' => $coords['location_recorded_at'],
             'updated_at' => now(),
         ]);
 
@@ -211,6 +241,66 @@ final class NetworkAdminController extends Controller
     private function isDemoIdentity(string $email): bool
     {
         return in_array($email, array_column(PanelDemoRegistry::identities(), 'email'), true);
+    }
+
+    public function saveCapability(Request $request, string $locale): RedirectResponse
+    {
+        $this->authorizeOwner($request);
+        $data = $request->validate([
+            'clinic_id' => ['required', 'exists:clinics,id'],
+            'service_type' => ['required', Rule::enum(ServiceType::class)],
+            'suitability_status' => ['required', Rule::enum(SuitabilityStatus::class)],
+        ]);
+        $existing = DB::table('clinics')->where('id', $data['clinic_id'])->first(['id', 'synthetic_demo_key']);
+        abort_unless($existing, 404);
+        abort_if(! empty($existing->synthetic_demo_key), 403, 'The synthetic demo clinic cannot be mutated from network administration.');
+
+        ClinicServiceCapability::query()->updateOrCreate(
+            ['clinic_id' => $data['clinic_id'], 'service_type' => $data['service_type']],
+            [
+                'suitability_status' => $data['suitability_status'],
+                'attested_at' => now(),
+                'attested_by_user_id' => $request->user()->id,
+            ],
+        );
+
+        return redirect()->route('network.index', ['locale' => $locale])->with('status', __('network.status_messages.capability_saved'));
+    }
+
+    /** @param array<string, mixed> $data
+     * @return array{latitude: ?float, longitude: ?float, location_recorded_at: mixed}
+     */
+    private function coordinatesFrom(array $data, ?object $existing = null): array
+    {
+        $latPresent = array_key_exists('latitude', $data);
+        $lngPresent = array_key_exists('longitude', $data);
+        if (! $latPresent && ! $lngPresent && $existing !== null) {
+            return [
+                'latitude' => $existing->latitude,
+                'longitude' => $existing->longitude,
+                'location_recorded_at' => $existing->location_recorded_at,
+            ];
+        }
+
+        $lat = $data['latitude'] ?? null;
+        $lng = $data['longitude'] ?? null;
+        if ($lat === null || $lat === '' || $lng === null || $lng === '') {
+            return ['latitude' => null, 'longitude' => null, 'location_recorded_at' => null];
+        }
+
+        $lat = round((float) $lat, 6);
+        $lng = round((float) $lng, 6);
+        $same = $existing !== null
+            && $existing->latitude !== null
+            && $existing->longitude !== null
+            && abs((float) $existing->latitude - $lat) < 0.0000005
+            && abs((float) $existing->longitude - $lng) < 0.0000005;
+
+        return [
+            'latitude' => $lat,
+            'longitude' => $lng,
+            'location_recorded_at' => $same ? $existing->location_recorded_at : now(),
+        ];
     }
 
     private function authorizeOwner(Request $request): void

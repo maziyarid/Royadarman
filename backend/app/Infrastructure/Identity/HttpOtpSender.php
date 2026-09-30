@@ -3,15 +3,18 @@
 namespace App\Infrastructure\Identity;
 
 use App\Domain\Identity\Contracts\OtpSender;
+use App\Domain\Operations\Services\IntegrationSettings;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
 final class HttpOtpSender implements OtpSender
 {
+    public function __construct(private readonly IntegrationSettings $settings) {}
+
     public function send(string $mobile, string $code, string $locale): void
     {
-        $endpoint = config('royadarman.sms.endpoint');
-        $token = config('royadarman.sms.token');
+        $endpoint = $this->settings->value('sms_endpoint', config('royadarman.sms.endpoint'));
+        $token = $this->settings->value('sms_token', config('royadarman.sms.token'));
 
         if (! is_string($endpoint) || $endpoint === '' || ! is_string($token) || $token === '') {
             throw new RuntimeException('OTP delivery is not configured.');

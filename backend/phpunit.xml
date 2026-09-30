@@ -39,5 +39,9 @@
         <env name="NIGHTWATCH_ENABLED" value="false" force="true"/>
         <env name="INTAKE_ENABLED" value="false" force="true"/>
         <env name="PANEL_DEMO_ACCESS" value="false" force="true"/>
+        <!-- Blank, not a leaked production duration. Config coerces "" to null. -->
+        <env name="ROYADARMAN_DOCUMENT_RETENTION_DAYS" value="" force="true"/>
+        <env name="ROYADARMAN_REFERRAL_GRANT_TTL_MINUTES" value="" force="true"/>
+        <env name="NESHAN_MAP_API_KEY" value="" force="true"/>
     </php>
 </phpunit>

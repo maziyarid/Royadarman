@@ -1,0 +1,2243 @@
+{
+  "captured_at": "2026-09-30T17:24:57.972414+00:00",
+  "source": "live production",
+  "files": [
+    {
+      "path": "backend/app/Console/Commands/DispatchOutbox.php",
+      "sha256": "0c2664ccc3e59ab3c20f5d968a979b7e958a4522e04e3da79a2f4fc9642f5c99",
+      "size": 638
+    },
+    {
+      "path": "backend/app/Console/Commands/PanelDemoLinks.php",
+      "sha256": "902d00dd87b102030a6fdecd2ea9c7fc948e4a1542b2a66f11f44ff37b172e57",
+      "size": 1909
+    },
+    {
+      "path": "backend/app/Console/Commands/Preflight.php",
+      "sha256": "09ed2d63e8f734edb3191958c7eef9e8507ee3a0b00d15f0dda98d732350220e",
+      "size": 8529
+    },
+    {
+      "path": "backend/app/Console/Commands/ProvisionStaff.php",
+      "sha256": "2f1d29c60d45344648f4d58b9676a34a2eeb531e4eb2cb11144ff5980e6a6363",
+      "size": 8010
+    },
+    {
+      "path": "backend/app/Console/Commands/ReleaseIdentity.php",
+      "sha256": "3fc7923cf56b40fac7ee306976bdb03c44d97501393a236070a42e0053af2cd6",
+      "size": 2873
+    },
+    {
+      "path": "backend/app/Console/Commands/RunRetention.php",
+      "sha256": "814ea6cc9028566f4a9cde0dd603ce7381cc0836e55ee116367782e7ec6b5fb6",
+      "size": 3975
+    },
+    {
+      "path": "backend/app/Console/Commands/SeedPanelDemo.php",
+      "sha256": "3ffca94282dd39870c7b483c7c236a06a18b199c178f1dee6202825e69e8f30c",
+      "size": 17850
+    },
+    {
+      "path": "backend/app/Domain/CMS/Enums/CommentStatus.php",
+      "sha256": "31b6bf811b822c230bc1aff351438c1a60a5343c07b90a475074a349d69c43e2",
+      "size": 183
+    },
+    {
+      "path": "backend/app/Domain/CMS/Enums/MenuItemType.php",
+      "sha256": "96d570d8752686a0dbfa3274f3aa0962a81c2dc6d7e834735bc0bd057875dfc8",
+      "size": 200
+    },
+    {
+      "path": "backend/app/Domain/CMS/Enums/PostStatus.php",
+      "sha256": "50cf012fa12e0f0d6fa1800ec5abf3041d8cf9f1df52dcab7fce360d18a14cea",
+      "size": 422
+    },
+    {
+      "path": "backend/app/Domain/CMS/Enums/PostType.php",
+      "sha256": "081b7e205d5fbf69268954af8596965e6abcadc93fc2be6da6ff5c2914c80387",
+      "size": 144
+    },
+    {
+      "path": "backend/app/Domain/CMS/Services/CmsMediaSanitizer.php",
+      "sha256": "daae80bd6c4e59ab4843141f695ab52c06c53ec767d8dd5c94764356e68d8f50",
+      "size": 7927
+    },
+    {
+      "path": "backend/app/Domain/CMS/Services/HtmlSanitizer.php",
+      "sha256": "8c918a9daec8479a0e01cbadba274abfbac8eac09d74d31c039d615c0408aed5",
+      "size": 5093
+    },
+    {
+      "path": "backend/app/Domain/CMS/Services/StructuredDataService.php",
+      "sha256": "362033fc204e67fc6dfd5e75e373014c45ce7daf6ca1ae7e4ce9b8d1fa52bd3e",
+      "size": 3242
+    },
+    {
+      "path": "backend/app/Domain/CMS/ValueObjects/SanitizedCmsMedia.php",
+      "sha256": "a91b9492be4018adab25fe0a1205d56d258ef61587ff387383fce89dbb225fd4",
+      "size": 420
+    },
+    {
+      "path": "backend/app/Domain/Cases/Enums/CaseStatus.php",
+      "sha256": "9382cebff1be02b173b2bac0a70c586c7f8e057845d618fe6520671cef63612c",
+      "size": 1805
+    },
+    {
+      "path": "backend/app/Domain/Cases/Enums/HomeServiceStatus.php",
+      "sha256": "eeb027923dcd37869f8664c69b91cb6af8f217946b2b9df9e78ba1a86e3a9016",
+      "size": 1762
+    },
+    {
+      "path": "backend/app/Domain/Cases/Enums/ServiceType.php",
+      "sha256": "20e25850b1ba7263039944efa8978be8028df6d302cc20c8ea3af743d99231cd",
+      "size": 198
+    },
+    {
+      "path": "backend/app/Domain/Cases/Services/CaseWorkflow.php",
+      "sha256": "23eb1c9a411e6d960c5cd4b68c49eb153491476ff8de744c86585be4842374fc",
+      "size": 2410
+    },
+    {
+      "path": "backend/app/Domain/Consent/Services/ConsentService.php",
+      "sha256": "4cad706b530fbe1d8d18a8a8331c8177cd9672c0b297f5d567f09da3b3c1b92d",
+      "size": 5347
+    },
+    {
+      "path": "backend/app/Domain/Coordination/Enums/ReferralLifecycleEventType.php",
+      "sha256": "d43b02b2072f1399999ab6765a7f07d20491bcc86b2be2c7334d16f82eb51e2f",
+      "size": 543
+    },
+    {
+      "path": "backend/app/Domain/Coordination/Services/CoordinatorAssignment.php",
+      "sha256": "13a6afc791228d3c8748b7d602f6e19796d825d5316f32aba04c91cf6e8478dc",
+      "size": 2406
+    },
+    {
+      "path": "backend/app/Domain/Coordination/Services/ReferralLifecycle.php",
+      "sha256": "0c3ed0ecdb4f4381d64137ce85ced353c9cac547f58b8245808c29ac7ed8371a",
+      "size": 7129
+    },
+    {
+      "path": "backend/app/Domain/Dashboard/DashboardService.php",
+      "sha256": "8557ea5ea94528dfa0e63684dca0786fe22e599710db0097348cacd37f027628",
+      "size": 18109
+    },
+    {
+      "path": "backend/app/Domain/Discovery/Enums/DiscoveryOutcome.php",
+      "sha256": "520fdd969bfc5d4ed8c9e2e52a431c6745300000ba88883a7fbccf7846a66e91",
+      "size": 237
+    },
+    {
+      "path": "backend/app/Domain/Discovery/Enums/SuitabilityStatus.php",
+      "sha256": "186d6ce8dae78826e4f20719b41ce991968e9e9d925f86b66305695b3ef27046",
+      "size": 182
+    },
+    {
+      "path": "backend/app/Domain/Discovery/Geo/BoundingBox.php",
+      "sha256": "3100bbe8ee1080080478668ab5ebda0ca50e3c0a8783fd1add69a369f49d3afe",
+      "size": 1442
+    },
+    {
+      "path": "backend/app/Domain/Discovery/Geo/Haversine.php",
+      "sha256": "396365acc7a117e897c689316e1f6c0c6cebc8e0c5578bdaf934e32edc10564a",
+      "size": 1157
+    },
+    {
+      "path": "backend/app/Domain/Discovery/NeshanDirectionsUrl.php",
+      "sha256": "790daadc1f01f17030bee552e726e0175654ad3ea65268c57b9d9076afdf1c39",
+      "size": 793
+    },
+    {
+      "path": "backend/app/Domain/Discovery/NeshanMapConfig.php",
+      "sha256": "c867f927a8506f079e0c85e1a38224830afcb8240f8ad1fd364e2c77c48e943b",
+      "size": 834
+    },
+    {
+      "path": "backend/app/Domain/Discovery/OpenMapConfig.php",
+      "sha256": "8038d6de62e67db644d1ac83763effa52685bc2b3ab93fd113160b57c9ea3a1f",
+      "size": 1048
+    },
+    {
+      "path": "backend/app/Domain/Discovery/PublicClinicMapPayload.php",
+      "sha256": "d479b189b0b7515d6353f5201a3813ec79875f82e2e423b4900cb3f1acca1c53",
+      "size": 3101
+    },
+    {
+      "path": "backend/app/Domain/Discovery/Services/TehranSuitabilityDiscovery.php",
+      "sha256": "23fd3f904031a68b82f709522d93376fe4cc90d4f340f15a0d7a1f15a29e6dbf",
+      "size": 9186
+    },
+    {
+      "path": "backend/app/Domain/Discovery/ValueObjects/DiscoveryCandidate.php",
+      "sha256": "83b47070d4b47d2a83bd49b17ff7d8044dd9d8fa054dcb8f66ccd359f28fff7f",
+      "size": 1385
+    },
+    {
+      "path": "backend/app/Domain/Discovery/ValueObjects/DiscoveryResult.php",
+      "sha256": "773bbf2b051398a2206d5a83965ce35c88794da77d61a46a2014fb3f751f5382",
+      "size": 1317
+    },
+    {
+      "path": "backend/app/Domain/Documents/Contracts/DocumentScanner.php",
+      "sha256": "93821cd191b69d84d345ebbff8c3ceb4739512f8fafdd70581bd79206a4048fd",
+      "size": 191
+    },
+    {
+      "path": "backend/app/Domain/Documents/Enums/DocumentStatus.php",
+      "sha256": "c734df0b87e44b22c626a2b33cd60862653b57a5df0c2b96759d5ef567244e7d",
+      "size": 279
+    },
+    {
+      "path": "backend/app/Domain/Documents/Services/QuarantineClinicalDocument.php",
+      "sha256": "3fb6664c2140ba9bd14986c345ab15ee82b38b381eed31c00f9d44afd1324c71",
+      "size": 4843
+    },
+    {
+      "path": "backend/app/Domain/Documents/ValueObjects/ScanResult.php",
+      "sha256": "699b20f2e360150c711c46f877c2e0cab1b92d6bf4bc09b45789e45069bd8354",
+      "size": 224
+    },
+    {
+      "path": "backend/app/Domain/Identity/Contracts/OtpSender.php",
+      "sha256": "80e29792a298bbd06e3690944012ef34a474a90685ae16a9c45b459fd79ddfda",
+      "size": 151
+    },
+    {
+      "path": "backend/app/Domain/Identity/Enums/CredentialStatus.php",
+      "sha256": "225b06eeda485c68a440aa99d3b72a55cb5759fccec0f11d136e043f3691455e",
+      "size": 419
+    },
+    {
+      "path": "backend/app/Domain/Identity/Enums/UserRole.php",
+      "sha256": "03c9415377d72ddc612180d363d651635611ebed97622e93f569383ebad11a8c",
+      "size": 382
+    },
+    {
+      "path": "backend/app/Domain/Identity/Services/OtpService.php",
+      "sha256": "909834a1ee91873345620e0a79aded41079838fdec65b1b8035abdeaaa88a340",
+      "size": 6982
+    },
+    {
+      "path": "backend/app/Domain/Identity/Services/SessionInventoryService.php",
+      "sha256": "b09fa258e07e64fb9bc52c15fe509fca2b3af2ae020c5a0bcd32799714b89e6c",
+      "size": 8459
+    },
+    {
+      "path": "backend/app/Domain/Identity/Services/StaffMfaService.php",
+      "sha256": "aea49e34ed507e975877160e966fa7caea2e0a2288a93aaaa9df1b2e8a592e54",
+      "size": 2893
+    },
+    {
+      "path": "backend/app/Domain/Identity/Services/TotpVerifier.php",
+      "sha256": "716a41398379563db754ddaae8b8c72d37d963798c59642dca3eb07cb6e6d0ad",
+      "size": 1665
+    },
+    {
+      "path": "backend/app/Domain/Operations/Contracts/NotificationSender.php",
+      "sha256": "e7e0065f3bddeb6a13c3723ad6775eb1a86b4b7bbe326f9725af139d8a603bef",
+      "size": 268
+    },
+    {
+      "path": "backend/app/Domain/Operations/Services/Idempotency.php",
+      "sha256": "653336093390316d52f94fe78ebfb0ee626710758afeeafccabb57543ef76ad6",
+      "size": 2599
+    },
+    {
+      "path": "backend/app/Domain/Operations/Services/IntegrationSettings.php",
+      "sha256": "77b1eaa3a9ea9a5a822b39ae3e9c0a0d00d738bc5d803463f6631c6573339c94",
+      "size": 8350
+    },
+    {
+      "path": "backend/app/Domain/Operations/Services/Outbox.php",
+      "sha256": "0d83b86a1b5af9b84e0dc50cd0475d5721c605386d51207bbe652c91a2a0266d",
+      "size": 859
+    },
+    {
+      "path": "backend/app/Domain/Support/Enums/ConversationStatus.php",
+      "sha256": "f4bb3068cc9e59164c47b464fa95d52300aa382522f79a54c3678ff395808be5",
+      "size": 1105
+    },
+    {
+      "path": "backend/app/Domain/Support/Enums/SupportCategory.php",
+      "sha256": "ec33dda6117c6d99d40cde04ce36cc5c7f4dbc9f9132d35bc7728b345b76025f",
+      "size": 292
+    },
+    {
+      "path": "backend/app/Domain/Support/Enums/SupportPriority.php",
+      "sha256": "1c47ecf00c04315387ecc770f9b4ae7194401583deb0286fcdf72d955548a406",
+      "size": 387
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/AuthController.php",
+      "sha256": "ed999643fc485ddd1ad30997154bc71ef07e9ffee530e97665e19fb6c9ceddd8",
+      "size": 4029
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/CaseController.php",
+      "sha256": "3163eb099e309468f1926fe565e9238835279fc3f53fa1359420884cc5407252",
+      "size": 7442
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/CmsCategoryController.php",
+      "sha256": "c97baba6fa91f881d0dec8dab4978443213014f1b3c96275d0f21ef26533572e",
+      "size": 5108
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/CmsCommentController.php",
+      "sha256": "7c380614cd766a054a8755a6cd7de20930d0406d901143185323d6652576f77b",
+      "size": 2582
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/CmsMediaController.php",
+      "sha256": "b2e86a53284d2bdc3a3ae9b32a2bb5e92098f66d375a1c6a6cac3c8e6119786e",
+      "size": 4868
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/CmsMenuController.php",
+      "sha256": "0e306183388ca29c4106d369ce83d5510688101a758ae5a90442f4e3cc99297a",
+      "size": 7870
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/CmsPostController.php",
+      "sha256": "25baa25bb9846345e188b403dbda99c84d7c044ed88d5f711b616320bc38c069",
+      "size": 7525
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/CmsRedirectController.php",
+      "sha256": "570b0d14ebe00c5822d71da663c70c5b2058f12cb587b4c532f320a979f874ef",
+      "size": 2691
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/CmsSeoMetadataController.php",
+      "sha256": "f186057c46ae55fd44a63d9ef04ab2f9cb74a0f373f3339aa93b0da61c63f5c6",
+      "size": 4329
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/CmsTagController.php",
+      "sha256": "c936d5af6fe6e3b1f0175a6605ff0d2132c9ad2249dd82daf93ce9dc741f3405",
+      "size": 2941
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/ConsentController.php",
+      "sha256": "58242c30b92bf7fcba265345c102b87ecc4cb7b67b8dddfbb5263c07a3025936",
+      "size": 3241
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/DashboardController.php",
+      "sha256": "6e86a02cec6d298597df0a2a0c5ff956c90b87820fb985dc0c796ef95cf91b28",
+      "size": 508
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/DiscoveryController.php",
+      "sha256": "a5759d20fde103326f20cb2bdf32bee8508ac79fc85a4acde6a63d05dad35500",
+      "size": 1576
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/DocumentController.php",
+      "sha256": "74cc19a81d62416ff21d566a2dbf39826c84cd49fbf3f4766293f406571fcfb3",
+      "size": 3730
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/HomeServiceController.php",
+      "sha256": "05e298cebe587623f614b1766475ef00840aaa669a527df05112549a3e098ab3",
+      "size": 6706
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/NotificationCallbackController.php",
+      "sha256": "ce30f8d51a16451ec9235eaa6f1727854dd9dcf029d9725f7e8764f05e48d4c3",
+      "size": 2875
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/PolicyController.php",
+      "sha256": "fedb40893ca75951e4eecabfed66c77c3d26a9a8366f6889582f6ad44df33f7c",
+      "size": 963
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/ProfileController.php",
+      "sha256": "d4e28e3a490d05ca7380eaa3f0e937d5e9ada8616db7bc4a2f946c406a190013",
+      "size": 740
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/PublicDiscoveryController.php",
+      "sha256": "0a12be24e4d5c2c3a6deb44a441690a3d786d0ddd6928e1cbaa6df73b4e59c22",
+      "size": 1818
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/ReferralController.php",
+      "sha256": "8eaadbd6a3497473c281c129655e7a5c1a3156c06eb81a3625a41848a695028b",
+      "size": 5020
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/SessionController.php",
+      "sha256": "2357639b9cd1d96bc79b891a31ff4dfc8d1397ca9ee88a46435a9d0fe79cdf36",
+      "size": 2091
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/StaffCaseController.php",
+      "sha256": "b9a89d956627282f9833af3be7746be04875b0792d9f8e7e2d4043ede65529eb",
+      "size": 14077
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/SupportController.php",
+      "sha256": "6ea65659873e688bf49e02b8031bcafd1473124e6542d85dc1d46f19e3a9665c",
+      "size": 8852
+    },
+    {
+      "path": "backend/app/Http/Controllers/Controller.php",
+      "sha256": "25d1c1ef8e6cc8a376553faacfba2b07d9dfaee9bdbb84f14f77517580e9deb1",
+      "size": 77
+    },
+    {
+      "path": "backend/app/Http/Controllers/DemoPanelAccessController.php",
+      "sha256": "e7a946064ca9fc08b144078438b1c411331dea1e0cd1789d0297637d3e28e8cf",
+      "size": 1890
+    },
+    {
+      "path": "backend/app/Http/Controllers/MarketingContentController.php",
+      "sha256": "aa07a8a041fff3b1ae30f1f7dff7c3d00ba39fec7a514528d5f1a59d4f3c7524",
+      "size": 6601
+    },
+    {
+      "path": "backend/app/Http/Controllers/NetworkAdminController.php",
+      "sha256": "9c89bd59eaa4ca14e2ac5ec281dde60128799eecebfb31d8a09024d1e6d51a60",
+      "size": 14685
+    },
+    {
+      "path": "backend/app/Http/Controllers/PanelCaseController.php",
+      "sha256": "05b8a97652574ce668667039c34727e58a63cb9b246b1f96d45b013ad53eed77",
+      "size": 8038
+    },
+    {
+      "path": "backend/app/Http/Controllers/PanelController.php",
+      "sha256": "962cf5bbd9e13c650c2e05faa921f3b3d6cd61735abb960bd0590080973dabe0",
+      "size": 10306
+    },
+    {
+      "path": "backend/app/Http/Controllers/PatientRequestController.php",
+      "sha256": "d1961ad33928c82fca2dc83f16b5a60da75f794cef806971c4932ee28ab5f0d9",
+      "size": 771
+    },
+    {
+      "path": "backend/app/Http/Controllers/PresentationPortalController.php",
+      "sha256": "879a1972905a573fdc0ca96a7be5abab49a50aa372ceeebcd8cf5159d09a0262",
+      "size": 3824
+    },
+    {
+      "path": "backend/app/Http/Controllers/PublicPageController.php",
+      "sha256": "310c6be6267eab7031ac82fcf4cafc00278694c48325dd7851c447322a07e669",
+      "size": 14073
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/Admin/AdminCmsController.php",
+      "sha256": "cf61fc5f1b6583561ef8f985d4a57153aab5d07b51ac8360459d92ebfd2372ed",
+      "size": 28530
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/Admin/AdministratorController.php",
+      "sha256": "2d041d593ac0bfd649368803b02fdfc6e87b420e81398d8448613bdf39f59dc8",
+      "size": 9604
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/Admin/IntegrationSettingsController.php",
+      "sha256": "28a8e6247cb1337cc45f9e48bda89bcb1493bed5c06fc8505872a27b24abd227",
+      "size": 6184
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/BlogController.php",
+      "sha256": "296b6832ab5aca148dcb7b72d3c18e7b882a8e6035af808ddadba8920c761aa4",
+      "size": 5069
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/CaseQueueController.php",
+      "sha256": "cc44b6e81fd2d20f55ed66d4870fa064aa2730b4860e4e2638b30228bed5cdf6",
+      "size": 4335
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/CmsMediaServeController.php",
+      "sha256": "b70c04f47ef94243090183db50cbf4f1fdced6d796b14b6ae61c431c4b19bb4b",
+      "size": 728
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/CoordinationTaskController.php",
+      "sha256": "4b9cee421576b1d7ad6309216adf36e4cb88a4ebcb083623d16fa7c8b0f361aa",
+      "size": 7186
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/DashboardController.php",
+      "sha256": "ead16b2dcf195278f4725f42b352fe40ec753504a6a97584ba36976e4885597c",
+      "size": 758
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/HomeServiceWorkspaceController.php",
+      "sha256": "658379f274e8304f0cefbeea62a576c4b736a3bb93cefd1c4069dbae18af01b7",
+      "size": 6638
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/LaunchReadinessController.php",
+      "sha256": "92a4b0821d6df2cfffbaff33129a6e6699f213018c5de5a25839ec148ae26999",
+      "size": 9129
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/NotificationDeliveryController.php",
+      "sha256": "b8c584a1cf1ac3b87745905e320faa5c4b94f59772797125961d70c56386d778",
+      "size": 8557
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/OperationsAnalyticsController.php",
+      "sha256": "279d766ccb5055eee56fc06e47519785a36eaf569ec4a186919556ed446b683e",
+      "size": 4849
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/OperationsCalendarController.php",
+      "sha256": "e6ef3d8189150346bc07cb790424f1a8092ecece1ced50ac6f28bae752434add",
+      "size": 10283
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/PageController.php",
+      "sha256": "0440da0695a691d0de8b51034f795d2ea482bdc2bc89fa6ef2e1af406497f1e8",
+      "size": 3247
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/PolicyManagementController.php",
+      "sha256": "f29930a782e3126cdcdef625818bc3e9fb2a5dbce69d272d7befd229d722964c",
+      "size": 7322
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/ProfileWorkspaceController.php",
+      "sha256": "b331025a010e977b228f5c5fc44120b18f29f026569f956b73f2412c77d3ebb2",
+      "size": 9031
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/PublicRedirectController.php",
+      "sha256": "87f61f5d990ba4fdfc47b84e24ffd4df899123d80ef0e0fed6cc4aeb01927d51",
+      "size": 773
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/RobotsController.php",
+      "sha256": "81ef0ef630d4fb33f66a931e59547e270fd03528483c220a274ba87261f23530",
+      "size": 600
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/SitemapController.php",
+      "sha256": "776c660bdaeadd66d4718e433d39c27ba67dc99bf31bef79cbdf7419b4998e05",
+      "size": 2877
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/SupportWorkspaceController.php",
+      "sha256": "09e06b5d2f2d1ac8055f9e6a841afbf58227d4ff90afb6c2a48b40468cb0effe",
+      "size": 13413
+    },
+    {
+      "path": "backend/app/Http/Controllers/Web/WorkspaceSearchController.php",
+      "sha256": "861feb178fb8693b993f389b794a502acb9ddff6ecaff46a1705d37a3548438e",
+      "size": 10017
+    },
+    {
+      "path": "backend/app/Http/Middleware/EnsureActiveUser.php",
+      "sha256": "b3ecbd80edfef7d89be4f0e22b6bc20471ef3a5e83c4c86022b9fd5d0a24d5aa",
+      "size": 1015
+    },
+    {
+      "path": "backend/app/Http/Middleware/EnsurePatientIntakeEnabled.php",
+      "sha256": "521b282b0fdf10982a91d5a4102f09b1b293665689237d74bf3432397a06cdc2",
+      "size": 616
+    },
+    {
+      "path": "backend/app/Http/Middleware/EnsureRecentAuthentication.php",
+      "sha256": "3cd7702314c286c2aa0c250159e809a75af9381a715a406408a08526f740541e",
+      "size": 820
+    },
+    {
+      "path": "backend/app/Http/Middleware/EnsureStaffAccess.php",
+      "sha256": "537f2a5b651b8e9348b1fb3219e66e4b636fbb75678967d51613534d2d282a7c",
+      "size": 522
+    },
+    {
+      "path": "backend/app/Http/Middleware/RequestId.php",
+      "sha256": "07378c40dea1fc273a72ffb8b509bf288e3f8f4b07b46f0b67657df6ebe71dd3",
+      "size": 473
+    },
+    {
+      "path": "backend/app/Http/Middleware/RestrictPanelDemoSession.php",
+      "sha256": "a7a7a8823397282c40a71166f1bf0aeada162482c264a6b15e8955bcff454579",
+      "size": 4341
+    },
+    {
+      "path": "backend/app/Http/Middleware/SetLocale.php",
+      "sha256": "d68ba1fca7d00284fd4be603a7faca9b941ec32ba3e444f1a6d0cb302853a227",
+      "size": 523
+    },
+    {
+      "path": "backend/app/Http/Responses/PasskeyLoginResponse.php",
+      "sha256": "4c18d98ba7ec62e741752541d5aa30c9dd12afa1ad67df3f1a33ac6be1831b2d",
+      "size": 717
+    },
+    {
+      "path": "backend/app/Infrastructure/Documents/ClamAvDocumentScanner.php",
+      "sha256": "1c1506e050ea03c135b289d25510a233affd84491d556f598f6de7459f1c714c",
+      "size": 1343
+    },
+    {
+      "path": "backend/app/Infrastructure/Identity/HttpOtpSender.php",
+      "sha256": "4e162cf8d0c5435e9e2f30252db305e2c899bc73ef36d3ab67238b189b4f8926",
+      "size": 1415
+    },
+    {
+      "path": "backend/app/Infrastructure/Identity/TsmsOtpSender.php",
+      "sha256": "3153f62196d70165c2b91e216bf135d826ff072ceeccb49dd59d16f361f9ec36",
+      "size": 1192
+    },
+    {
+      "path": "backend/app/Infrastructure/Operations/HttpNotificationSender.php",
+      "sha256": "7024c78d3a59c260632459ff5565c3f71ce0668e5581b505c02801c9a0d44db1",
+      "size": 1658
+    },
+    {
+      "path": "backend/app/Infrastructure/Operations/TsmsNotificationSender.php",
+      "sha256": "8e58958869d7475dea16d5b7166283cf6dcfcef69c37d4b2f38326a6b18f2492",
+      "size": 1091
+    },
+    {
+      "path": "backend/app/Infrastructure/Sms/TsmsClient.php",
+      "sha256": "9c854e1e62c7040cce98c4dddd120dbfc7ec8129819bdd49bd16e466b46c868c",
+      "size": 4784
+    },
+    {
+      "path": "backend/app/Jobs/ProcessOutboxEvent.php",
+      "sha256": "c617890a2fa462b72a3882a3142e7fb52d85e1258252b624153d0d452b16db9c",
+      "size": 5191
+    },
+    {
+      "path": "backend/app/Jobs/ScanClinicalDocument.php",
+      "sha256": "40d808822c50e07c04e3d7bb879180816ad5084ea909248823acb9150466a845",
+      "size": 7109
+    },
+    {
+      "path": "backend/app/Models/AuditEvent.php",
+      "sha256": "4d9908edf5c7897581d6fac232a127cbb4985b77969061f8dc12f08be8e21a2a",
+      "size": 608
+    },
+    {
+      "path": "backend/app/Models/CaseAssignment.php",
+      "sha256": "c6b97131267f76e323d3c7cbd6dd0ed38b5640a52b55b6ed318962d042b4af74",
+      "size": 400
+    },
+    {
+      "path": "backend/app/Models/CaseStatusEvent.php",
+      "sha256": "296f171ed91c9a975552616f7f575d5db5fae75224f552d9a0f1e3f61e08608f",
+      "size": 816
+    },
+    {
+      "path": "backend/app/Models/Clinic.php",
+      "sha256": "f77d978f78fa9b7ede36f6b2e6d0ee7e4b6b2a893199080dcdca36c708f7fc5c",
+      "size": 1430
+    },
+    {
+      "path": "backend/app/Models/ClinicMembership.php",
+      "sha256": "c4f47f69e27c471df59f3914684a900f4aaa62634cfea5c864a0c245a90e8446",
+      "size": 817
+    },
+    {
+      "path": "backend/app/Models/ClinicServiceCapability.php",
+      "sha256": "30f602e02759738c59fecd4db368e7022af7500652ff18813830fea842fd8c89",
+      "size": 742
+    },
+    {
+      "path": "backend/app/Models/ClinicalDocument.php",
+      "sha256": "d2843c0ba73200f842a30f82d6e5e63204237cc45379d37bf49498f932fe319e",
+      "size": 1513
+    },
+    {
+      "path": "backend/app/Models/Cms/Category.php",
+      "sha256": "93e9579a6ee947a88623bf75ba01490074b043c64d26a258551b363f5de12105",
+      "size": 849
+    },
+    {
+      "path": "backend/app/Models/Cms/CategoryTranslation.php",
+      "sha256": "755b90db08bd4eba8d5ccaf2c67bee6222765f2a62da0f7a4c4277457aa4dc8e",
+      "size": 375
+    },
+    {
+      "path": "backend/app/Models/Cms/Comment.php",
+      "sha256": "9565a5ba2ec8dcadc31239da098d339e8d83ab0b196f937e14cd6d6a955e7690",
+      "size": 753
+    },
+    {
+      "path": "backend/app/Models/Cms/Media.php",
+      "sha256": "a0592768ead13aa359b0607bae812bde5ec7ba90b6d36def600400f6c89e6a8a",
+      "size": 733
+    },
+    {
+      "path": "backend/app/Models/Cms/MediaTranslation.php",
+      "sha256": "e0e27f8dc1bae7b494765cbab54de7fbdacef3d32defba61e9d47e9b96603969",
+      "size": 360
+    },
+    {
+      "path": "backend/app/Models/Cms/Menu.php",
+      "sha256": "23b482c8cf1034ec9970458f8fa67b9b81b8e914f14b62239fc6f4022279c01b",
+      "size": 454
+    },
+    {
+      "path": "backend/app/Models/Cms/MenuItem.php",
+      "sha256": "1b94792648e853d55bae496191c32c0383bc70b50377568133340a58f61278b6",
+      "size": 990
+    },
+    {
+      "path": "backend/app/Models/Cms/MenuItemTranslation.php",
+      "sha256": "190e5d54fd4d6aaf5a379c922ef58441ebd0524b2fca01340a171f70ceb7cc87",
+      "size": 377
+    },
+    {
+      "path": "backend/app/Models/Cms/MenuTranslation.php",
+      "sha256": "140b1c9ca8948682f56c433192fbc319cc78d50add69e616f81a4998b8c82c8d",
+      "size": 355
+    },
+    {
+      "path": "backend/app/Models/Cms/Post.php",
+      "sha256": "9fd2876caf120631456266a4587314ecffdfeada92161d0f14e51f933ab90e73",
+      "size": 2019
+    },
+    {
+      "path": "backend/app/Models/Cms/PostRevision.php",
+      "sha256": "dc5b8dd84256a2026e426d70153529d6ad96a10f542f3c01d44ca916bfb9720c",
+      "size": 487
+    },
+    {
+      "path": "backend/app/Models/Cms/PostTranslation.php",
+      "sha256": "50132283e5574eece736dc1fba2aceae8245d5ebbb4e388da08976cc88c018a1",
+      "size": 355
+    },
+    {
+      "path": "backend/app/Models/Cms/Redirect.php",
+      "sha256": "3d0b5dfcda65ecf02a42aa670571fccd1b0b01b6793e112df1bc463130ec101b",
+      "size": 373
+    },
+    {
+      "path": "backend/app/Models/Cms/SeoMetadata.php",
+      "sha256": "5b961324913f167ac210bb763cb7b9fcc85f47af362bd79b7879a431c0697005",
+      "size": 613
+    },
+    {
+      "path": "backend/app/Models/Cms/Tag.php",
+      "sha256": "87838d2c90372e6dfce0fc570d39550802a5271094cc4e4431c65e98cbf82ad7",
+      "size": 542
+    },
+    {
+      "path": "backend/app/Models/Cms/TagTranslation.php",
+      "sha256": "d3511dd06f3812d12b67bdd45ce64f731102aad98e1b2eeae6b482fefaef2510",
+      "size": 350
+    },
+    {
+      "path": "backend/app/Models/ConsentEvent.php",
+      "sha256": "e1b256bebf0e0d914aa08a1eb9b5813461f270df7c42796090d274ad18784429",
+      "size": 1133
+    },
+    {
+      "path": "backend/app/Models/CoordinationTask.php",
+      "sha256": "8049c93507346be541ef65221cd8a02de108eddecc218218c6f07740f5ade63f",
+      "size": 771
+    },
+    {
+      "path": "backend/app/Models/HomeServiceRequest.php",
+      "sha256": "c6361807d7c4ac402e9e73bf6a2a9f62b2e55280008ed00838d9f2b5121e649e",
+      "size": 1393
+    },
+    {
+      "path": "backend/app/Models/HomeServiceStatusEvent.php",
+      "sha256": "5bfed3cac55020afb0bcf7e63f8f84ce129cc0d098c881319aba92e8b30e00fe",
+      "size": 738
+    },
+    {
+      "path": "backend/app/Models/IntegrationSetting.php",
+      "sha256": "f6a8cfe5ca597254d22b0190d848eb11a77ebe92f9e02c36b1c1b1c7ecbc8104",
+      "size": 337
+    },
+    {
+      "path": "backend/app/Models/MarketingPage.php",
+      "sha256": "80bb0e5038fe347abdbd67ca06465017112dd1f5cabfbcbc2c1392783486bb17",
+      "size": 726
+    },
+    {
+      "path": "backend/app/Models/MarketingPageRevision.php",
+      "sha256": "db777fcd50556494c9a8c3105cc2293bdbc3f2f8c170fc2aa5cc8fac8a44d0cd",
+      "size": 718
+    },
+    {
+      "path": "backend/app/Models/OtpChallenge.php",
+      "sha256": "07bbbf33b308287a818053742a3fb845677b8a1ccb9e028ebc7e1239c2498247",
+      "size": 503
+    },
+    {
+      "path": "backend/app/Models/OutboxEvent.php",
+      "sha256": "601be1e052dc85e22cc19a4a36d1d4af816ad116a8f9409b627937674b3a4c2d",
+      "size": 377
+    },
+    {
+      "path": "backend/app/Models/PatientCase.php",
+      "sha256": "e00d51309939110615da393eb92fba589da711ed0428201b973239462fe51c0a",
+      "size": 2757
+    },
+    {
+      "path": "backend/app/Models/PolicyVersion.php",
+      "sha256": "90ae31a5a39ec1dafef64b7b7ab02af28b7905d7476678429f4f138ec8132690",
+      "size": 1607
+    },
+    {
+      "path": "backend/app/Models/Practitioner.php",
+      "sha256": "bcb2f1c96b75df13ba5f141b0ea5954304cb463f4e35597ad85e9eec5cebf4c4",
+      "size": 1250
+    },
+    {
+      "path": "backend/app/Models/PublicationEvent.php",
+      "sha256": "c49629909bac97e666a389222dfe1d4ddc6b71d23dcdce2d7f375c5567a620e9",
+      "size": 660
+    },
+    {
+      "path": "backend/app/Models/ReferralGrant.php",
+      "sha256": "b22cf65a215e452c11fbcda6b3a90f7d9e924318832f898abb9e82c0dffd9cb5",
+      "size": 881
+    },
+    {
+      "path": "backend/app/Models/ReferralLifecycleEvent.php",
+      "sha256": "a5a743fb99886f9bb64aded5286df6cfe1f150b97f72e488adfb4f4a328f8197",
+      "size": 1590
+    },
+    {
+      "path": "backend/app/Models/ReferralProposal.php",
+      "sha256": "4b65ac680b99bc23043e44c5a51ed3ee39dc962fc0f38e9de91539991c90b801",
+      "size": 1190
+    },
+    {
+      "path": "backend/app/Models/ReviewRevision.php",
+      "sha256": "425b3674caedcdf679391e31ab28b5930ef1bf09285deabc9f6c0ca46576ffc4",
+      "size": 1876
+    },
+    {
+      "path": "backend/app/Models/ScanAttempt.php",
+      "sha256": "bc5286fbc0bb59509fd2fdbe2dd0028e88fb6d0ec2f4763df6ef04606d08fc9e",
+      "size": 385
+    },
+    {
+      "path": "backend/app/Models/SupportConversation.php",
+      "sha256": "c5b5e7b9be9e8ee4cb86c9d3478669eee2fbd937cc0b8c808bbd95b4e6d5ef7b",
+      "size": 1736
+    },
+    {
+      "path": "backend/app/Models/SupportMessage.php",
+      "sha256": "f623479ef4afef7b3a5209aa06b88cd2b0d581d5add8d0fbba4f8aab7e2b2af8",
+      "size": 757
+    },
+    {
+      "path": "backend/app/Models/SupportStatusEvent.php",
+      "sha256": "e2e373557478890e161a66bd9ac87a3e3ee4d8ea72e1d2232cbc0781c57657de",
+      "size": 721
+    },
+    {
+      "path": "backend/app/Models/User.php",
+      "sha256": "8a4a899445a78be50f51bac961cdfae8e00bf2463d08cb6d3b202dd3ec76a298",
+      "size": 3265
+    },
+    {
+      "path": "backend/app/Policies/ClinicalDocumentPolicy.php",
+      "sha256": "5eb79726c3b84a527919a189d60cdfac2af509713ae6ca6b6c259ec99573b218",
+      "size": 1836
+    },
+    {
+      "path": "backend/app/Policies/CmsContentPolicy.php",
+      "sha256": "6bca7831c6bb3f8b367aad205050bf3d6da4a570f9d8b7b75bba842bdd7340f3",
+      "size": 459
+    },
+    {
+      "path": "backend/app/Policies/CmsPostPolicy.php",
+      "sha256": "2a5e34453ee168f45666e9e79c8b0075befe8eb26cd6c8d36a5c0e91179cedc7",
+      "size": 1247
+    },
+    {
+      "path": "backend/app/Policies/PatientCasePolicy.php",
+      "sha256": "46d93ea962c4191d00d48b3ae8448b70cb42d000c4951dfb243d053f8b38bcd1",
+      "size": 2763
+    },
+    {
+      "path": "backend/app/Policies/SupportConversationPolicy.php",
+      "sha256": "d1b3a3c94dc30581530174efc13581ec6a9a2048f6635c0b160a2ae0488327e3",
+      "size": 2758
+    },
+    {
+      "path": "backend/app/Providers/AppServiceProvider.php",
+      "sha256": "d3afc38c351157a9dba88e191f3b9868cba55fef50003968297f2cc4837a3bf3",
+      "size": 4258
+    },
+    {
+      "path": "backend/app/Support/DigitNormalizer.php",
+      "sha256": "74f181a3cd8b9e87e92d39e8fcd5f11321b188212e9418eaf5d8a8dfef481245",
+      "size": 698
+    },
+    {
+      "path": "backend/app/Support/DomainException.php",
+      "sha256": "bc32c59f26a0dff2d2c8cde5e4b7006c1ffa84c5bd370bb71a15ebdd15f3cfcd",
+      "size": 1146
+    },
+    {
+      "path": "backend/app/Support/JalaliCalendar.php",
+      "sha256": "f8f5aa8cc755c2dc83e20ce521646023b1cae26140a1c5fc23be32d9811fd3a2",
+      "size": 4362
+    },
+    {
+      "path": "backend/app/Support/PanelDemoRegistry.php",
+      "sha256": "7d145db1068a8b871fab140b4d1e043c3fac25b2db2172db5eb9af2880c42e4c",
+      "size": 3069
+    },
+    {
+      "path": "backend/app/Support/PhoneHasher.php",
+      "sha256": "72c4b63ea16128885a951ed51011054f74a0928af2fde59a24c3e7233b8c3965",
+      "size": 1229
+    },
+    {
+      "path": "backend/app/Support/PublicUrl.php",
+      "sha256": "1ae32205332ba4270eebc55b726e638de3fc7110e886240703ddff87e070e084",
+      "size": 1738
+    },
+    {
+      "path": "backend/app/Support/WaitClock.php",
+      "sha256": "1d132fdf8500123a528d2690edf76f90a17d0a61403d44e8d507f9c4669b45c0",
+      "size": 1514
+    },
+    {
+      "path": "backend/app/Support/WorkspaceView.php",
+      "sha256": "a44fd04c83ac4990f327a1d0567165a5c90a595e550f3a0e4ffaef32777670e6",
+      "size": 1612
+    },
+    {
+      "path": "backend/config/app.php",
+      "sha256": "b4b25e15efa76846a7f2e19fd1044fec4945e4e928c4098126a2b0042b034383",
+      "size": 4281
+    },
+    {
+      "path": "backend/config/auth.php",
+      "sha256": "c7e204e9785c9f596d66fb884b493f658f2327f157646bdb4088efd6b3a7773f",
+      "size": 4040
+    },
+    {
+      "path": "backend/config/cache.php",
+      "sha256": "ee4ad2bba1edfcff52e9599f37371f2370d0b167cc226ce72d46cdf6edf2dc55",
+      "size": 4369
+    },
+    {
+      "path": "backend/config/database.php",
+      "sha256": "02cd62f589b43d33f9ceac740705dac1dec9740eb2bb9e6e202d4b66a15244cf",
+      "size": 6876
+    },
+    {
+      "path": "backend/config/filesystems.php",
+      "sha256": "c71c6352e2c4aa18f610c58361a365404206c8cddbbf9c21d7028d513963f8ee",
+      "size": 1468
+    },
+    {
+      "path": "backend/config/logging.php",
+      "sha256": "beb1ffd0db910f6f0b4f75214c3d5aa385d692733ece8a450f4c169d2c99ce38",
+      "size": 4606
+    },
+    {
+      "path": "backend/config/mail.php",
+      "sha256": "c43ff49a31c5f32ce21eb7159f2a4b3cd2f4074eaed5838d265646dbfedd3474",
+      "size": 3631
+    },
+    {
+      "path": "backend/config/passkeys.php",
+      "sha256": "53c7253732f6f9f65b917129f1897b9f08080941fa8930189130399914be76f9",
+      "size": 3857
+    },
+    {
+      "path": "backend/config/queue.php",
+      "sha256": "d1ff6840fe3fbc9cbd2e26e1fecb39fb924692ccc219ce9d99475fc7486bf263",
+      "size": 4294
+    },
+    {
+      "path": "backend/config/royadarman.php",
+      "sha256": "6240449aeec1fa1ea682ad75ff72a6eea05e152b8aada0273bc6232cdfa22e16",
+      "size": 8125
+    },
+    {
+      "path": "backend/config/services.php",
+      "sha256": "b7ee786ea1adbc92db9f229f479431c94503527c47051da3862eb0e4d7db70aa",
+      "size": 1039
+    },
+    {
+      "path": "backend/config/session.php",
+      "sha256": "64272cfbef6f47c65bf857f1c5b1e853700c0d0278de46b86663fd83ef4aeed8",
+      "size": 8423
+    },
+    {
+      "path": "backend/database/factories/UserFactory.php",
+      "sha256": "f3e5d81288ec29c8ddfc41632ffc096ee0b7990dd91f32e02f1f975072c013f7",
+      "size": 1077
+    },
+    {
+      "path": "backend/database/migrations/0001_01_01_000000_create_users_table.php",
+      "sha256": "10d79883bc08ce46510f9ad8b1830b4d06d586dc56ae2c8bac3b3e491f69a90f",
+      "size": 1473
+    },
+    {
+      "path": "backend/database/migrations/0001_01_01_000001_create_cache_table.php",
+      "sha256": "fbb4665e5a977e71df4e74ec75b3c06ca4f17ad0de7138fe9786639189978e77",
+      "size": 873
+    },
+    {
+      "path": "backend/database/migrations/0001_01_01_000002_create_jobs_table.php",
+      "sha256": "df4910687180313a14a3f96a8bddd808ae145ed1b107cd772caf865c0dc2b746",
+      "size": 1883
+    },
+    {
+      "path": "backend/database/migrations/2026_08_31_000100_create_royadarman_case_tables.php",
+      "sha256": "fcc68d9dc98dc3e997a765dcea1cbb482676300065c0116081690d725373580e",
+      "size": 6298
+    },
+    {
+      "path": "backend/database/migrations/2026_08_31_000200_add_scan_tracking_to_clinical_documents.php",
+      "sha256": "e3ac70ce554eb87c1595a30d9b9f86064e93b35be161654e63ced0fe3f146204",
+      "size": 813
+    },
+    {
+      "path": "backend/database/migrations/2026_09_08_000300_create_identity_provider_and_consent.php",
+      "sha256": "95a0004c4d7f346393dd6062676d895c4275c84d46c895215fb4bf2b5b258edf",
+      "size": 6442
+    },
+    {
+      "path": "backend/database/migrations/2026_09_08_000400_create_coordination_clinical_and_operations.php",
+      "sha256": "8720e3c6c39f88786a52280a55172e53b3815df68690f88f2ce7be2b540a636c",
+      "size": 6607
+    },
+    {
+      "path": "backend/database/migrations/2026_09_10_000500_drop_legacy_consent_records_and_add_consent_event_revocation.php",
+      "sha256": "8e8add0ebabe08e2a90e3f73c24ed2a4120b02b563a5d61bc2c0d23fbd0e1fad",
+      "size": 1478
+    },
+    {
+      "path": "backend/database/migrations/2026_09_10_000600_link_review_revisions_to_documents.php",
+      "sha256": "98a62dd98d380b92a5ef1916c4409d4657f43db4c91415d20b9cc57ab0e81637",
+      "size": 784
+    },
+    {
+      "path": "backend/database/migrations/2026_09_10_000700_link_grants_and_documents_to_consent_events.php",
+      "sha256": "cb1f8e3d3323f2d08374ba536fcb784a03b4d191b7c0a291692fcaca9e379d71",
+      "size": 1238
+    },
+    {
+      "path": "backend/database/migrations/2026_09_11_000100_add_otp_superseded_at.php",
+      "sha256": "de5d6aee548450c99b30d43953f56a530889fa75d8e079488267a4f4d4dd2c7f",
+      "size": 626
+    },
+    {
+      "path": "backend/database/migrations/2026_09_11_000200_require_review_document_link.php",
+      "sha256": "ec7258d080feda47f875bd601a7c37f153f63c2d91034eac08ccf645d41e086b",
+      "size": 1718
+    },
+    {
+      "path": "backend/database/migrations/2026_09_11_000300_require_grant_consent_and_expiry.php",
+      "sha256": "1226d09172bf529a702469f427d619706425e4bbc2a1bc8e1b9dc5ab0443f628",
+      "size": 736
+    },
+    {
+      "path": "backend/database/migrations/2026_09_11_000400_create_otp_issuance_locks.php",
+      "sha256": "f9e00b1dac49d38bba72c5be398e4c42e80c687b44b089d0fc77204756865a8e",
+      "size": 1116
+    },
+    {
+      "path": "backend/database/migrations/2026_09_11_000500_create_marketing_content_tables.php",
+      "sha256": "73a1bc5247ac8409884daf219b0432a65424d22184f860ee77d97bf80eaddf16",
+      "size": 2096
+    },
+    {
+      "path": "backend/database/migrations/2026_09_11_000900_allow_system_case_assignment_actor.php",
+      "sha256": "1fbdcd42b2f3d6c259f7a36ee66e2b7231a0c0382ee016933d31689023dcbf3b",
+      "size": 1012
+    },
+    {
+      "path": "backend/database/migrations/2026_09_11_001000_unique_notification_provider_reference.php",
+      "sha256": "025f02e702df8fa9a81d22280d97f27bf66fffda1a02c63e9f14d076f60f9039",
+      "size": 1309
+    },
+    {
+      "path": "backend/database/migrations/2026_09_15_000100_create_support_system.php",
+      "sha256": "16833ea69969f110e830a01cacc7b0d3c18058d75f739158f5b76ea02ec395cb",
+      "size": 2786
+    },
+    {
+      "path": "backend/database/migrations/2026_09_15_000200_create_home_service_requests.php",
+      "sha256": "c20ea352b9e0910ee6bf23341bed249e99731e69387ef69fa61bb79b70fd57c8",
+      "size": 2188
+    },
+    {
+      "path": "backend/database/migrations/2026_09_16_000100_add_clinic_synthetic_demo_key.php",
+      "sha256": "444e33fbc49c1527fc71ea77d329f89db8efcdb441a519336af7efc0e344f357",
+      "size": 632
+    },
+    {
+      "path": "backend/database/migrations/2026_09_16_000100_create_cms_tables.php",
+      "sha256": "d0b626b3e1fc44dc64a7c54535381c3f5ad4c3112a69b1768fe73d5ff22b0692",
+      "size": 10932
+    },
+    {
+      "path": "backend/database/migrations/2026_09_19_071500_widen_encrypted_status_reason_columns.php",
+      "sha256": "cf9c882d89ed321dafcc541f30e4269abe5c612eb6a02eb8d6c22d0258721a5b",
+      "size": 1362
+    },
+    {
+      "path": "backend/database/migrations/2026_09_19_090000_create_referral_lifecycle_events.php",
+      "sha256": "7e300f6f7dce6ae865b1168f2f682b3816563f3d4b8af9dfd235ed003e000da8",
+      "size": 1157
+    },
+    {
+      "path": "backend/database/migrations/2026_09_19_120000_add_clinic_discovery_fields.php",
+      "sha256": "af00b349faa1cfdf41cf5b463bafb047fc0db5442ff58a5311cf30f751e15f5e",
+      "size": 3298
+    },
+    {
+      "path": "backend/database/migrations/2026_09_20_162500_create_integration_settings.php",
+      "sha256": "be5c22f6413f81d57e4a1196a9d77753e5110ec2173365fa759e444cedf13544",
+      "size": 673
+    },
+    {
+      "path": "backend/database/migrations/2026_09_20_174208_create_passkeys_table.php",
+      "sha256": "7f0fc4cabc5a8f28e53e21403171e8aff2ac910d4a4845b7c98f5a333fa272db",
+      "size": 895
+    },
+    {
+      "path": "backend/database/migrations/2026_09_29_160000_add_username_to_users.php",
+      "sha256": "983e80a5d0b836c087c67fd30f9ac13feb3c577be2b7807d9e0aa1d8a5110874",
+      "size": 747
+    },
+    {
+      "path": "backend/database/seeders/CmsStarterContentSeeder.php",
+      "sha256": "9cf4ef1aae36bfa673e49e6727cd293eed6e7f2b597a0eadfc3e6565b5a59aaf",
+      "size": 11085
+    },
+    {
+      "path": "backend/database/seeders/DatabaseSeeder.php",
+      "sha256": "301b438d564d73e34cf1ebd02d277e6cb3fdd713e1d26ad02b269341127a303f",
+      "size": 360
+    },
+    {
+      "path": "backend/lang/ar/administrators.php",
+      "sha256": "80cacecbc3745ca8ff8e6dc218d2864b50d112afcf59c3914e0b1da7525a1658",
+      "size": 2520
+    },
+    {
+      "path": "backend/lang/ar/auth_ui.php",
+      "sha256": "5e5f9348f18564e3bc0653553ba0fb42354d1de78ec062307d7f37870d0f4db1",
+      "size": 2185
+    },
+    {
+      "path": "backend/lang/ar/integrations.php",
+      "sha256": "4890ffa48c7bce7d74253efcd1b6e459eda4c3a2f59c8575a5459813a38f3568",
+      "size": 5038
+    },
+    {
+      "path": "backend/lang/ar/marketing.php",
+      "sha256": "f52c997bba263badc6eefe342998c5f76aa70772b5e0c8e5d48d2d01ce2a0dc7",
+      "size": 4093
+    },
+    {
+      "path": "backend/lang/ar/network.php",
+      "sha256": "136b3bfd883e10440788aafb99287cd206c34019d32e9f742f9de8f5a291e6cd",
+      "size": 3347
+    },
+    {
+      "path": "backend/lang/ar/notifications.php",
+      "sha256": "3d7cac70521f4184e42a1300cf5e1704ffe427c175bd5f532bf225c0670946ee",
+      "size": 452
+    },
+    {
+      "path": "backend/lang/ar/panel.php",
+      "sha256": "76e57c89cea10c6606237e2968cd76e964173ec4135f51d5263791ad4df47053",
+      "size": 34572
+    },
+    {
+      "path": "backend/lang/ar/panel_case.php",
+      "sha256": "eab480b8ff8742e141762110f54c70791a49354a0d246ae84990ba55fd99ac6c",
+      "size": 2603
+    },
+    {
+      "path": "backend/lang/ar/request.php",
+      "sha256": "42e41bba96d80d91edfabb42303951281f2cd664a2ee97784144e574c10b91a5",
+      "size": 5442
+    },
+    {
+      "path": "backend/lang/ar/site.php",
+      "sha256": "1373030fd7913278ae83aca758c51b1c09cbe57dd36b5ba3a7103e8fba0656ca",
+      "size": 21037
+    },
+    {
+      "path": "backend/lang/ar/ui.php",
+      "sha256": "7f7c23ef47b6317cbcecb2671c7438360ea1f8525a223cd3a13bf7222a6ca7cb",
+      "size": 24560
+    },
+    {
+      "path": "backend/lang/ar/validation.php",
+      "sha256": "7c7e09ecd80b036d2b967a786ae190c18ad171f8fac08bdce119c12d9a8a8ba6",
+      "size": 12580
+    },
+    {
+      "path": "backend/lang/en/administrators.php",
+      "sha256": "ae253cb4880a10033b6d824905a040b9c718afafe151edf3b474d131bdeb8ee8",
+      "size": 2036
+    },
+    {
+      "path": "backend/lang/en/auth_ui.php",
+      "sha256": "fb1fbeb797febc2bde820d5bacc3cd8156deb32ee16a298651de3c1f86a75370",
+      "size": 1549
+    },
+    {
+      "path": "backend/lang/en/integrations.php",
+      "sha256": "58650fb903d8c33c4a03ec668f7def01ce1e6e5136b37e3a3c01f16810e51e54",
+      "size": 4087
+    },
+    {
+      "path": "backend/lang/en/marketing.php",
+      "sha256": "30753342df1ff319d985407b55381e429a63386eb9784fe727ca8b2e9421e3cf",
+      "size": 2938
+    },
+    {
+      "path": "backend/lang/en/network.php",
+      "sha256": "93c49090d35b72c3a78678e5fb4482025f4412ec229d9a1d6c4094de1150809a",
+      "size": 2691
+    },
+    {
+      "path": "backend/lang/en/notifications.php",
+      "sha256": "f9c84b071282c4fa3a1c536af9eb93d5d4e468e63a46e4061a89e6fa9d369384",
+      "size": 355
+    },
+    {
+      "path": "backend/lang/en/panel.php",
+      "sha256": "ed0d243260629691e43134c1dd986057a4c5e5cef8d532ed8c05d1edec45f4fd",
+      "size": 27305
+    },
+    {
+      "path": "backend/lang/en/panel_case.php",
+      "sha256": "4e75a45fa021aa768629cba4589bdf6b14e20f7caf6f42d79692b3570384e830",
+      "size": 2088
+    },
+    {
+      "path": "backend/lang/en/request.php",
+      "sha256": "8ee88173660520b2d3aba5162fdb3b36f66846a25499e2e5441f28a8a126146a",
+      "size": 4327
+    },
+    {
+      "path": "backend/lang/en/site.php",
+      "sha256": "1afc986edf03f32a0b9ece1f78d27865e1cc64ddad07ea14be8aadb19b4dd94e",
+      "size": 17343
+    },
+    {
+      "path": "backend/lang/en/ui.php",
+      "sha256": "02a27abe891c49723d13740ea612de0781cbdb24efee3f9ef2f826f4a34592da",
+      "size": 19771
+    },
+    {
+      "path": "backend/lang/en/validation.php",
+      "sha256": "a174e129e524e379036931dc115917bdd45e8c02342b9b79102320c2b5648790",
+      "size": 10209
+    },
+    {
+      "path": "backend/lang/fa/administrators.php",
+      "sha256": "7e345b7cdbee2c93bc45dd544652441b4adb4840997a82615a8bff4a42c177d9",
+      "size": 2927
+    },
+    {
+      "path": "backend/lang/fa/auth_ui.php",
+      "sha256": "d4398422d64d3680fef749b28d9fbee5395fb0421068d7a50d424d5daa2c472b",
+      "size": 2246
+    },
+    {
+      "path": "backend/lang/fa/integrations.php",
+      "sha256": "002b17f47ec690e54ffef643386d48da555bd7fb9d24a5901d890f4fae015715",
+      "size": 5664
+    },
+    {
+      "path": "backend/lang/fa/marketing.php",
+      "sha256": "5b6862b2bba5d97352b2d6a5d07bbdf4b27fdb851d1124973dc2a2192d07a2bb",
+      "size": 6214
+    },
+    {
+      "path": "backend/lang/fa/network.php",
+      "sha256": "bbc646b8ebb305e80e9d9f901dee267bef419fc667f72627ea1c1ff983aa9708",
+      "size": 3413
+    },
+    {
+      "path": "backend/lang/fa/notifications.php",
+      "sha256": "81c94751bb4ca7d86a1af6f39768d69c9aba55fb0f1a84725f350e226332cfb4",
+      "size": 477
+    },
+    {
+      "path": "backend/lang/fa/panel.php",
+      "sha256": "5f3912fc3c2009f38d3ab43a222d0fca7c0b4dce5ed419adb1dd467d58c7a786",
+      "size": 36522
+    },
+    {
+      "path": "backend/lang/fa/panel_case.php",
+      "sha256": "5e358f67ade14be03423301d27165518f978fd1092c0bd6a8a0ada1def65677d",
+      "size": 2651
+    },
+    {
+      "path": "backend/lang/fa/request.php",
+      "sha256": "dce8007ee626f3800b955436d0a17c864392f63627838e6bdeb9654f4a04a7ee",
+      "size": 5817
+    },
+    {
+      "path": "backend/lang/fa/site.php",
+      "sha256": "a686da5088ee53f2e0ec1c30d5bd84db124c76b636f78c1a60253634b6bffc76",
+      "size": 29054
+    },
+    {
+      "path": "backend/lang/fa/ui.php",
+      "sha256": "331fc83227b75086585fa69fd7df299113ab5940db6b7e27c66eb118f77b803e",
+      "size": 25918
+    },
+    {
+      "path": "backend/lang/fa/validation.php",
+      "sha256": "631d6ff5aff273ae3698c67345ed1e3c72cbe573b001fcf41e4c63d5fadf31dd",
+      "size": 12778
+    },
+    {
+      "path": "backend/resources/css/app.css",
+      "sha256": "491b088a6d015e2ae2bc5cf6fdef9481048208ee08138077b8329dfa5137fd49",
+      "size": 340
+    },
+    {
+      "path": "backend/resources/js/app.js",
+      "sha256": "6ddaf5dfddc4db48765f59b8c26b76b281b2760781d5cdff76f3bafc528b63c9",
+      "size": 4
+    },
+    {
+      "path": "backend/resources/js/discovery-map.js",
+      "sha256": "a7b02819b8589f2eb632f182d9968e048910b269cf045f0c44dada4391e4bcfd",
+      "size": 14905
+    },
+    {
+      "path": "backend/resources/js/passkeys.js",
+      "sha256": "0aa20f5226a3277b0da3dd4278d5aa5746e7980c784e5047a2f525dae5eb2034",
+      "size": 2039
+    },
+    {
+      "path": "backend/resources/pwa/manifest.webmanifest",
+      "sha256": "089f9c6e391d79b928eaf8d5b9ee521d8a66cebb197cd065bca386ca65c45f00",
+      "size": 788
+    },
+    {
+      "path": "backend/resources/pwa/offline.html",
+      "sha256": "4494f989578aa8276ea687e865d7a9dfceca62189c96c5a7eb1a3aab90a107b7",
+      "size": 1890
+    },
+    {
+      "path": "backend/resources/pwa/sw.js",
+      "sha256": "70b503817aca3d3ce42b0f98eaf0d5533911d6c9093093a1e67b3fdc70c03ffa",
+      "size": 1583
+    },
+    {
+      "path": "backend/resources/views/admin/cms/categories-index.blade.php",
+      "sha256": "41313cd1353b16e033e44da58314af4de3025a13c3d2f2b6859ea29d5cb152ee",
+      "size": 1943
+    },
+    {
+      "path": "backend/resources/views/admin/cms/category-editor.blade.php",
+      "sha256": "87d97e7409dc35a838a94a48d55b8ff58a24ddbd47c9c9fef1ab832f2090e818",
+      "size": 2327
+    },
+    {
+      "path": "backend/resources/views/admin/cms/comments-index.blade.php",
+      "sha256": "6f7eb3c828a217064dca5ed143159acc5503e59af875a0a268f4a1c8d30e3fdd",
+      "size": 2248
+    },
+    {
+      "path": "backend/resources/views/admin/cms/dashboard.blade.php",
+      "sha256": "813e189acbcea0e172f096dc6b9474e0dbae799b6dc4243af49f1c7503584915",
+      "size": 3335
+    },
+    {
+      "path": "backend/resources/views/admin/cms/media-index.blade.php",
+      "sha256": "490fd659519e1fbbdd9cb34f6fe9d4d4409c7fa46b3e10c6c8e6eac99a5afead",
+      "size": 4657
+    },
+    {
+      "path": "backend/resources/views/admin/cms/menus-index.blade.php",
+      "sha256": "0f5f68047d4378af21ba9c69e979b02bce6f87f7a5c371e1bbde3a073e3e1138",
+      "size": 11967
+    },
+    {
+      "path": "backend/resources/views/admin/cms/post-editor.blade.php",
+      "sha256": "38ecf9c631c945eccaa7bb57d91312e2654d5a1bcd1c7ff562ab6c41c802b5de",
+      "size": 8046
+    },
+    {
+      "path": "backend/resources/views/admin/cms/posts-index.blade.php",
+      "sha256": "efdfb2187bdd9538c558453a49c31cffc576dcaf501e8b422249c13011019316",
+      "size": 3810
+    },
+    {
+      "path": "backend/resources/views/admin/cms/redirects-index.blade.php",
+      "sha256": "c92cdc0d041963908e20502f02b492634b4cd5633ffc8fd640710921321559fa",
+      "size": 1926
+    },
+    {
+      "path": "backend/resources/views/admin/cms/seo-editor.blade.php",
+      "sha256": "3133d1f4c6f56bdbe12516c5e16ddf282aae0fe7abf37eac14111a03780ff3b1",
+      "size": 2504
+    },
+    {
+      "path": "backend/resources/views/admin/cms/seo-index.blade.php",
+      "sha256": "d20ceb8621cac67fa59c147e75401502254869369908082d5736d101eca5717f",
+      "size": 1388
+    },
+    {
+      "path": "backend/resources/views/admin/cms/tags-index.blade.php",
+      "sha256": "6b9b3a61c2a1598afc3d197653c31dacc989992a2d90213267d5ede3b26700b1",
+      "size": 2053
+    },
+    {
+      "path": "backend/resources/views/admin/layout.blade.php",
+      "sha256": "ebc20e39e9148f4e0eb5fbb986a449360b637c2c146e2df69d76adc965c417e8",
+      "size": 4311
+    },
+    {
+      "path": "backend/resources/views/auth/login.blade.php",
+      "sha256": "9d1ae96401c0b729203839da1f53f05ec75a830bea783568fb99bca1c3bd7608",
+      "size": 4662
+    },
+    {
+      "path": "backend/resources/views/dashboard/clinic_rep.blade.php",
+      "sha256": "83875cb805a41d4978d32d47c1e6d7e50e2cb111dd6ccad6fd1c4d6adc4285fc",
+      "size": 2941
+    },
+    {
+      "path": "backend/resources/views/dashboard/clinician.blade.php",
+      "sha256": "9ecba96e212d9e3fb8051a6ef83b20ac7bccff8db671585694ad76b121886d08",
+      "size": 2556
+    },
+    {
+      "path": "backend/resources/views/dashboard/coordinator.blade.php",
+      "sha256": "abf458c88578d4234e1207eab6b295f5d65d02c797e9943b431c9470c8fc86aa",
+      "size": 6093
+    },
+    {
+      "path": "backend/resources/views/dashboard/layout.blade.php",
+      "sha256": "71c23c262eaa7cd3ad061390b05f5c3147aa61fbe505aed9a2f0b51baa93ac96",
+      "size": 1918
+    },
+    {
+      "path": "backend/resources/views/dashboard/owner.blade.php",
+      "sha256": "8dc25746d677dbd08c55710a82c309cce533e926a629a236a3c753ad335d7a79",
+      "size": 3408
+    },
+    {
+      "path": "backend/resources/views/dashboard/partials/wait-chip.blade.php",
+      "sha256": "d6ac3ddd6f8798ebc62c97946f63f1f328f06e8f8d9264c21580c278189379e6",
+      "size": 473
+    },
+    {
+      "path": "backend/resources/views/dashboard/patient.blade.php",
+      "sha256": "4ea3b9161f509649ab9446f5236bbc9282dc7c3a7d943726dade25b9b8b14e09",
+      "size": 4381
+    },
+    {
+      "path": "backend/resources/views/dashboard/tech_admin.blade.php",
+      "sha256": "7967da2579de1d15df2069a04de853d7ddfb2895646d525202b11ee5c42a70e1",
+      "size": 2650
+    },
+    {
+      "path": "backend/resources/views/errors/403.blade.php",
+      "sha256": "3c709433ab5e69d806855744892e1792fa3e07752d91d40d6054bd08bcb59a75",
+      "size": 45
+    },
+    {
+      "path": "backend/resources/views/errors/404.blade.php",
+      "sha256": "e11f8cd54fab4f6d8693543bc11510874d14c8ded09a8d91d3f53324c3350077",
+      "size": 45
+    },
+    {
+      "path": "backend/resources/views/errors/419.blade.php",
+      "sha256": "49e0ab2fdea1e7d8514b75230eff190a24b1110e65976c9890ed37fd78efabc4",
+      "size": 45
+    },
+    {
+      "path": "backend/resources/views/errors/422.blade.php",
+      "sha256": "5be522c972da4482c8ef41f636b7c6997c6f9f85664718fd172b814dba22df17",
+      "size": 45
+    },
+    {
+      "path": "backend/resources/views/errors/429.blade.php",
+      "sha256": "3a43be6872b0a722994560086d87facf1c173821e8af4975fa61cef65c25cf41",
+      "size": 45
+    },
+    {
+      "path": "backend/resources/views/errors/500.blade.php",
+      "sha256": "102e471b584dc6e4c3f54cc73d4b82443995133a898dc3460c7527f800b86593",
+      "size": 45
+    },
+    {
+      "path": "backend/resources/views/errors/503.blade.php",
+      "sha256": "6cde125a8f78f9f75e946d85ae89a8860575213e49a3ee9e41fd937b31881dee",
+      "size": 45
+    },
+    {
+      "path": "backend/resources/views/errors/layout.blade.php",
+      "sha256": "fef357bbf847ab52b0a7eae6673ac3d38dca5846ae3bd2dff064ffbc83411c5d",
+      "size": 1568
+    },
+    {
+      "path": "backend/resources/views/panel/administrators/index.blade.php",
+      "sha256": "7a10cca4ac92423d8dbe73ac184066ae7b301d4b36446795b85862e20b594faa",
+      "size": 7095
+    },
+    {
+      "path": "backend/resources/views/panel/analytics/index.blade.php",
+      "sha256": "95bb2894220a5e1bb238ed3cc8fa09391aafb8e9ff3ff43ebbd36aab42b3782b",
+      "size": 5472
+    },
+    {
+      "path": "backend/resources/views/panel/calendar/index.blade.php",
+      "sha256": "60abda7000349f6b473beb0cc1117761f3de16752ee48e38168a68ae3e318bcb",
+      "size": 3817
+    },
+    {
+      "path": "backend/resources/views/panel/case.blade.php",
+      "sha256": "e3702d140c07f5c40b45817c2d59391c6487e2cab67f6de58aa6ab113ff29011",
+      "size": 11193
+    },
+    {
+      "path": "backend/resources/views/panel/cases/index.blade.php",
+      "sha256": "4401fbd9760d69d4910cf998a627003f3b3afb13eaef71c5954db21ab742611b",
+      "size": 4978
+    },
+    {
+      "path": "backend/resources/views/panel/dashboard.blade.php",
+      "sha256": "0c388696d41638527958e8892553e6391a279dc5ce3f3804ed6a011fc87b273e",
+      "size": 2956
+    },
+    {
+      "path": "backend/resources/views/panel/deliveries/index.blade.php",
+      "sha256": "f481af14a3228b6e8586fd5cc7bfce495f9347655bbeb439609a2e073b35c791",
+      "size": 7815
+    },
+    {
+      "path": "backend/resources/views/panel/home-service/index.blade.php",
+      "sha256": "0f5bb50f472f5bbba7747e8b6d83b37358edada4bbaa00a347dbb6bef74d6a5a",
+      "size": 2718
+    },
+    {
+      "path": "backend/resources/views/panel/home-service/show.blade.php",
+      "sha256": "85bc72a286dbdd7cec8fe87627f072ea508430ca30b6e5436538740a70be2561",
+      "size": 3191
+    },
+    {
+      "path": "backend/resources/views/panel/integrations/index.blade.php",
+      "sha256": "d0cdfdcd31c87e1184a9483300a2ae2d1a10a36e91b28632387ee2692f3b90c7",
+      "size": 4382
+    },
+    {
+      "path": "backend/resources/views/panel/launch-readiness/index.blade.php",
+      "sha256": "e94b0df736ae6e201f30123195956f4a49ec82e2989ea6b3710193a47d200008",
+      "size": 5382
+    },
+    {
+      "path": "backend/resources/views/panel/layout.blade.php",
+      "sha256": "837f8beaec62a184bfa6c484020a89813e7764f53c781cee4d39621d647ebcee",
+      "size": 8088
+    },
+    {
+      "path": "backend/resources/views/panel/marketing/edit.blade.php",
+      "sha256": "56aaeb7b121cdb2b427184230872e7a9df6e4ceeb3c68e82271d6aa80683d17b",
+      "size": 3923
+    },
+    {
+      "path": "backend/resources/views/panel/marketing/index.blade.php",
+      "sha256": "430c7a15a765be74e419a0467fbeeed54b4331595999af0dceb38c7be0867310",
+      "size": 1851
+    },
+    {
+      "path": "backend/resources/views/panel/network/index.blade.php",
+      "sha256": "f8444196137394197804fa9fd55dabfbddf7f78a7719446982b0d2502ba4992a",
+      "size": 11789
+    },
+    {
+      "path": "backend/resources/views/panel/patient-new-request.blade.php",
+      "sha256": "50d464ec75c68bcdeeba7f2f58512b008634f75a1e1a6c4cd8e9c57d6fa6c0da",
+      "size": 11373
+    },
+    {
+      "path": "backend/resources/views/panel/policies/index.blade.php",
+      "sha256": "5d0235310068694aa18e9faa0e4b8856b2bc93f7c15ccd3317d841b7aa124a23",
+      "size": 7467
+    },
+    {
+      "path": "backend/resources/views/panel/profile.blade.php",
+      "sha256": "a7a8a898f1ad6f444e5305ea0542a411e02321160d86122cba18ac26d27d03fb",
+      "size": 14479
+    },
+    {
+      "path": "backend/resources/views/panel/search/index.blade.php",
+      "sha256": "5c73a9dd1f52582b2b0b225d4311e188f9829fd6f7ecff722f29ba4b127fdb2f",
+      "size": 1440
+    },
+    {
+      "path": "backend/resources/views/panel/support/index.blade.php",
+      "sha256": "3209d6b655fbc2f2767110826631ee4cd8213a5f9fa6533014e7c4d3457b3b16",
+      "size": 8437
+    },
+    {
+      "path": "backend/resources/views/panel/support/show.blade.php",
+      "sha256": "560b6333c4ae9d752299759518892d66021627c5f4c3516f82d9b07629a846a7",
+      "size": 9643
+    },
+    {
+      "path": "backend/resources/views/panel/tasks/index.blade.php",
+      "sha256": "12de172d7650770c5bfcc87f31ba86d00af472a1749cb8e816aae7b6e0dd661c",
+      "size": 8291
+    },
+    {
+      "path": "backend/resources/views/public/blog/index.blade.php",
+      "sha256": "739398028e37e28d972da7a97e3307347960a92d889af139233243e3ac22f326",
+      "size": 2416
+    },
+    {
+      "path": "backend/resources/views/public/blog/show.blade.php",
+      "sha256": "ce8e61ee76375e06c761d3281c61288ec1274c5dd23090c63be5285e2dba507e",
+      "size": 2836
+    },
+    {
+      "path": "backend/resources/views/public/home.blade.php",
+      "sha256": "009063b7afe5fa8a479b1759e15201374858d8992f78237c0f03b62ca1ba7643",
+      "size": 8527
+    },
+    {
+      "path": "backend/resources/views/public/marketing-page.blade.php",
+      "sha256": "7414d65016196d1feec52749ddfbaf72e6e640fa3c6606f0a37b362c40a32838",
+      "size": 3411
+    },
+    {
+      "path": "backend/resources/views/public/page/show.blade.php",
+      "sha256": "486d0ef81da228162568d5494e5fd00c25166e6fac06973fea6d2f864da9d605",
+      "size": 1891
+    },
+    {
+      "path": "backend/resources/views/public/partials/contact-launcher.blade.php",
+      "sha256": "ab81234ca49033fcb0547f66eff8d5b3915ad139514c2f7e8f3caa302f8804d7",
+      "size": 575
+    },
+    {
+      "path": "backend/resources/views/public/partials/discovery-map.blade.php",
+      "sha256": "727b214f6f0dd49a1b1f21f8528d62083701457f9ceaae722df52373c29093b4",
+      "size": 7157
+    },
+    {
+      "path": "backend/resources/views/public/partials/footer.blade.php",
+      "sha256": "88fc3f4c36fe7fc93dafdfce05c4b55ad3dff98e0a512545b76a81397468b475",
+      "size": 1998
+    },
+    {
+      "path": "backend/resources/views/public/partials/header.blade.php",
+      "sha256": "97cc2540a56452f194e0b1e99b2ea620ba070b9f44f805e0603ec6c071550a18",
+      "size": 2888
+    },
+    {
+      "path": "backend/resources/views/public/pres.blade.php",
+      "sha256": "703589387cd961d88456f11c24a31413bd538bd37ae83007ce171534ee1d028d",
+      "size": 3525
+    },
+    {
+      "path": "backend/resources/views/public/static-page.blade.php",
+      "sha256": "838a85eec2b7edeca38d5a4fe0aeca8ae629ee4129e329e18db3b5f0d859397a",
+      "size": 3358
+    },
+    {
+      "path": "backend/resources/views/public/story.blade.php",
+      "sha256": "e0be795ee3d900855c972b2ec69a19cd821a68e370cd1592f8b7236432285492",
+      "size": 10519
+    },
+    {
+      "path": "backend/resources/views/seo/sitemap-index.blade.php",
+      "sha256": "72cf837c2fe6948c323ba788fb4bc1a3da5d65d0a661f5118d2a2f660ca382ff",
+      "size": 326
+    },
+    {
+      "path": "backend/resources/views/seo/sitemap-locale.blade.php",
+      "sha256": "243d5cd21ae62009ac5a4b8ccd8166d2fd4a44d40c806dd196cd8d65784f9135",
+      "size": 374
+    },
+    {
+      "path": "backend/resources/views/welcome.blade.php",
+      "sha256": "dfa1a05db3051ea60f05fff64b66ebcad953b285a497d8021eca8acafc2a8c89",
+      "size": 72303
+    },
+    {
+      "path": "backend/routes/api.php",
+      "sha256": "6f379b2023c5ddf4017030ef03d2c4973c4e40148abd76da5e5d8c269a358741",
+      "size": 8747
+    },
+    {
+      "path": "backend/routes/console.php",
+      "sha256": "226514176ecda30340762c55e4ac8e4971ad13578d831675ce05e8baa2254483",
+      "size": 192
+    },
+    {
+      "path": "backend/routes/web.php",
+      "sha256": "de46c0427d75f8e6618894931873a9a5b2c3b6858bede8075c0ce5b2405ca4dd",
+      "size": 21643
+    },
+    {
+      "path": "backend/artisan",
+      "sha256": "6e8526e2c86fe20b5119c13547c087553339b97b136f59f3a83a435aa2e40bef",
+      "size": 426
+    },
+    {
+      "path": "backend/composer.json",
+      "sha256": "dbda407b5a24fb467448ca8cf3155f34590550d00150e0aa61a1ea721cca8db0",
+      "size": 2692
+    },
+    {
+      "path": "backend/composer.lock",
+      "sha256": "72127e7d217d9a2e9672704a25e760450f528ca9a8bd264a1df8f4af39bf1b0b",
+      "size": 360758
+    },
+    {
+      "path": "backend/package.json",
+      "sha256": "4bdf390c859a4260192889c53deb95586836545ebd0bf7bbf789d0aad68d083f",
+      "size": 562
+    },
+    {
+      "path": "backend/package-lock.json",
+      "sha256": "e247db9af12418dc018cc94a91db40859da9f785b1ae6ca5b3f7ffc81ebf1539",
+      "size": 105131
+    },
+    {
+      "path": "backend/vite.config.js",
+      "sha256": "0ebc0ba19e8424950aad3acca1f43d45cc65aeb3321bf202711e4f03d1f31e30",
+      "size": 694
+    },
+    {
+      "path": "backend/phpunit.xml",
+      "sha256": "b339cb1236138d5a79369f4b21debfa75b8e6134f2cef148fe8174ea5ec80f92",
+      "size": 2428
+    },
+    {
+      "path": "backend/phpunit.mariadb.xml",
+      "sha256": "5d5a2a860ee30c058dd713fa6e2ea46359fb94b04e6227f7444ff91a53707ae8",
+      "size": 3050
+    },
+    {
+      "path": "backend/.gitignore",
+      "sha256": "eb70266eb5b994bbaa6c3bb08499b431c62119de9bb31794a977e091b0def36c",
+      "size": 517
+    },
+    {
+      "path": "backend/bootstrap/app.php",
+      "sha256": "3251ebfc4c2f6fcc2fdb543460a14c1b0fb90cc8678cfaba1be62ccdd25f8e78",
+      "size": 4786
+    },
+    {
+      "path": "backend/bootstrap/providers.php",
+      "sha256": "f720e185207a343d4c19fc99dbb317a4187efbcd7d38a303a695bbdd77ffb943",
+      "size": 89
+    },
+    {
+      "path": "backend/public/assets/auth-login.js",
+      "sha256": "ae7562cffab945de9ad097cc3546c49abbbcf330a07839d51868f88e28cb4156",
+      "size": 3626
+    },
+    {
+      "path": "backend/public/assets/brand-mark.svg",
+      "sha256": "491dcbb2cac8e72d4d3380449733c91db36664ca9c776addc83fabff57dded8b",
+      "size": 657
+    },
+    {
+      "path": "backend/public/assets/favicon.svg",
+      "sha256": "185261e2a2dca5447abd6d6b8cd7a07be79b92116f381c4c38178caa96a2cc1c",
+      "size": 337
+    },
+    {
+      "path": "backend/public/assets/font.css",
+      "sha256": "00adb2469fedf3b3ad6b0acd2adf2a5a73b3dce7e50a5b59b7006e010b5d6046",
+      "size": 920
+    },
+    {
+      "path": "backend/public/assets/fonts/Royadarman-Bold.ttf",
+      "sha256": "b00f4a8ff5a742bc86701356f6287feaa87a314b9b17df4bbc806f53147c6899",
+      "size": 83260
+    },
+    {
+      "path": "backend/public/assets/fonts/Royadarman-Medium.ttf",
+      "sha256": "633e12d07f8be9a7ed57956e106497fb779108d05d78ac49cf98418e2cafadfc",
+      "size": 83452
+    },
+    {
+      "path": "backend/public/assets/fonts/Royadarman-Regular.ttf",
+      "sha256": "06f80aa42e48b1515f96d7a7c404c19ac4ebab13dbf346542ba6bdff16b3caa9",
+      "size": 83316
+    },
+    {
+      "path": "backend/public/assets/fonts/Royadarman-SemiBold.ttf",
+      "sha256": "d6f2ec40d0e8119d0a08095b9a5ea372a234ab1183f4df8e66c2b8575ac4cca2",
+      "size": 82916
+    },
+    {
+      "path": "backend/public/assets/icon-home.svg",
+      "sha256": "ac949e9557fab065a915e51405cc12cddce5253fa9687405fc60ff1dd69ef55e",
+      "size": 288
+    },
+    {
+      "path": "backend/public/assets/icon-opg.svg",
+      "sha256": "4015738b57d33e7e3e0afb51a385c90dd649dda2bc5cbec93d6ec38515ee2438",
+      "size": 292
+    },
+    {
+      "path": "backend/public/assets/icon-support.svg",
+      "sha256": "9e9f36476115338107f61044b8732af070765a7d590970edc4e215cb062ba961",
+      "size": 382
+    },
+    {
+      "path": "backend/public/assets/panel-case.js",
+      "sha256": "f6043a17029c4d9627cafdc1cd38b6579b880f4b03e916b18f51bfb3f1da04f9",
+      "size": 5037
+    },
+    {
+      "path": "backend/public/assets/patient-request.js",
+      "sha256": "cebfe3ef622f1e5e36275178834a73d39ccea54e965f5361fdaf99323566c85c",
+      "size": 9041
+    },
+    {
+      "path": "backend/public/assets/photos/about.jpg",
+      "sha256": "354083da7f3636431571a8fa81db0b541abdd82e813249a532a79123c4151714",
+      "size": 29678
+    },
+    {
+      "path": "backend/public/assets/photos/about.webp",
+      "sha256": "286a475b0f3d10d5dc9975e472f2ff5b2d947b4fc86e4c7af75cfe563d0349af",
+      "size": 15204
+    },
+    {
+      "path": "backend/public/assets/photos/coord.jpg",
+      "sha256": "111b90dfe515ccb859251bf82f9e758a4ce7e115f78507a770d52ab10440e91e",
+      "size": 30579
+    },
+    {
+      "path": "backend/public/assets/photos/coord.webp",
+      "sha256": "708c87a27a4201addfc061f0f585cb4e985b36af114a620f017813115d7dde6d",
+      "size": 15678
+    },
+    {
+      "path": "backend/public/assets/photos/home.jpg",
+      "sha256": "ce0dd51470ba5affa7540102e6588cb030affb6106dc277549f80e22f848aedb",
+      "size": 29701
+    },
+    {
+      "path": "backend/public/assets/photos/home.webp",
+      "sha256": "d25925ed963ab9f1dd1448873c618f25bd0fed3cd148bb4e1057ba00d7cb482a",
+      "size": 15180
+    },
+    {
+      "path": "backend/public/assets/photos/opg.jpg",
+      "sha256": "fa306fd4f8bfba56f3ade2fc22c810f15beb6c3eade007a1e12dd668e798ed51",
+      "size": 142505
+    },
+    {
+      "path": "backend/public/assets/photos/opg.webp",
+      "sha256": "c5b1fe1eb66585f390f4ba9bdcddb7a9d063a919cf0a6944200bc40c1ebe20e5",
+      "size": 44902
+    },
+    {
+      "path": "backend/public/assets/photos/support.jpg",
+      "sha256": "09cb3645b549cbb34a15a7a554b58ef827ed31348ed764d78b4cf965b12e6c25",
+      "size": 30110
+    },
+    {
+      "path": "backend/public/assets/photos/support.webp",
+      "sha256": "ee257596a008944d63fb73154c2d1fafb3c73155db26b13c6f902d19ba99f4db",
+      "size": 15384
+    },
+    {
+      "path": "backend/public/assets/photos/tehran.jpg",
+      "sha256": "28a3b34b300669addca4a36ab16e4f91f34ba7d62faec0428a6f8cbb107c7a65",
+      "size": 25308
+    },
+    {
+      "path": "backend/public/assets/photos/tehran.webp",
+      "sha256": "38c3a126366140dcd7d08c3ecb05a33c109c6611312d120322a644f6b2228d5a",
+      "size": 12612
+    },
+    {
+      "path": "backend/public/assets/pwa/icon-192.png",
+      "sha256": "bbeb2b9a5ef09ddbd4d09b7d190f346d98bf3ec9d2de5fc4aeaca35a6d0b9f97",
+      "size": 29050
+    },
+    {
+      "path": "backend/public/assets/pwa/icon-512.png",
+      "sha256": "86c4afae40ea9a17797e5d459ab87fa97e4eae9d3944e6464eeb7730e72e0b55",
+      "size": 37705
+    },
+    {
+      "path": "backend/public/assets/site.css",
+      "sha256": "b8ca599476b4afa5677d4ff510d6c111453fed3934867a63fb50c8c8cc6dc767",
+      "size": 20357
+    },
+    {
+      "path": "backend/public/assets/site.js",
+      "sha256": "95f2017fc856311e354684f012bd469775039c24df200136441047ef2073a745",
+      "size": 1015
+    },
+    {
+      "path": "backend/public/assets/workspace.css",
+      "sha256": "1853bdd35aa7f512027dab6f6e371c423de045631b68a119b5a8c67746cbd95f",
+      "size": 27132
+    },
+    {
+      "path": "backend/public/assets/workspace.js",
+      "sha256": "02555cc3158079b9ff3ff5c462781f58d01e4f93e5ee8192362e61b041a5a6ca",
+      "size": 8513
+    },
+    {
+      "path": "backend/public/build/assets/app-BvRk9kiK.js",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "backend/public/build/assets/app-D4sjMGwk.css",
+      "sha256": "2e2066a03dfc76b10d5cea7f71b0224345b22731fa523f5ad0990b5f32db651f",
+      "size": 38227
+    },
+    {
+      "path": "backend/public/build/assets/discovery-map-1RY0dqsC.js",
+      "sha256": "6baac3f8c460ce3cfa2f92de63e21a8673af530673746880160e94c945781f1d",
+      "size": 1039086
+    },
+    {
+      "path": "backend/public/build/assets/discovery-map-CKRTiAqP.css",
+      "sha256": "a44e9c8519685a73587bcb465401eade1c3491d382c22243373c1c42b766f186",
+      "size": 82869
+    },
+    {
+      "path": "backend/public/build/assets/fonts-C9MNnjVw.css",
+      "sha256": "3846a9bb60bfad92960eadcccaf0b4e129d74b11d48791506c8d1a827a385cc8",
+      "size": 2352
+    },
+    {
+      "path": "backend/public/build/assets/instrument-sans-400-normal-D1W7dsQl.woff",
+      "sha256": "797bd3eaa70edbd4757650ab44dad75fbfbfdf18bacedb4b71022c04621d30ad",
+      "size": 21240
+    },
+    {
+      "path": "backend/public/build/assets/instrument-sans-400-normal-DRC__1Mx.woff2",
+      "sha256": "9a91efaa3599a6ef01b2f49e9ec670e3a2f39baeef09c73198f1052cf3bb0850",
+      "size": 16860
+    },
+    {
+      "path": "backend/public/build/assets/instrument-sans-500-normal-Dk9ku72i.woff2",
+      "sha256": "9d3547da16d950d12a677c772a3ff9b69846e60e7dcd1b5efd540993f7286532",
+      "size": 17232
+    },
+    {
+      "path": "backend/public/build/assets/instrument-sans-500-normal-Z6ESRlEs.woff",
+      "sha256": "bd6a8dc8b0dc0cced0c32d3eda93f0e0e82c58ddefea8b53b3307b0c48da3089",
+      "size": 21652
+    },
+    {
+      "path": "backend/public/build/assets/instrument-sans-600-normal-B7fBEWYG.woff2",
+      "sha256": "efb770916eda95a0e31d80cccde9651d4e8617010b21220e9f227c4820d675da",
+      "size": 17408
+    },
+    {
+      "path": "backend/public/build/assets/instrument-sans-600-normal-B9e8oLYv.woff",
+      "sha256": "9b4ce1f2b26be7cb087fd87d6f99a202136292ec820af75bd38ab9e53895cf28",
+      "size": 21676
+    },
+    {
+      "path": "backend/public/build/assets/passkeys-dtX7jgnS.js",
+      "sha256": "defcad6ecff206b891aa8f15ad5d7e8342b4bc239fcd24d22d04172eb0b646ba",
+      "size": 13133
+    },
+    {
+      "path": "backend/public/build/fonts-manifest.json",
+      "sha256": "66edf17c93351fe01158be7414a441a762f106417c74351881876b405b8b10ca",
+      "size": 5742
+    },
+    {
+      "path": "backend/public/build/manifest.json",
+      "sha256": "683d43a45271ceebf896d0696d215b3790c19466fcfbb1538ec684e82eaf4cf8",
+      "size": 1886
+    },
+    {
+      "path": "backend/public/index.php",
+      "sha256": "3003271a79c0fccc6fcb49ba5b09cabc3c123adf6157b434a5d7a5cc6813e8cc",
+      "size": 454
+    },
+    {
+      "path": "backend/public/robots.txt",
+      "sha256": "16517f015727c04486cd413efc1f8299a0c5366dca00c158af3d91c9552f5287",
+      "size": 68
+    },
+    {
+      "path": "backend/public/sitemap.xml",
+      "sha256": "97f3737b7e7aab8907b9fc698df252dc37ee514a005dbcc91eff2df12a0540f6",
+      "size": 263
+    },
+    {
+      "path": "deployment/webroot/.htaccess",
+      "sha256": "66692498cd53acd278c7aa51b28ad71d5cd7995fd8082aec44701977e770f54d",
+      "size": 1538
+    },
+    {
+      "path": "deployment/webroot/assets/auth-login.js",
+      "sha256": "acd8762db6a41c2e80ad9cb3bbab9886c3b788501b6a97378b138b4df866a0ff",
+      "size": 4628
+    },
+    {
+      "path": "deployment/webroot/assets/brand-mark.svg",
+      "sha256": "491dcbb2cac8e72d4d3380449733c91db36664ca9c776addc83fabff57dded8b",
+      "size": 657
+    },
+    {
+      "path": "deployment/webroot/assets/favicon.svg",
+      "sha256": "185261e2a2dca5447abd6d6b8cd7a07be79b92116f381c4c38178caa96a2cc1c",
+      "size": 337
+    },
+    {
+      "path": "deployment/webroot/assets/font.css",
+      "sha256": "00adb2469fedf3b3ad6b0acd2adf2a5a73b3dce7e50a5b59b7006e010b5d6046",
+      "size": 920
+    },
+    {
+      "path": "deployment/webroot/assets/fonts/Royadarman-Bold.ttf",
+      "sha256": "b00f4a8ff5a742bc86701356f6287feaa87a314b9b17df4bbc806f53147c6899",
+      "size": 83260
+    },
+    {
+      "path": "deployment/webroot/assets/fonts/Royadarman-Medium.ttf",
+      "sha256": "633e12d07f8be9a7ed57956e106497fb779108d05d78ac49cf98418e2cafadfc",
+      "size": 83452
+    },
+    {
+      "path": "deployment/webroot/assets/fonts/Royadarman-Regular.ttf",
+      "sha256": "06f80aa42e48b1515f96d7a7c404c19ac4ebab13dbf346542ba6bdff16b3caa9",
+      "size": 83316
+    },
+    {
+      "path": "deployment/webroot/assets/fonts/Royadarman-SemiBold.ttf",
+      "sha256": "d6f2ec40d0e8119d0a08095b9a5ea372a234ab1183f4df8e66c2b8575ac4cca2",
+      "size": 82916
+    },
+    {
+      "path": "deployment/webroot/assets/icon-home.svg",
+      "sha256": "ac949e9557fab065a915e51405cc12cddce5253fa9687405fc60ff1dd69ef55e",
+      "size": 288
+    },
+    {
+      "path": "deployment/webroot/assets/icon-opg.svg",
+      "sha256": "4015738b57d33e7e3e0afb51a385c90dd649dda2bc5cbec93d6ec38515ee2438",
+      "size": 292
+    },
+    {
+      "path": "deployment/webroot/assets/icon-support.svg",
+      "sha256": "9e9f36476115338107f61044b8732af070765a7d590970edc4e215cb062ba961",
+      "size": 382
+    },
+    {
+      "path": "deployment/webroot/assets/panel-case.js",
+      "sha256": "f6043a17029c4d9627cafdc1cd38b6579b880f4b03e916b18f51bfb3f1da04f9",
+      "size": 5037
+    },
+    {
+      "path": "deployment/webroot/assets/patient-request.js",
+      "sha256": "cebfe3ef622f1e5e36275178834a73d39ccea54e965f5361fdaf99323566c85c",
+      "size": 9041
+    },
+    {
+      "path": "deployment/webroot/assets/photos/about.jpg",
+      "sha256": "354083da7f3636431571a8fa81db0b541abdd82e813249a532a79123c4151714",
+      "size": 29678
+    },
+    {
+      "path": "deployment/webroot/assets/photos/about.webp",
+      "sha256": "286a475b0f3d10d5dc9975e472f2ff5b2d947b4fc86e4c7af75cfe563d0349af",
+      "size": 15204
+    },
+    {
+      "path": "deployment/webroot/assets/photos/coord.jpg",
+      "sha256": "111b90dfe515ccb859251bf82f9e758a4ce7e115f78507a770d52ab10440e91e",
+      "size": 30579
+    },
+    {
+      "path": "deployment/webroot/assets/photos/coord.webp",
+      "sha256": "708c87a27a4201addfc061f0f585cb4e985b36af114a620f017813115d7dde6d",
+      "size": 15678
+    },
+    {
+      "path": "deployment/webroot/assets/photos/home.jpg",
+      "sha256": "ce0dd51470ba5affa7540102e6588cb030affb6106dc277549f80e22f848aedb",
+      "size": 29701
+    },
+    {
+      "path": "deployment/webroot/assets/photos/home.webp",
+      "sha256": "d25925ed963ab9f1dd1448873c618f25bd0fed3cd148bb4e1057ba00d7cb482a",
+      "size": 15180
+    },
+    {
+      "path": "deployment/webroot/assets/photos/opg.jpg",
+      "sha256": "fa306fd4f8bfba56f3ade2fc22c810f15beb6c3eade007a1e12dd668e798ed51",
+      "size": 142505
+    },
+    {
+      "path": "deployment/webroot/assets/photos/opg.webp",
+      "sha256": "c5b1fe1eb66585f390f4ba9bdcddb7a9d063a919cf0a6944200bc40c1ebe20e5",
+      "size": 44902
+    },
+    {
+      "path": "deployment/webroot/assets/photos/support.jpg",
+      "sha256": "09cb3645b549cbb34a15a7a554b58ef827ed31348ed764d78b4cf965b12e6c25",
+      "size": 30110
+    },
+    {
+      "path": "deployment/webroot/assets/photos/support.webp",
+      "sha256": "ee257596a008944d63fb73154c2d1fafb3c73155db26b13c6f902d19ba99f4db",
+      "size": 15384
+    },
+    {
+      "path": "deployment/webroot/assets/photos/tehran.jpg",
+      "sha256": "28a3b34b300669addca4a36ab16e4f91f34ba7d62faec0428a6f8cbb107c7a65",
+      "size": 25308
+    },
+    {
+      "path": "deployment/webroot/assets/photos/tehran.webp",
+      "sha256": "38c3a126366140dcd7d08c3ecb05a33c109c6611312d120322a644f6b2228d5a",
+      "size": 12612
+    },
+    {
+      "path": "deployment/webroot/assets/pwa/icon-192.png",
+      "sha256": "bbeb2b9a5ef09ddbd4d09b7d190f346d98bf3ec9d2de5fc4aeaca35a6d0b9f97",
+      "size": 29050
+    },
+    {
+      "path": "deployment/webroot/assets/pwa/icon-512.png",
+      "sha256": "86c4afae40ea9a17797e5d459ab87fa97e4eae9d3944e6464eeb7730e72e0b55",
+      "size": 37705
+    },
+    {
+      "path": "deployment/webroot/assets/site.css",
+      "sha256": "b8ca599476b4afa5677d4ff510d6c111453fed3934867a63fb50c8c8cc6dc767",
+      "size": 20357
+    },
+    {
+      "path": "deployment/webroot/assets/site.js",
+      "sha256": "95f2017fc856311e354684f012bd469775039c24df200136441047ef2073a745",
+      "size": 1015
+    },
+    {
+      "path": "deployment/webroot/assets/workspace.css",
+      "sha256": "12a65d5cde491c447941b1d2542126c9130d353670ac2fd8c104f54d1ce32de7",
+      "size": 33713
+    },
+    {
+      "path": "deployment/webroot/assets/workspace.js",
+      "sha256": "02555cc3158079b9ff3ff5c462781f58d01e4f93e5ee8192362e61b041a5a6ca",
+      "size": 8513
+    },
+    {
+      "path": "deployment/webroot/build/assets/app-BvRk9kiK.js",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "deployment/webroot/build/assets/app-D4sjMGwk.css",
+      "sha256": "2e2066a03dfc76b10d5cea7f71b0224345b22731fa523f5ad0990b5f32db651f",
+      "size": 38227
+    },
+    {
+      "path": "deployment/webroot/build/assets/discovery-map-1RY0dqsC.js",
+      "sha256": "6baac3f8c460ce3cfa2f92de63e21a8673af530673746880160e94c945781f1d",
+      "size": 1039086
+    },
+    {
+      "path": "deployment/webroot/build/assets/discovery-map-CKRTiAqP.css",
+      "sha256": "a44e9c8519685a73587bcb465401eade1c3491d382c22243373c1c42b766f186",
+      "size": 82869
+    },
+    {
+      "path": "deployment/webroot/build/assets/fonts-C9MNnjVw.css",
+      "sha256": "3846a9bb60bfad92960eadcccaf0b4e129d74b11d48791506c8d1a827a385cc8",
+      "size": 2352
+    },
+    {
+      "path": "deployment/webroot/build/assets/instrument-sans-400-normal-D1W7dsQl.woff",
+      "sha256": "797bd3eaa70edbd4757650ab44dad75fbfbfdf18bacedb4b71022c04621d30ad",
+      "size": 21240
+    },
+    {
+      "path": "deployment/webroot/build/assets/instrument-sans-400-normal-DRC__1Mx.woff2",
+      "sha256": "9a91efaa3599a6ef01b2f49e9ec670e3a2f39baeef09c73198f1052cf3bb0850",
+      "size": 16860
+    },
+    {
+      "path": "deployment/webroot/build/assets/instrument-sans-500-normal-Dk9ku72i.woff2",
+      "sha256": "9d3547da16d950d12a677c772a3ff9b69846e60e7dcd1b5efd540993f7286532",
+      "size": 17232
+    },
+    {
+      "path": "deployment/webroot/build/assets/instrument-sans-500-normal-Z6ESRlEs.woff",
+      "sha256": "bd6a8dc8b0dc0cced0c32d3eda93f0e0e82c58ddefea8b53b3307b0c48da3089",
+      "size": 21652
+    },
+    {
+      "path": "deployment/webroot/build/assets/instrument-sans-600-normal-B7fBEWYG.woff2",
+      "sha256": "efb770916eda95a0e31d80cccde9651d4e8617010b21220e9f227c4820d675da",
+      "size": 17408
+    },
+    {
+      "path": "deployment/webroot/build/assets/instrument-sans-600-normal-B9e8oLYv.woff",
+      "sha256": "9b4ce1f2b26be7cb087fd87d6f99a202136292ec820af75bd38ab9e53895cf28",
+      "size": 21676
+    },
+    {
+      "path": "deployment/webroot/build/assets/passkeys-dtX7jgnS.js",
+      "sha256": "defcad6ecff206b891aa8f15ad5d7e8342b4bc239fcd24d22d04172eb0b646ba",
+      "size": 13133
+    },
+    {
+      "path": "deployment/webroot/build/fonts-manifest.json",
+      "sha256": "66edf17c93351fe01158be7414a441a762f106417c74351881876b405b8b10ca",
+      "size": 5742
+    },
+    {
+      "path": "deployment/webroot/build/manifest.json",
+      "sha256": "683d43a45271ceebf896d0696d215b3790c19466fcfbb1538ec684e82eaf4cf8",
+      "size": 1886
+    },
+    {
+      "path": "deployment/webroot/favicon.ico",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "deployment/webroot/index.php",
+      "sha256": "253b46880df1ca5ff13378bc30f5fd2a62382e43d27f8ca1e787f4d1227e6f74",
+      "size": 480
+    },
+    {
+      "path": "deployment/webroot/robots.txt",
+      "sha256": "16517f015727c04486cd413efc1f8299a0c5366dca00c158af3d91c9552f5287",
+      "size": 68
+    },
+    {
+      "path": "deployment/webroot/sitemap.xml",
+      "sha256": "97f3737b7e7aab8907b9fc698df252dc37ee514a005dbcc91eff2df12a0540f6",
+      "size": 263
+    }
+  ],
+  "exclusions": [
+    ".env and production credentials",
+    "vendor and node_modules",
+    "storage and private uploads",
+    "database data/dumps",
+    "bootstrap caches and sessions",
+    "logs/error_log",
+    "cPanel PHP INI and MCP configuration",
+    "old-security assets and staging trees",
+    "live docs/audit/runtime reports"
+  ],
+  "repository_only": "Existing tests, documentation, CI, infrastructure and archived frontend retained; not evidence of production deployment."
+}

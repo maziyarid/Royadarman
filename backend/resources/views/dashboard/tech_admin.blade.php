@@ -26,19 +26,14 @@
     @if(count($data['recent_audit']) === 0)
         <div class="empty">{{ __('ui.dashboard.no_audit') }}</div>
     @else
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th scope="col">{{ __('ui.dashboard.col_action') }}</th><th scope="col">{{ __('ui.dashboard.col_updated') }}</th></tr></thead>
-                <tbody>
-                    @foreach($data['recent_audit'] as $a)
-                        <tr>
-                            <td>{{ $a['action'] }}</td>
-                            <td><bdi>{{ $a['created_at'] }}</bdi></td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+        @foreach($data['recent_audit'] as $a)
+            <article class="task-card">
+                <div class="task-card-main">
+                    <strong>{{ $a['action'] }}</strong>
+                    <bdi>{{ $a['created_at'] }}</bdi>
+                </div>
+            </article>
+        @endforeach
     @endif
 </div>
 <p class="notice">{{ __('panel.roles.tech_admin.subtitle') }}</p>

@@ -1,0 +1,134 @@
+diff --git a/backend/lang/ar/site.php b/backend/lang/ar/site.php
+index 4a9c6b6..1e77820 100644
+--- a/backend/lang/ar/site.php
++++ b/backend/lang/ar/site.php
+@@ -1,7 +1,7 @@
+ <?php
+ 
+ return [
+-    'contact_launcher' => ['open' => 'طرق التواصل', 'phone' => 'اتصال هاتفي', 'whatsapp' => 'واتساب', 'instagram' => 'إنستغرام', 'linkedin' => 'لينكدإن', 'contact' => 'صفحة التواصل', 'privacy' => 'لا ترسل صور OPG أو التفاصيل العلاجية عبر تطبيقات المراسلة. استخدم مسار الطلب الآمن.'],
++    'contact_launcher' => ['open' => 'طرق التواصل', 'phone' => 'اتصال هاتفي', 'whatsapp' => 'واتساب', 'instagram' => 'إنستغرام', 'linkedin' => 'لينكدإن', 'contact' => 'صفحة التواصل', 'privacy' => 'لا ترسل صور OPG أو التفاصيل العلاجية عبر تطبيقات المراسلة. للأسئلة العامة استخدم صفحة التواصل أو الهاتف.'],
+     'brand' => 'رويا درمان', 'tagline' => 'إرشاد وتنسيق مسار رعاية الأسنان', 'nav_label' => 'التنقل الرئيسي', 'language' => 'اللغة', 'menu' => 'القائمة', 'cta' => 'ابدأ طلباً آمناً', 'nav' => ['services' => 'الخدمات', 'how' => 'كيف نعمل', 'about' => 'من نحن', 'faq' => 'الأسئلة', 'contact' => 'تواصل'], 'links' => ['opg' => 'مراجعة أولية لـ OPG', 'home' => 'طب الأسنان المنزلي', 'referral' => 'الإحالة والتنسيق', 'privacy' => 'الخصوصية', 'login' => 'تسجيل الدخول'], 'footer_intro' => 'مسار واضح للإرشاد والتنسيق والإحالة مع فصل الأدوار السريرية عن غير السريرية.', 'footer_services' => 'الخدمات', 'footer_company' => 'رويا درمان', 'footer_trust' => 'الثقة والوصول', 'common_cta_title' => 'هل أنت مستعد للخطوة التالية؟', 'common_cta_text' => 'يبدأ مسار الطلب الآمن بتسجيل الدخول عبر الهاتف. تُستقبل المعلومات السريرية داخل مساحة موثقة فقط.', 'trust_title' => 'حدود سريرية واضحة',
+     'home' => ['hero_kicker' => 'طهران · تنسيق على مدار الساعة', 'hero_title' => 'ما الخدمة التي تحتاجها؟', 'hero_text' => 'تنسّق رويا درمان مسار رعاية الأسنان. التشخيص والعلاج لطبيب أسنان مرخّص فقط.', 'hero_primary' => 'ابدأ طلباً آمناً', 'hero_secondary' => 'كيف نعمل', 'search_placeholder' => 'ابحث عن خدمة أو حي أو احتياج…', 'search_results' => 'المسارات المطابقة لـ «:q»', 'search_no_match' => 'لا تطابق دقيق. تبقى المسارات الثلاثة ظاهرة — لا نخفي طرق الرعاية.', 'search_matched' => 'أفضل تطابق', 'coverage_title' => 'تغطية طهران', 'coverage_text' => 'ابحث عن حي أو اختر من القائمة. لا يُؤخذ الموقع إلا بطلبك.', 'coverage_cta' => 'طب الأسنان المنزلي في طهران', 'neighborhoods' => ['تجريش', 'نياوران', 'فناك', 'سعادت آباد', 'ولي العصر', 'طهران بارس', 'نارمك', 'نازي آباد'], 'photo_alt' => 'أفق طهران وبرج ميلاد. سياق مكاني فقط — ليست عيادة رويا درمان.', 'photo_caption' => 'طهران هي مدينة العمل الحالية. البرج معلم مديني وليس مكتب رويا درمان.', 'map_title' => 'مسار رعايتك', 'map_subtitle' => 'من الطلب إلى الخطوة التالية', 'map_steps' => [['title' => 'توضيح الحاجة', 'text' => 'نوع الخدمة والموقع والأولوية.'], ['title' => 'تنسيق المسار', 'text' => 'إحالة أو خدمة منزلية أو مراجعة OPG.'], ['title' => 'متابعة التسليم', 'text' => 'لكل مرحلة مسؤول واضح.']], 'services_title' => 'ثلاث طرق عملية للبدء', 'services_intro' => 'لكل خدمة صفحة ونطاق ومسار عمل مستقل.', 'all_services' => 'عرض كل الخدمات', 'services' => ['referral' => ['title' => 'الإرشاد والإحالة', 'text' => 'تنسيق حسب الحاجة والموقع والميزانية المعلنة.'], 'home' => ['title' => 'طب الأسنان المنزلي في طهران', 'text' => 'تنسيق الخدمات المناسبة في المنزل داخل مدينة طهران.'], 'opg' => ['title' => 'مراجعة أولية لصورة OPG', 'text' => 'مسار خاص لمراجعة الصورة بواسطة طبيب مرخص.']], 'process_title' => 'مصمم لتسليم آمن منذ البداية.', 'process_text' => 'المنسق ليس طبيباً معالجاً ومالك المنصة لا يملك وصولاً ضمنياً إلى السجل السريري.', 'process_link' => 'تفاصيل المسار', 'process_steps' => [['title' => 'الطلب', 'text' => 'تُجمع أقل كمية لازمة من المعلومات بأمان.'], ['title' => 'التنسيق', 'text' => 'يُراجع نوع الخدمة والمنطقة والتوفر.'], ['title' => 'الرأي السريري عند الحاجة', 'text' => 'يبقى الحكم السريري لدى طبيب مرخص.'], ['title' => 'المتابعة', 'text' => 'تبقى الخطوة التالية قابلة للتتبع.']], 'trust_title' => 'الخصوصية جزء من بنية الخدمة.', 'trust_text' => 'تبقى المستندات السريرية خارج الويب العام ويكون الوصول مقيداً وقابلاً للتدقيق.', 'trust_points' => ['لا تُجمع المستندات السريرية في الصفحات العامة.', 'وصول العيادة مرتبط بنطاق مصرح به.', 'مراجعة OPG الأولية ليست تشخيصاً نهائياً.'], 'trust_link' => 'تفاصيل الخصوصية', 'cta_title' => 'ابدأ من الصفحة المناسبة.', 'cta_text' => 'استكشف الخدمات أو انتقل إلى مساحة الطلب الآمن.', 'faq_title' => 'أسئلة يجب أن تكون إجاباتها واضحة', 'faq_intro' => 'نوضح الدور والنطاق والحدود السريرية قبل تقديم الطلب.', 'faq_link' => 'كل الأسئلة'],
+     'pages' => [
+diff --git a/backend/lang/en/site.php b/backend/lang/en/site.php
+index ab575f1..ae058a3 100644
+--- a/backend/lang/en/site.php
++++ b/backend/lang/en/site.php
+@@ -1,7 +1,7 @@
+ <?php
+ 
+ return [
+-    'contact_launcher' => ['open' => 'Contact options', 'phone' => 'Call', 'whatsapp' => 'WhatsApp', 'instagram' => 'Instagram', 'linkedin' => 'LinkedIn', 'contact' => 'Contact page', 'privacy' => 'Please do not send OPG images or treatment details through messaging apps. Use the secure request path.'],
++    'contact_launcher' => ['open' => 'Contact options', 'phone' => 'Call', 'whatsapp' => 'WhatsApp', 'instagram' => 'Instagram', 'linkedin' => 'LinkedIn', 'contact' => 'Contact page', 'privacy' => 'Please do not send OPG images or treatment details through messaging apps. Use the contact page or phone for general questions.'],
+     'brand' => 'Royadarman', 'tagline' => 'Dental care-path guidance and coordination', 'nav_label' => 'Main navigation', 'language' => 'Language', 'menu' => 'Menu', 'cta' => 'Start a secure request', 'nav' => ['services' => 'Services', 'how' => 'How it works', 'about' => 'About', 'faq' => 'FAQ', 'contact' => 'Contact'], 'links' => ['opg' => 'Preliminary OPG review', 'home' => 'Home dentistry', 'referral' => 'Clinic referral and coordination', 'privacy' => 'Privacy', 'login' => 'Sign in'], 'footer_intro' => 'A clear route for dental guidance, coordination and referral, with clinical and non-clinical roles kept separate.', 'footer_services' => 'Services', 'footer_company' => 'Royadarman', 'footer_trust' => 'Trust & access', 'common_cta_title' => 'Ready for the next step?', 'common_cta_text' => 'The secure request path begins with mobile sign-in. Clinical information is accepted only inside the authenticated workspace.', 'trust_title' => 'Clear clinical boundaries',
+     'home' => ['hero_kicker' => 'Tehran · 24/7 coordination', 'hero_title' => 'What do you need?', 'hero_text' => 'Royadarman coordinates your dental-care path. Diagnosis and treatment stay with a licensed dentist.', 'hero_primary' => 'Start a secure request', 'hero_secondary' => 'How Royadarman works', 'search_placeholder' => 'Search a service, neighbourhood or need…', 'search_results' => 'Matching routes for “:q”', 'search_no_match' => 'No exact match. All three routes stay listed — care paths are not hidden.', 'search_matched' => 'Best match', 'coverage_title' => 'Tehran coverage', 'coverage_text' => 'Search a neighbourhood or pick from the list. Location is captured only after you ask.', 'coverage_cta' => 'Home dentistry in Tehran', 'neighborhoods' => ['Tajrish', 'Niavaran', 'Vanak', 'Saadatabad', 'Valiasr', 'Tehranpars', 'Narmak', 'Naziabad'], 'photo_alt' => 'Tehran skyline with Milad Tower. Location context only — not a Royadarman clinic.', 'photo_caption' => 'Tehran is the current operating city. The tower is a city landmark, not a Royadarman office.', 'map_title' => 'Your care path', 'map_subtitle' => 'From request to next step', 'map_steps' => [['title' => 'Clarify the need', 'text' => 'Service type, location and priorities.'], ['title' => 'Coordinate the route', 'text' => 'Referral, home service or OPG review.'], ['title' => 'Follow through', 'text' => 'Each hand-off has an accountable owner.']], 'services_title' => 'Three practical ways to start', 'services_intro' => 'Each service has its own page, scope and workflow.', 'all_services' => 'View all services', 'services' => ['referral' => ['title' => 'Guidance and clinic referral', 'text' => 'Coordination around your need, location and stated budget.'], 'home' => ['title' => 'Home dentistry in Tehran', 'text' => 'Coordination of suitable home dental services within Tehran city.'], 'opg' => ['title' => 'Preliminary OPG review', 'text' => 'A private path for review by a licensed dentist.']], 'process_title' => 'Designed for a safe hand-off from the beginning.', 'process_text' => 'Coordinators are not treating clinicians, and the platform owner has no implicit clinical-record access.', 'process_link' => 'See the full process', 'process_steps' => [['title' => 'Request', 'text' => 'Minimum necessary information is collected securely.'], ['title' => 'Coordination', 'text' => 'Service fit, area and availability are reviewed.'], ['title' => 'Clinical input when needed', 'text' => 'Clinical judgement stays with licensed dentists.'], ['title' => 'Follow-up', 'text' => 'The next step remains visible and traceable.']], 'trust_title' => 'Privacy is part of the service architecture.', 'trust_text' => 'Clinical documents stay outside the public web root and access is restricted and auditable.', 'trust_points' => ['No clinical documents are collected on public pages.', 'Clinic access is created only within an authorised scope.', 'A preliminary OPG review is not a final diagnosis.'], 'trust_link' => 'Privacy details', 'cta_title' => 'Start from the right page.', 'cta_text' => 'Explore services first, or move into the secure request workspace when ready.', 'faq_title' => 'Questions worth answering before you start', 'faq_intro' => 'We make the role, scope and clinical boundaries clear before a request is submitted.', 'faq_link' => 'All questions'],
+     'pages' => [
+diff --git a/backend/lang/fa/site.php b/backend/lang/fa/site.php
+index 0b9ee79..cc221ad 100644
+--- a/backend/lang/fa/site.php
++++ b/backend/lang/fa/site.php
+@@ -1,10 +1,10 @@
+ <?php
+ 
+ return [
++    'contact_launcher' => ['open' => 'راه‌های تماس', 'phone' => 'تماس تلفنی', 'whatsapp' => 'واتساپ', 'instagram' => 'اینستاگرام', 'linkedin' => 'لینکدین', 'contact' => 'صفحه تماس', 'privacy' => 'تصویر OPG و جزئیات درمان را در پیام‌رسان نفرستید. برای پرسش‌های عمومی از صفحه تماس یا تلفن استفاده کنید.'],
+     'brand' => 'رویا درمان', 'tagline' => 'راهنمایی و هماهنگی مسیر دندانپزشکی', 'nav_label' => 'ناوبری اصلی', 'language' => 'انتخاب زبان', 'menu' => 'منو', 'cta' => 'شروع درخواست امن',
+     'nav' => ['services' => 'خدمات', 'how' => 'نحوه کار', 'about' => 'درباره ما', 'faq' => 'پرسش‌های متداول', 'contact' => 'تماس'],
+     'links' => ['opg' => 'بررسی اولیه OPG', 'home' => 'دندانپزشکی در منزل', 'referral' => 'معرفی و هماهنگی مرکز', 'privacy' => 'حریم خصوصی', 'login' => 'ورود به پنل'],
+-    'contact_launcher' => ['open' => 'راه‌های تماس', 'phone' => 'تماس تلفنی', 'whatsapp' => 'واتساپ', 'instagram' => 'اینستاگرام', 'linkedin' => 'لینکدین', 'contact' => 'صفحه تماس', 'privacy' => 'تصویر OPG و اطلاعات درمان را در پیام‌رسان نفرستید. برای ثبت درخواست از مسیر امن سایت استفاده کنید.'],
+     'footer_intro' => 'یک مسیر روشن برای راهنمایی، هماهنگی و ارجاع دندانپزشکی؛ با تفکیک روشن نقش‌های غیر بالینی و بالینی.', 'footer_services' => 'خدمات', 'footer_company' => 'رویا درمان', 'footer_trust' => 'اعتماد و دسترسی',
+     'common_cta_title' => 'برای قدم بعدی آماده‌اید؟', 'common_cta_text' => 'مسیر امن درخواست از ورود با شماره همراه شروع می‌شود. اطلاعات بالینی فقط در فضای احراز هویت‌شده دریافت می‌شود.', 'trust_title' => 'مرز روشن مسئولیت',
+     'home' => [
+diff --git a/backend/public/assets/site.css b/backend/public/assets/site.css
+index b064bed..36ab8c5 100644
+--- a/backend/public/assets/site.css
++++ b/backend/public/assets/site.css
+@@ -4,7 +4,7 @@
+ @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+ 
+ /* Multi-page content surfaces */
+-.contact-launcher{position:fixed;inset-inline-end:18px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:90;max-width:min(330px,calc(100vw - 36px));font-size:14px}.contact-launcher summary{display:grid;place-items:center;min-height:52px;padding:10px 18px;border-radius:30px;color:#fff;background:#2947a3;box-shadow:0 8px 28px rgba(22,43,112,.3);cursor:pointer;font-weight:700;list-style:none}.contact-launcher summary::-webkit-details-marker{display:none}.contact-launcher summary:focus-visible,.contact-launcher a:focus-visible{outline:3px solid #f2a566;outline-offset:3px}.contact-launcher nav{position:absolute;inset-inline-end:0;bottom:calc(100% + 10px);width:min(310px,calc(100vw - 36px));display:grid;gap:4px;padding:12px;border:1px solid #d8def3;border-radius:18px;background:#fff;box-shadow:0 12px 36px rgba(22,43,112,.2)}.contact-launcher nav a{display:block;padding:10px 12px;border-radius:9px;color:#162b70;text-decoration:none}.contact-launcher nav a:hover{background:#eef1fb}.contact-launcher nav p{margin:8px 4px 2px;font-size:12px;line-height:1.8;color:#555f75}
++.contact-launcher{position:fixed;inset-inline-end:18px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:90;max-width:min(330px,calc(100vw - 36px));font-size:14px}.contact-launcher summary{display:grid;place-items:center;min-height:52px;padding:10px 18px;border-radius:30px;color:#fff;background:#2947a3;box-shadow:0 8px 28px rgba(22,43,112,.3);cursor:pointer;font-weight:700;list-style:none}.contact-launcher summary::-webkit-details-marker{display:none}.contact-launcher summary:focus-visible,.contact-launcher a:focus-visible{outline:3px solid #f2a566;outline-offset:3px}.contact-launcher nav{position:absolute;inset-inline-end:0;bottom:calc(100% + 10px);width:min(310px,calc(100vw - 36px));max-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 100px);max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 100px);overflow-y:auto;overscroll-behavior:contain;display:grid;gap:4px;padding:12px;border:1px solid #d8def3;border-radius:18px;background:#fff;box-shadow:0 12px 36px rgba(22,43,112,.2)}.contact-launcher nav a{display:block;padding:10px 12px;border-radius:9px;color:#162b70;text-decoration:none}.contact-launcher nav a:hover{background:#eef1fb}.contact-launcher nav p{margin:8px 4px 2px;font-size:12px;line-height:1.8;color:#555f75}
+ .content-hero{padding:72px 0 52px;background:linear-gradient(180deg,#f5f7ff 0%,#fff 100%)}.content-hero.compact{padding-bottom:38px}.content-hero h1{max-width:850px;margin:0 0 14px}.eyebrow,.article-meta{font-size:.88rem;color:#63708d}.prose{max-width:880px;line-height:2}.prose h2,.prose h3{margin-top:2rem}.prose img{max-width:100%;height:auto;border-radius:18px}.prose a{color:#2947a3;text-decoration:underline}.article-list{display:grid;gap:18px}.article-card{display:flex;justify-content:space-between;gap:28px;align-items:flex-end;padding:26px;border:1px solid #e2e6f0;border-radius:20px;background:#fff}.article-card h2{margin:.35rem 0 .6rem}.article-card h2 a{color:inherit;text-decoration:none}.pagination{display:flex;gap:14px;align-items:center;justify-content:center;margin-top:30px}.pagination a,.pagination span{padding:8px 12px;border-radius:10px;border:1px solid #dce2ee}.preview-banner{background:#9a5a08;color:#fff;padding:9px 16px;text-align:center;font-weight:700}.error-section{min-height:55vh;display:grid;place-items:center;text-align:center;padding:90px 0}.error-code{font-size:4.5rem;font-weight:800;color:#2947a3;margin:0}.empty-state{padding:34px;border:1px dashed #ccd4e5;border-radius:18px;text-align:center;color:#64708a}@media(max-width:720px){.content-hero{padding:50px 0 34px}.article-card{display:block}.article-card .text-link{display:inline-flex;margin-top:14px}}
+ .photo-frame{margin:0 0 8px}.photo-frame picture,.photo-frame>img{display:block;width:100%;height:auto}.photo-frame img{border-radius:28px;border:1px solid var(--line)}.photo-frame figcaption{margin-top:10px;font-size:12px;color:var(--muted)}.service-link.photo-card img{width:100%;height:140px;object-fit:cover;padding:0;border-radius:14px;background:#eef1fb}
+ @media(max-width:640px){.service-link.photo-card img{height:120px}}
+diff --git a/backend/resources/views/public/partials/discovery-map.blade.php b/backend/resources/views/public/partials/discovery-map.blade.php
+index bd443a8..5081f3c 100644
+--- a/backend/resources/views/public/partials/discovery-map.blade.php
++++ b/backend/resources/views/public/partials/discovery-map.blade.php
+@@ -55,7 +55,11 @@
+                                     <p>{{ $copy['not_available_claim'] }}</p>
+                                     <div class="discovery-card-actions">
+                                         <a class="button primary" data-directions-link href="{{ $clinic['directions_url'] }}" rel="noopener noreferrer" target="_blank">{{ $copy['directions'] }}</a>
+-                                        <a class="button ghost" href="{{ route('login', ['locale' => $locale]) }}">{{ $copy['select_clinic'] }}</a>
++                                        @if(config('royadarman.intake_enabled'))
++                                            <a class="button ghost" href="{{ route('login', ['locale' => $locale]) }}">{{ $copy['select_clinic'] }}</a>
++                                        @else
++                                            <a class="button ghost" href="{{ \App\Support\PublicUrl::to('contact', $locale) }}">{{ __('site.contact_launcher.contact') }}</a>
++                                        @endif
+                                     </div>
+                                 </article>
+                             </li>
+diff --git a/backend/tests/Feature/PublicDiscoveryMapTest.php b/backend/tests/Feature/PublicDiscoveryMapTest.php
+index 7ba34dd..c85cdd5 100644
+--- a/backend/tests/Feature/PublicDiscoveryMapTest.php
++++ b/backend/tests/Feature/PublicDiscoveryMapTest.php
+@@ -115,6 +115,57 @@ final class PublicDiscoveryMapTest extends TestCase
+             ->assertSee('الاتجاهات', false);
+     }
+ 
++    public function test_contact_cta_fallback(): void
++    {
++        config()->set('royadarman.intake_enabled', false);
++        $clinic = $this->makeClinic('Vanak Match', 35.7572, 51.4103);
++        $this->attest($clinic, SuitabilityStatus::Suitable);
++        $this->get('/en/referrals')->assertOk()->assertSee('http://localhost/en/contact', false)->assertSee('Contact page', false);
++        $this->get('/referrals')->assertOk()->assertSee('http://localhost/contact', false)->assertSee('صفحه تماس', false);
++        $this->get('/ar/referrals')->assertOk()->assertSee('http://localhost/ar/contact', false)->assertSee('صفحة التواصل', false);
++    }
++
++    public function test_guidance_cta_keeps_login_when_intake_is_open(): void
++    {
++        config()->set('royadarman.intake_enabled', true);
++        $clinic = $this->makeClinic('Vanak Match', 35.7572, 51.4103);
++        $this->attest($clinic, SuitabilityStatus::Suitable);
++        $this->get('/en/referrals')
++            ->assertOk()
++            ->assertSee('class="button ghost" href="http://localhost/en/login"', false)
++            ->assertSee('Request guidance', false);
++    }
++
++    public function test_contact_launcher_only_renders_allowlisted_urls_and_valid_phone(): void
++    {
++        config()->set('royadarman.public_contact.phone', '09122701201');
++        config()->set('royadarman.public_contact.whatsapp', 'https://wa.me/989122701201');
++        config()->set('royadarman.public_contact.instagram', 'https://www.instagram.com/royadarman/');
++        config()->set('royadarman.public_contact.linkedin', 'https://www.linkedin.com/company/royadarman/');
++        $this->get('/en/')->assertOk()
++            ->assertSee('tel:+989122701201', false)
++            ->assertSee('href="https://wa.me/989122701201"', false)
++            ->assertSee('href="https://www.instagram.com/royadarman/"', false)
++            ->assertSee('href="https://www.linkedin.com/company/royadarman/"', false);
++
++        config()->set('royadarman.public_contact.whatsapp', 'https://wa.me.evil.example/steal');
++        config()->set('royadarman.public_contact.instagram', 'http://instagram.com/royadarman');
++        config()->set('royadarman.public_contact.linkedin', 'https://user:pass@linkedin.com/company/royadarman');
++        config()->set('royadarman.public_contact.phone', 'not-a-phone');
++        $this->get('/en/')->assertOk()
++            ->assertDontSee('wa.me.evil.example', false)
++            ->assertDontSee('http://instagram.com', false)
++            ->assertDontSee('user:pass@linkedin.com', false)
++            ->assertDontSee('tel:+98', false);
++    }
++
++    public function test_contact_menu_scroll_css(): void
++    {
++        $css = File::get(public_path('assets/site.css'));
++        $this->assertStringContainsString('100dvh', $css);
++        $this->assertStringContainsString('overflow-y:auto', $css);
++    }
++
+     public function test_invalid_neshan_key_does_not_500_the_referrals_page(): void
+     {
+         config()->set('royadarman.neshan.map_api_key', 'not-a-real-key');

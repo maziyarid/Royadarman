@@ -54,6 +54,16 @@ final class SupportConversationPolicy
         return $user->role === UserRole::Owner;
     }
 
+    public function changePriority(User $user, SupportConversation $conversation): bool
+    {
+        if ($user->role === UserRole::Coordinator) {
+            return $conversation->assignee_user_id !== null
+                && (int) $conversation->assignee_user_id === (int) $user->id;
+        }
+
+        return $user->role === UserRole::Owner;
+    }
+
     public function changeStatus(User $user, SupportConversation $conversation): bool
     {
         if ($user->role === UserRole::Coordinator) {

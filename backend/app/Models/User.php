@@ -11,13 +11,25 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passkeys\Contracts\PasskeyUser;
+use Laravel\Passkeys\PasskeyAuthenticatable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'locale', 'phone', 'phone_hash', 'totp_secret', 'mfa_recovery_codes', 'is_active'])]
-#[Hidden(['password', 'remember_token', 'phone', 'totp_secret', 'mfa_recovery_codes'])]
-class User extends Authenticatable
+#[Fillable(['name', 'email', 'username', 'password', 'role', 'locale', 'phone', 'phone_hash', 'totp_secret', 'mfa_recovery_codes', 'is_active'])]
+#[Hidden(['password', 'remember_token', 'phone', 'phone_hash', 'username', 'totp_secret', 'mfa_recovery_codes'])]
+class User extends Authenticatable implements PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, PasskeyAuthenticatable;
+
+    public function getPasskeyDisplayName(): string
+    {
+        return $this->name ?: 'Royadarman user';
+    }
+
+    public function getPasskeyUsername(): string
+    {
+        return 'royadarman-user-'.$this->getKey();
+    }
 
     protected function casts(): array
     {
