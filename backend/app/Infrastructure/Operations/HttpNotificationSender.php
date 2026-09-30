@@ -3,15 +3,18 @@
 namespace App\Infrastructure\Operations;
 
 use App\Domain\Operations\Contracts\NotificationSender;
+use App\Domain\Operations\Services\IntegrationSettings;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
 final class HttpNotificationSender implements NotificationSender
 {
+    public function __construct(private readonly IntegrationSettings $settings) {}
+
     public function send(string $mobile, string $template, string $locale, array $parameters, string $idempotencyKey): string
     {
-        $endpoint = config('royadarman.sms.endpoint');
-        $token = config('royadarman.sms.token');
+        $endpoint = $this->settings->value('sms_endpoint', config('royadarman.sms.endpoint'));
+        $token = $this->settings->value('sms_token', config('royadarman.sms.token'));
         if (! is_string($endpoint) || $endpoint === '' || ! is_string($token) || $token === '') {
             throw new RuntimeException('Notification delivery is not configured.');
         }

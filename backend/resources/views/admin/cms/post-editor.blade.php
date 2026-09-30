@@ -93,7 +93,7 @@
                 @php $ct = $cat->translations->firstWhere('locale', 'fa') ?? $cat->translations->first(); @endphp
                 <label class="check">
                     <input type="checkbox" name="categories[]" value="{{ $cat->id }}" @checked($post->categories->contains($cat->id))>
-                    {{ $ct?->title ?? $cat->id }}
+                    {{ $ct?->name ?? $cat->id }}
                 </label>
             @endforeach
         </div>
@@ -108,7 +108,7 @@
                 @php $tt = $tag->translations->firstWhere('locale', 'fa') ?? $tag->translations->first(); @endphp
                 <label class="check">
                     <input type="checkbox" name="tags[]" value="{{ $tag->id }}" @checked($post->tags->contains($tag->id))>
-                    {{ $tt?->title ?? $tag->id }}
+                    {{ $tt?->name ?? $tag->id }}
                 </label>
             @endforeach
         </div>

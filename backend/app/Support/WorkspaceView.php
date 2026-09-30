@@ -10,7 +10,7 @@ final class WorkspaceView
     /**
      * Shared Blade data for authenticated workspace shells.
      *
-     * @return array{panelKey: string, isDemo: bool, canManageMarketing: bool, navActive: string, locale: string, role: UserRole}
+     * @return array{panelKey: string, isDemo: bool, canManageMarketing: bool, canManageIntegrations: bool, navActive: string, locale: string, role: UserRole}
      */
     public static function data(Request $request, string $navActive): array
     {
@@ -32,6 +32,9 @@ final class WorkspaceView
             'panelKey' => $panelKey,
             'isDemo' => $isDemo,
             'canManageMarketing' => ! $isDemo && $role === UserRole::Owner,
+            'canManageCms' => ! $isDemo && in_array($role, [UserRole::Owner, UserRole::TechnicalAdministrator], true),
+            'canManageIntegrations' => ! $isDemo && in_array($role, [UserRole::Owner, UserRole::TechnicalAdministrator], true),
+            'canManageAdministrators' => ! $isDemo && $role === UserRole::Owner,
             'navActive' => $navActive,
             'locale' => app()->getLocale(),
             'role' => $role,

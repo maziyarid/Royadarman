@@ -14,10 +14,18 @@ final class TsmsOtpSender implements OtpSender
     public function send(string $mobile, string $code, string $locale): void
     {
         $locale = in_array($locale, ['fa', 'ar', 'en'], true) ? $locale : 'fa';
-        $key = 'notifications.otp';
-        $message = Lang::get($key, ['code' => $code], $locale);
-        if ($message === $key) {
-            throw new RuntimeException('OTP notification translation is missing.');
+        $template = config('royadarman.sms.otp.message_template');
+        if (is_string($template) && trim($template) !== '') {
+            if (! str_contains($template, '{{code}}')) {
+                throw new RuntimeException('Configured OTP message template must contain {{code}}.');
+            }
+            $message = str_replace(['{{code}}', '\\n'], [$code, "\n"], $template);
+        } else {
+            $key = 'notifications.otp';
+            $message = Lang::get($key, ['code' => $code], $locale);
+            if ($message === $key) {
+                throw new RuntimeException('OTP notification translation is missing.');
+            }
         }
 
         $this->client->send($mobile, $message);

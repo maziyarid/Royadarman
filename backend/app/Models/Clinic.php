@@ -17,6 +17,9 @@ class Clinic extends Model
     {
         return [
             'is_active' => 'boolean',
+            'latitude' => 'float',
+            'longitude' => 'float',
+            'location_recorded_at' => 'immutable_datetime',
         ];
     }
 
@@ -38,6 +41,11 @@ class Clinic extends Model
     public function referralGrants(): HasMany
     {
         return $this->hasMany(ReferralGrant::class);
+    }
+
+    public function serviceCapabilities(): HasMany
+    {
+        return $this->hasMany(ClinicServiceCapability::class);
     }
 
     public function activeMemberships(): HasMany

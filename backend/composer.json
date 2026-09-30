@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.3",
         "laravel/framework": "^13.17",
+        "laravel/passkeys": "^0.2",
         "laravel/tinker": "^3.0"
     },
     "require-dev": {
@@ -37,7 +38,7 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
             "@php artisan migrate --force",
-            "npm install --ignore-scripts",
+            "npm ci",
             "npm run build"
         ],
         "dev": [
@@ -84,4 +85,3 @@
     "minimum-stability": "stable",
     "prefer-stable": true
 }
-

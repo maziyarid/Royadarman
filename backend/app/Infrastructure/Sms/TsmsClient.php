@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Sms;
 
+use App\Domain\Operations\Services\IntegrationSettings;
 use App\Support\DigitNormalizer;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
@@ -9,6 +10,8 @@ use RuntimeException;
 
 final class TsmsClient
 {
+    public function __construct(private readonly IntegrationSettings $settings) {}
+
     private const ERRORS = [
         '1' => 'TSMS server error.',
         '2' => 'TSMS rejected the message because the UDH payload is too large.',
@@ -35,6 +38,10 @@ final class TsmsClient
         }
 
         [$endpoint, $username, $password, $from] = $this->configuration();
+        $sendParam = trim((string) config('royadarman.sms.tsms.send_param', 'message'));
+        if (! preg_match('/^[a-z][a-z0-9_]{0,31}$/', $sendParam)) {
+            throw new RuntimeException('TSMS send parameter name is invalid.');
+        }
 
         try {
             $response = Http::accept('text/plain')
@@ -46,7 +53,7 @@ final class TsmsClient
                     'to' => $mobile,
                     'username' => $username,
                     'password' => $password,
-                    'message' => $message,
+                    $sendParam => $message,
                 ]);
         } catch (ConnectionException) {
             // Do not propagate the underlying exception because it may contain a
@@ -64,10 +71,10 @@ final class TsmsClient
     /** @return array{0:string,1:string,2:string,3:string} */
     private function configuration(): array
     {
-        $endpoint = trim((string) config('royadarman.sms.tsms.endpoint'));
-        $username = trim((string) config('royadarman.sms.tsms.username'));
-        $password = (string) config('royadarman.sms.tsms.password');
-        $from = trim((string) config('royadarman.sms.tsms.from'));
+        $endpoint = trim((string) $this->settings->value('tsms_endpoint', config('royadarman.sms.tsms.endpoint')));
+        $username = trim((string) $this->settings->value('tsms_username', config('royadarman.sms.tsms.username')));
+        $password = (string) $this->settings->value('tsms_password', config('royadarman.sms.tsms.password'));
+        $from = trim((string) $this->settings->value('tsms_from', config('royadarman.sms.tsms.from')));
 
         if ($username === '' || $password === '' || $from === '') {
             throw new RuntimeException('TSMS credentials/sender are not configured.');

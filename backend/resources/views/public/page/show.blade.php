@@ -6,7 +6,7 @@
     <title>{{ $seo?->seo_title ?: $translation->title }}</title><link rel="canonical" href="{{ $canonical }}">
     @foreach($alternates as $lang=>$href)<link rel="alternate" hreflang="{{ $lang }}" href="{{ $href }}">@endforeach<link rel="alternate" hreflang="x-default" href="{{ $alternates['fa'] ?? $canonical }}">
     @if($ogImage)<meta property="og:title" content="{{ $seo?->og_title ?: $translation->title }}"><meta property="og:description" content="{{ $seo?->og_description ?: Str::limit(strip_tags($translation->body),160) }}"><meta property="og:image" content="{{ $ogImage }}"><meta property="og:url" content="{{ $canonical }}"><meta name="twitter:card" content="summary_large_image">@endif
-    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/assets/font.css?v=20260912"><link rel="stylesheet" href="/assets/site.css?v=20260912">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/assets/font.css?v=20260912"><link rel="stylesheet" href="/assets/site.css?v=20260929-contact-1">
     @if($schema)<script type="application/ld+json">{!! json_encode($schema,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>@endif
 </head>
 <body>

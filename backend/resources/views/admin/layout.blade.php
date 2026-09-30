@@ -2,6 +2,9 @@
     $locale = in_array(auth()->user()?->locale, ['fa', 'ar', 'en'], true) ? auth()->user()->locale : (in_array(app()->getLocale(), ['fa', 'ar', 'en'], true) ? app()->getLocale() : 'fa');
     $rtl = in_array($locale, ['fa', 'ar'], true);
     $home = $locale === 'fa' ? url('/') : url('/'.$locale);
+    $role = auth()->user()?->role;
+    $isOwner = $role === \App\Domain\Identity\Enums\UserRole::Owner;
+    $isTechnicalAdmin = $role === \App\Domain\Identity\Enums\UserRole::TechnicalAdministrator;
 @endphp
 <!doctype html>
 <html lang="{{ $locale }}" dir="{{ $rtl ? 'rtl' : 'ltr' }}">
@@ -28,6 +31,7 @@
         </div>
         <nav class="app-nav" aria-label="{{ __('ui.admin.title') }}">
             <a href="{{ route('dashboard', ['locale' => $locale]) }}">{{ __('ui.dashboard.title') }}</a>
+            <a href="{{ route('admin.cms.dashboard') }}">{{ __('ui.admin.overview') }}</a>
             <a href="{{ route('admin.cms.posts.index') }}">{{ __('ui.admin.posts') }}</a>
             <a href="{{ route('admin.cms.categories.index') }}">{{ __('ui.admin.categories') }}</a>
             <a href="{{ route('admin.cms.tags.index') }}">{{ __('ui.admin.tags') }}</a>
@@ -37,8 +41,14 @@
             <a href="{{ route('admin.cms.comments.index') }}">{{ __('ui.admin.comments') }}</a>
             <a href="{{ route('admin.cms.seo.index') }}">{{ __('ui.admin.seo') }}</a>
             <div class="nav-sep"></div>
-            <a href="{{ route('marketing.index', ['locale' => $locale]) }}">{{ __('panel.marketing') }}</a>
-            <a href="{{ route('network.index', ['locale' => $locale]) }}">{{ __('network.title') }}</a>
+            @if($isOwner)
+                <a href="{{ route('marketing.index', ['locale' => $locale]) }}">{{ __('panel.marketing') }}</a>
+                <a href="{{ route('network.index', ['locale' => $locale]) }}">{{ __('network.title') }}</a>
+                <a href="{{ route('administrators.index', ['locale' => $locale]) }}">{{ __('panel.nav.administrators') }}</a>
+            @endif
+            @if($isOwner || $isTechnicalAdmin)
+                <a href="{{ route('integrations.index', ['locale' => $locale]) }}">{{ __('panel.nav.integrations') }}</a>
+            @endif
             <a href="{{ $home }}" target="_blank" rel="noopener">{{ __('ui.admin.view_site') }}</a>
         </nav>
         <div class="app-sidebar-foot">

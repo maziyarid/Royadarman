@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\Operations\Services\IntegrationSettings;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,9 +21,9 @@ final class NotificationCallbackController extends Controller
 
     private const MAX_SKEW_SECONDS = 300;
 
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(Request $request, IntegrationSettings $settings): JsonResponse
     {
-        $secret = (string) config('royadarman.sms.callback_secret');
+        $secret = (string) $settings->value('sms_callback_secret', config('royadarman.sms.callback_secret'));
         $timestamp = (string) $request->header('X-Callback-Timestamp');
         $signature = (string) $request->header('X-Callback-Signature');
 

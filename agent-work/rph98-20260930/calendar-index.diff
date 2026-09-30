@@ -1,0 +1,146 @@
+--- /workspace/worker-b-rph98-20260930/baseline/resources/views/panel/calendar/index.blade.php	2026-09-30 16:55:14.228860992 +0000
++++ /workspace/worker-b-rph98-20260930/resources/views/panel/calendar/index.blade.php	2026-09-30 16:55:43.220862246 +0000
+@@ -3,73 +3,76 @@
+ @section('heading', __('panel.calendar.title'))
+ 
+ @section('content')
+-<section class="hero-panel">
+-    <h1>{{ __('panel.calendar.title') }}</h1>
+-    <p>{{ __('panel.calendar.intro') }}</p>
+-</section>
+-
+-<div class="calendar-toolbar">
+-    <a class="btn" href="{{ route('panel.calendar.index', ['locale'=>$locale, $monthQueryKey=>$previousMonth]) }}">← {{ __('panel.calendar.previous') }}</a>
+-    <strong>{{ $jalaliMode ? $monthLabel : $monthInput }}</strong>
+-    <a class="btn" href="{{ route('panel.calendar.index', ['locale'=>$locale, $monthQueryKey=>$nextMonth]) }}">{{ __('panel.calendar.next') }} →</a>
+-</div>
++<link rel="stylesheet" href="/assets/rph98-presentation.css?v=20260930-worker-b">
++<div class="rph98-calendar" data-rph98-calendar>
++    <section class="rph98-hero">
++        <h1>{{ __('panel.calendar.title') }}</h1>
++        <p>{{ __('panel.calendar.intro') }}</p>
++    </section>
++
++    <x-rph98.month-toolbar
++        :locale="$locale"
++        :month-query-key="$monthQueryKey"
++        :previous-month="$previousMonth"
++        :next-month="$nextMonth"
++        :month-label="$jalaliMode ? $monthLabel : $monthInput"
++    />
++
++    <x-rph98.filter-chips
++        :label="__('panel.calendar.total')"
++        :chips="[
++            ['id' => 'all', 'label' => __('panel.calendar.total')],
++            ['id' => 'task', 'label' => __('panel.calendar.types.task')],
++            ['id' => 'home_service', 'label' => __('panel.calendar.types.home_service')],
++            ['id' => 'referral_expiry', 'label' => __('panel.calendar.types.referral_deadline')],
++        ]"
++    />
++
++    <section class="rph98-stats" aria-label="{{ __('panel.calendar.total') }}">
++        <x-rph98.stat :value="$summary['total']" :label="__('panel.calendar.total')" />
++        <x-rph98.stat :value="$summary['tasks']" :label="__('panel.calendar.types.task')" />
++        <x-rph98.stat :value="$summary['home_service']" :label="__('panel.calendar.types.home_service')" />
++        <x-rph98.stat :value="$summary['referral_expiry']" :label="__('panel.calendar.types.referral_deadline')" />
++    </section>
++
++    <x-rph98.operations-month
++        :days="$days"
++        :leading="$leading"
++        :weekdays="$weekdays"
++        :jalali-mode="$jalaliMode"
++        :locale="$locale"
++    />
+ 
+-<section class="stat-grid">
+-    <article class="stat"><div class="num">{{ $summary['total'] }}</div><div class="label">{{ __('panel.calendar.total') }}</div></article>
+-    <article class="stat"><div class="num">{{ $summary['tasks'] }}</div><div class="label">{{ __('panel.calendar.types.task') }}</div></article>
+-    <article class="stat"><div class="num">{{ $summary['home_service'] }}</div><div class="label">{{ __('panel.calendar.types.home_service') }}</div></article>
+-    <article class="stat"><div class="num">{{ $summary['referral_expiry'] }}</div><div class="label">{{ __('panel.calendar.types.referral_deadline') }}</div></article>
+-</section>
+-
+-<section class="calendar-grid" aria-label="{{ __('panel.calendar.title') }}">
+-    @if($jalaliMode)
+-        @foreach($weekdays as $weekday)
+-            <div class="calendar-weekday">{{ $weekday }}</div>
+-        @endforeach
+-    @endif
+-    @foreach(range(1, $leading) as $unused)
+-        <div class="calendar-day calendar-day-empty" aria-hidden="true"></div>
+-    @endforeach
+-
+-    @foreach($days as $day)
+-        <article class="calendar-day {{ $day['today'] ? 'today' : '' }} {{ $jalaliMode && $day['friday'] ? 'friday' : '' }}">
+-            <header>
+-                <strong>{{ $day['day_number'] }}</strong>
+-                <small>{{ $jalaliMode ? $day['weekday'] : $day['date']->locale($locale)->isoFormat('ddd') }}</small>
+-            </header>
+-
+-            @if($day['events']->isEmpty())
+-                <span class="calendar-no-event">—</span>
+-            @else
+-                <div class="calendar-events">
+-                    @foreach($day['events'] as $event)
+-                        <a class="calendar-event {{ $event['kind'] }}" href="{{ $event['url'] }}">
+-                            <span class="calendar-event-time" dir="ltr">{{ $event['at']->format('H:i') }}</span>
+-                            <strong>{{ $event['title'] }}</strong>
+-                            <small>{{ $event['meta'] }}</small>
+-                        </a>
+-                    @endforeach
+-                </div>
+-            @endif
+-        </article>
+-    @endforeach
+-</section>
+-
+-<section class="card pad">
+-    <h2>{{ __('panel.calendar.agenda') }}</h2>
+-    @forelse($events as $event)
+-        <a class="agenda-row" href="{{ $event['url'] }}">
+-            <time dir="ltr">@if($jalaliMode)@php([$eventYear, $eventMonth, $eventDay] = \App\Support\JalaliCalendar::fromGregorian((int) $event['at']->format('Y'), (int) $event['at']->format('m'), (int) $event['at']->format('d'))){{ \App\Support\JalaliCalendar::toPersianDigits(sprintf('%04d-%02d-%02d %s', $eventYear, $eventMonth, $eventDay, $event['at']->format('H:i'))) }}@else{{ $event['at']->format('Y-m-d H:i') }}@endif</time>
+-            <div>
+-                <strong>{{ $event['title'] }}</strong>
+-                <span>{{ $event['meta'] }}</span>
+-            </div>
+-            <span class="badge">{{ __('panel.calendar.kinds.'.$event['kind']) }}</span>
+-        </a>
+-    @empty
+-        <div class="empty">{{ __('panel.calendar.empty') }}</div>
+-    @endforelse
+-</section>
++    <x-rph98.operations-agenda :events="$events" :jalali-mode="$jalaliMode" />
+ 
+-<p class="hint">{{ __('panel.calendar.privacy_note') }}</p>
++    <p class="rph98-note">{{ __('panel.calendar.privacy_note') }}</p>
++</div>
++<script>
++(function () {
++    var root = document.querySelector('[data-rph98-calendar]');
++    if (!root) return;
++    var buttons = root.querySelectorAll('[data-rph98-filter]');
++    var filterEmpty = root.querySelector('[data-rph98-filter-empty]');
++    function apply(kind) {
++        root.querySelectorAll('[data-rph98-event]').forEach(function (el) {
++            var show = kind === 'all' || el.getAttribute('data-kind') === kind;
++            if (show) el.removeAttribute('hidden');
++            else el.setAttribute('hidden', '');
++        });
++        buttons.forEach(function (btn) {
++            btn.setAttribute('aria-pressed', btn.getAttribute('data-rph98-filter') === kind ? 'true' : 'false');
++        });
++        if (!filterEmpty) return;
++        var total = root.querySelectorAll('[data-rph98-agenda] [data-rph98-event]').length;
++        var visible = root.querySelectorAll('[data-rph98-agenda] [data-rph98-event]:not([hidden])').length;
++        if (total > 0 && visible === 0) filterEmpty.removeAttribute('hidden');
++        else filterEmpty.setAttribute('hidden', '');
++    }
++    buttons.forEach(function (btn) {
++        btn.addEventListener('click', function () {
++            apply(btn.getAttribute('data-rph98-filter'));
++        });
++    });
++})();
++</script>
+ @endsection

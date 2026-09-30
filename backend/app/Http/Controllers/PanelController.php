@@ -33,6 +33,9 @@ final class PanelController extends Controller
             'metrics' => $metrics,
             'cases' => $cases,
             'canManageMarketing' => ! $isDemo && $user->role === UserRole::Owner,
+            'canManageCms' => ! $isDemo && in_array($user->role, [UserRole::Owner, UserRole::TechnicalAdministrator], true),
+            'canManageIntegrations' => ! $isDemo && in_array($user->role, [UserRole::Owner, UserRole::TechnicalAdministrator], true),
+            'canManageAdministrators' => ! $isDemo && $user->role === UserRole::Owner,
             'isDemo' => $isDemo,
         ])->with('locale', $locale);
     }
