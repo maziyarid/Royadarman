@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domain\Identity\Enums\UserRole;
+use App\Domain\Operations\Services\IntegrationSettings;
+use App\Domain\Operations\Services\OperationalHealth;
 use App\Http\Controllers\Controller;
 use App\Models\AuditEvent;
 use App\Models\IntegrationSetting;
@@ -94,6 +96,10 @@ final class LaunchReadinessController extends Controller
         $retryMargin = (int) config('royadarman.queue.retry_after_min_margin_seconds');
         $queueTimingSafe = $retryAfter - $workerTimeout >= $retryMargin;
 
+        // Observed evidence, separate from the configuration checks above.
+        $health = app(OperationalHealth::class)->snapshot();
+        $integration = app(IntegrationSettings::class)->diagnostics();
+
         $allPoliciesPublished = collect($policyCoverage)
             ->flatten()
             ->every(fn (bool $published) => $published);
@@ -124,6 +130,17 @@ final class LaunchReadinessController extends Controller
             'legal_approval' => ['ok' => $manual['legal_approved']['confirmed'], 'detail' => null],
             'backup_restore' => ['ok' => $manual['backup_restore_rehearsed']['confirmed'], 'detail' => null],
             'queue_timing' => ['ok' => $queueTimingSafe, 'detail' => "{$workerTimeout}/{$retryAfter}"],
+            'operational_backlog' => [
+                'ok' => $health['state'] === 'ok',
+                'detail' => $health['reasons'] === [] ? null : implode(', ', array_map(
+                    fn (string $reason): string => __('panel.launch.health_reasons.'.$reason),
+                    $health['reasons'],
+                )),
+            ],
+            'integration_settings' => [
+                'ok' => $integration['problem_count'] === 0,
+                'detail' => $integration['problem_count'] === 0 ? null : (string) $integration['problem_count'],
+            ],
         ];
 
         $ready = collect($gates)->every(fn (array $gate) => $gate['ok']);
@@ -143,8 +160,9 @@ final class LaunchReadinessController extends Controller
             'ready' => $ready,
             'intakeEnabled' => (bool) config('royadarman.intake_enabled'),
             'release' => $release,
-            'failedJobs' => DB::table('failed_jobs')->count(),
-            'queuedJobs' => DB::table('jobs')->count(),
+            'failedJobs' => $health['signals']['failed_jobs'] ?? null,
+            'queuedJobs' => $health['signals']['queued_jobs'] ?? null,
+            'operationalHealth' => $health,
         ])->with('locale', $locale);
     }
 

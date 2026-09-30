@@ -76,7 +76,11 @@
                             · {{ __('integrations.source.'.$setting['source']) }}
                         </p>
 
-                        @if($setting['source'] === 'database')
+                        @if($setting['problem'])
+                            <p class="notice danger" role="alert">{{ __('integrations.read_failure') }}</p>
+                        @endif
+
+                        @if($setting['has_override'])
                             <label class="hint">
                                 <input type="checkbox" name="clear[]" value="{{ $key }}">
                                 {{ __('integrations.clear_override') }}
