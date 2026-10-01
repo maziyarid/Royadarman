@@ -148,6 +148,29 @@ final class GranularRoleBoundaryTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_customer_support_can_list_support_conversations_but_receptionist_cannot(): void
+    {
+        SupportConversation::query()->create([
+            'patient_user_id' => $this->patient->id,
+            'case_id' => $this->patientCase->id,
+            'category' => 'general',
+            'status' => ConversationStatus::Open->value,
+            'subject' => 'list probe',
+            'opened_at' => now(),
+            'source_language' => 'fa',
+        ]);
+
+        $support = User::factory()->create(['role' => 'customer_support']);
+        $this->actingAs($support)
+            ->getJson('/api/v1/support')
+            ->assertOk();
+
+        $receptionist = User::factory()->create(['role' => 'receptionist']);
+        $this->actingAs($receptionist)
+            ->getJson('/api/v1/support')
+            ->assertForbidden();
+    }
+
     public function test_receptionist_and_accountant_cannot_answer_or_note_support_conversation(): void
     {
         $conversation = SupportConversation::query()->create([
