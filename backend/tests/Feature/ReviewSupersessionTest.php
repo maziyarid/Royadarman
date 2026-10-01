@@ -38,6 +38,23 @@ final class ReviewSupersessionTest extends TestCase
         $document = $this->document($case);
 
         $firstEarlier = $this->publish($first, $case, $document, 'earlier-from-first');
+        $this->actingAs($patient)->get('/en/panel/cases/'.$case->id)->assertOk()->assertSee('earlier-from-first', false);
+
+        $this->actingAs($first)->postJson("/api/v1/staff/cases/{$case->id}/reviews", [
+            'source_language' => 'fa',
+            'clinical_document_id' => $document->id,
+            'image_adequacy' => 'adequate',
+            'observations' => 'unpublished-draft',
+            'limitations' => 'limits',
+            'options' => 'options',
+            'recommended_next_step' => 'next',
+        ])->assertCreated();
+        $this->actingAs($patient)
+            ->get('/en/panel/cases/'.$case->id)
+            ->assertOk()
+            ->assertSee('earlier-from-first', false)
+            ->assertDontSee('unpublished-draft', false);
+
         $secondRevision = $this->publish($second, $case, $document, 'from-second');
         $firstLater = $this->publish($first, $case, $document, 'later-from-first');
 
@@ -48,7 +65,8 @@ final class ReviewSupersessionTest extends TestCase
         $this->actingAs($patient)
             ->get('/en/panel/cases/'.$case->id)
             ->assertOk()
-            ->assertSee('earlier-from-first', false)
+            ->assertDontSee('earlier-from-first', false)
+            ->assertDontSee('unpublished-draft', false)
             ->assertSee('from-second', false)
             ->assertSee('later-from-first', false);
 
