@@ -43,7 +43,7 @@ class RecentAuthenticationSessionTest extends TestCase
 
     protected function tearDown(): void
     {
-        Carbon::setUp();
+        Carbon::setTestNow();
         parent::tearDown();
     }
 
