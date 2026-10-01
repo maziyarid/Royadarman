@@ -131,6 +131,28 @@ Result: 426 passed / same 3 pre-existing failures. `php -l` clean on all touched
 - `OtpService` staff-MFA branch: new roles are `isStaff()` → MFA required when
   configured; unchanged behavior.
 
+## Commit 4 — Reauthentication on privileged administrator actions (753eea2 follow-up)
+
+Hypothesis: the most sensitive panel operations (staff creation, role changes, MFA
+reset, session revocation) lacked the reauthentication gate that profile credential
+changes already have — a stolen admin cookie could escalate or lock out staff.
+
+Evidence: `EnsureRecentAuthentication` was attached only to profile/credentials,
+TOTP and launch-readiness/policy-publish routes. The four `/panel/administrators`
+mutation routes (store/update/reset-mfa/revoke-sessions, routes/web.php:178-181)
+had none.
+
+Changes:
+1. routes/web.php — all four administrator mutation routes now use
+   `EnsureRecentAuthentication` (max age 30 minutes, returns 423 with
+   `panel.security.reauthenticate`).
+2. `tests/Feature/PrivilegedActionReauthenticationTest.php` (new, 3 tests):
+   - Stale owner session (2h old) blocked with 423 on all four mutations; no DB change.
+   - Fresh owner session passes the gate (not 423).
+   - Stale superadmin blocked likewise.
+
+Result: 429 passed / same 3 pre-existing failures.
+
 ## Open items in this lane (not yet done)
 
 1. Explicit multi-membership workspace/branch chooser (roadmap §2 requires a user to
@@ -139,8 +161,6 @@ Result: 426 passed / same 3 pre-existing failures. `php -l` clean on all touched
    The referral-grant policy already constrains clinic reps/managers per grant, so the
    isolation requirement is met at the data level; the chooser is a UX/product decision
    needing RPH-96 ERD decisions (branch table does not exist yet — only `clinics`).
-2. Reauthentication coverage for new privileged roles (superadmin/developer) on
-   sensitive actions — belongs with RPH-97 audit lifecycle work.
 3. Branch-level scoping: schema has no `branches` table yet; multi-branch isolation
    tests cannot be written until RPH-96 lands the ERD/migrations.
 4. The 3 pre-existing test failures should be triaged by whoever owns the
@@ -153,5 +173,5 @@ cd backend
 composer install            # once
 cp .env.example .env        # if absent
 php artisan key:generate --force
-php artisan test            # 426 passed / 3 pre-existing failures at time of writing
+php artisan test            # 429 passed / 3 pre-existing failures at time of writing
 ```
