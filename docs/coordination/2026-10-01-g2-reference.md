@@ -37,7 +37,7 @@ These classes are not called by the controllers, except the patient query, which
 | Class | A clean or successful-looking input still denies with |
 | --- | --- |
 | `MembershipPermissionMap` | The live map. Illegal pairs deny. Six `users.role` values stay. |
-| `WorkspaceGrantCatalogue` | `grant_not_activated` and the other closed reasons. No title signs. |
+| `WorkspaceGrantCatalogue` | `grant_not_activated` and the other closed reasons. A relative expiry such as `tomorrow` is `invalid_expiry`. An expiry equal to `now` is `grant_expired`. No title signs. |
 | `BranchTenantContract` | `migration_not_in_this_contract` even when backup flags are passed. |
 | `AuditAccessContract` | `redaction_passed_not_a_writer`. `authorisesClinicalRead` is `privileged_read_not_authorised`. |
 | `OpgAccessContract` | `bytes_not_granted_by_this_contract`, `malware_verdict_not_a_diagnosis`, `released_text_not_a_byte_grant`. |

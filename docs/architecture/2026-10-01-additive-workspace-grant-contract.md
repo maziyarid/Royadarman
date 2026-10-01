@@ -37,7 +37,7 @@ Stable ids for later grants. They must not be written into `users.role`.
 
 `tech_admin`, `coordinator` and `clinic_rep` are current account roles. They are not workspace ids. This slice does not alias `tech_admin` to `developer`, `coordinator` to `customer_support` or `treatment_specialist`, or `clinic_rep` to `clinic_manager`.
 
-The only roadmap slash-pairs recorded, and they are labels rather than grants, are `owner`/`owner`, `dentist`/`clinician` and `patient`/`patient`.
+The workspace-to-enum label pairs recorded here, not grants or literal roadmap slash-pairs, are `owner`/`owner`, `dentist`/`clinician` and `patient`/`patient`.
 
 ## What a later grant row would have to prove
 

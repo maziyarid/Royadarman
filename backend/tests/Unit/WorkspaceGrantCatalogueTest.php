@@ -151,6 +151,18 @@ final class WorkspaceGrantCatalogueTest extends TestCase
             'invalid_expiry',
             WorkspaceGrantCatalogue::evaluate('dentist', 'clinical_read', false, 'not-a-date', $now)->reason,
         );
+        $this->assertSame(
+            'invalid_expiry',
+            WorkspaceGrantCatalogue::evaluate('dentist', 'clinical_read', false, 'tomorrow', $now)->reason,
+        );
+        $this->assertSame(
+            'invalid_expiry',
+            WorkspaceGrantCatalogue::evaluate('dentist', 'clinical_read', false, 'yesterday', $now)->reason,
+        );
+        $this->assertSame(
+            'grant_expired',
+            WorkspaceGrantCatalogue::evaluate('dentist', 'clinical_read', false, $now, $now)->reason,
+        );
         $this->assertFalse(
             WorkspaceGrantCatalogue::evaluate('dentist', 'clinical_sign', false, 'not-a-date', $now)->allowed,
         );
