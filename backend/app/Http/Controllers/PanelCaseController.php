@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Domain\Coordination\Services\ReferralLifecycle;
 use App\Domain\Identity\Enums\UserRole;
+use App\Models\ClinicalDocument;
 use App\Models\PatientCase;
 use App\Models\ReferralProposal;
+use App\Models\ReviewRevision;
 use App\Support\PanelDemoRegistry;
 use App\Support\WorkspaceView;
 use Illuminate\Contracts\View\View;
@@ -54,16 +56,18 @@ final class PanelCaseController extends Controller
             ->each(fn (ReferralProposal $proposal) => $lifecycle->recordViewed($proposal, $request->user()));
 
         return [
-            'documents' => DB::table('clinical_documents')->where('case_id', $case->id)->whereNull('deleted_at')
-                ->orderByDesc('created_at')->get(['id', 'original_name', 'status', 'created_at']),
-            'reviews' => DB::table('review_revisions')->where('case_id', $case->id)->whereNotNull('signed_at')
-                ->whereExists(function ($query): void {
-                    $query->selectRaw('1')
-                        ->from('publication_events')
-                        ->whereColumn('publication_events.review_revision_id', 'review_revisions.id')
-                        ->where('publication_events.event', 'published');
-                })
-                ->orderByDesc('signed_at')->get(['id', 'revision_number', 'source_language', 'image_adequacy', 'observations', 'limitations', 'options', 'recommended_next_step', 'budget_band', 'signed_at']),
+            'documents' => ClinicalDocument::query()->where('case_id', $case->id)->whereNull('deleted_at')
+                ->orderByDesc('created_at')->get(['id', 'original_name', 'status', 'created_at'])
+                ->map(fn (ClinicalDocument $document): object => (object) [
+                    'id' => $document->id,
+                    'original_name' => $document->original_name,
+                    'status' => $document->status->value,
+                    'created_at' => $document->created_at,
+                ]),
+            'reviews' => ReviewRevision::query()->where('case_id', $case->id)->whereNotNull('signed_at')
+                ->whereHas('publicationEvents', fn ($query) => $query->where('event', 'published'))
+                ->orderByDesc('signed_at')
+                ->get(['id', 'revision_number', 'source_language', 'image_adequacy', 'observations', 'limitations', 'options', 'recommended_next_step', 'budget_band', 'signed_at']),
             'referrals' => DB::table('referral_proposals')->join('clinics', 'clinics.id', '=', 'referral_proposals.clinic_id')
                 ->where('case_id', $case->id)->orderByDesc('proposed_at')
                 ->get(['referral_proposals.id', 'referral_proposals.status', 'referral_proposals.source_language', 'referral_proposals.proposed_at', 'clinics.name as clinic_name']),

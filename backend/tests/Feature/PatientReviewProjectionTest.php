@@ -50,10 +50,15 @@ final class PatientReviewProjectionTest extends TestCase
 
         $response = $this->actingAs($patient)->get('/en/panel/cases/'.$case->id);
         $response->assertOk();
+        $response->assertSee('observation-2', false);
+        $response->assertSee('opg.png', false);
+        $response->assertDontSee('observation-1', false);
+        $response->assertDontSee('observation-3', false);
         $response->assertViewHas('reviews', function ($reviews) use ($published, $signedOnly, $unsigned): bool {
             $ids = $reviews->pluck('id')->all();
 
             return $ids === [$published->id]
+                && $reviews->first()->observations === 'observation-2'
                 && ! in_array($signedOnly->id, $ids, true)
                 && ! in_array($unsigned->id, $ids, true);
         });
