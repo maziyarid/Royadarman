@@ -114,6 +114,7 @@ final class OpgAccessContractTest extends TestCase
         $this->assertStringNotContainsString("DB::table('clinical_documents')", $panel);
         $counts = (string) file_get_contents(dirname(__DIR__, 2).'/app/Http/Controllers/PanelController.php');
         $this->assertStringContainsString("where('publication_events.event', 'published')", $counts);
+        $this->assertStringContainsString('later_revisions.supersedes_id', $counts);
         $this->assertStringContainsString('match ($user->role)', $counts);
     }
 
