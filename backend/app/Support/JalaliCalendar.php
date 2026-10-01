@@ -71,6 +71,8 @@ final class JalaliCalendar
         return [$gy, $gm, $gd];
     }
 
+    private const LEAP_CYCLE_YEARS = [1, 5, 9, 13, 17, 22, 26, 30];
+
     public static function monthLength(int $jy, int $jm): int
     {
         if ($jm < 1 || $jm > 12 || $jy < 1) {
@@ -78,8 +80,16 @@ final class JalaliCalendar
         }
         if ($jm <= 6) return 31;
         if ($jm <= 11) return 30;
-        $cycleYear = (($jy - ($jy > 0 ? 474 : 473)) % 2820 + 2820) % 2820 + 474 + 38;
-        return (($cycleYear * 682) % 2816) < 682 ? 30 : 29;
+        return self::isLeap($jy) ? 30 : 29;
+    }
+
+    /** Same 33-year leap cycle that fromGregorian/toGregorian embed, so validity, month grids and conversions cannot disagree. */
+    public static function isLeap(int $jy): bool
+    {
+        if ($jy < 1) {
+            throw new InvalidArgumentException('Invalid Jalali year.');
+        }
+        return in_array($jy % 33, self::LEAP_CYCLE_YEARS, true);
     }
 
     public static function isValid(int $jy, int $jm, int $jd): bool
