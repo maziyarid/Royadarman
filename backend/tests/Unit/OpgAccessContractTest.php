@@ -111,6 +111,9 @@ final class OpgAccessContractTest extends TestCase
         $this->assertStringContainsString("where('status', 'approved')", $panel);
         $this->assertStringContainsString("whereNull('revoked_at')", $panel);
         $this->assertStringNotContainsString("DB::table('clinical_documents')", $panel);
+        $counts = (string) file_get_contents(dirname(__DIR__, 2).'/app/Http/Controllers/PanelController.php');
+        $this->assertStringContainsString("where('publication_events.event', 'published')", $counts);
+        $this->assertStringContainsString('match ($user->role)', $counts);
     }
 
     private function migrations(): string
