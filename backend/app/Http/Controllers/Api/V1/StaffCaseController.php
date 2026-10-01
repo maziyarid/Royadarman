@@ -276,6 +276,18 @@ final class StaffCaseController extends Controller
                 throw new DomainException(403, 'review.consent_revoked');
             }
 
+            $laterPublished = ReviewRevision::query()
+                ->where('case_id', $case->id)
+                ->where('clinician_user_id', $request->user()->id)
+                ->where('revision_number', '>', $locked->revision_number)
+                ->whereNotNull('signed_at')
+                ->whereHas('publicationEvents', fn ($query) => $query->where('event', 'published'))
+                ->lockForUpdate()
+                ->exists();
+            if ($laterPublished) {
+                throw new DomainException(409, 'review.later_revision_published');
+            }
+
             $previousId = ReviewRevision::query()
                 ->where('case_id', $case->id)
                 ->where('clinician_user_id', $request->user()->id)
