@@ -62,7 +62,7 @@ class StaffMfaPolicyCharacterizationTest extends TestCase
         $this->account('coordinator', 'mfa.totp', ['totp_secret' => 'GEZDGNBVGY3TQOJQ', 'mfa_recovery_codes' => []]);
 
         $this->login('mfa.totp')->assertStatus(422);
-        $this->login('mfa.totp', ['totp_code' => '000000'])->assertStatus(422);
+        $this->login('mfa.totp', ['recovery_code' => 'not-a-real-recovery-code'])->assertStatus(422);
         $this->assertGuest();
     }
 
