@@ -145,7 +145,14 @@ final class IntegrationSettings
 
             $value = $row->value;
             if ($definition['type'] === 'boolean') {
-                return filter_var($value, FILTER_VALIDATE_BOOL);
+                $parsed = $this->booleanFromStored($value);
+                if ($parsed === null) {
+                    $this->note($key, 'invalid');
+
+                    return self::FAIL_CLOSED[$key] ?? $fallback;
+                }
+
+                return $parsed;
             }
             if ($definition['type'] === 'integer') {
                 if (! is_numeric($value)) {
@@ -203,7 +210,16 @@ final class IntegrationSettings
             }
 
             if ($definition['type'] === 'boolean') {
-                $value = filter_var($value, FILTER_VALIDATE_BOOL);
+                $parsed = $this->booleanFromStored($value);
+                if ($parsed === null) {
+                    $this->note($row->key, 'invalid');
+                    if (array_key_exists($row->key, self::FAIL_CLOSED)) {
+                        config()->set($definition['config'], self::FAIL_CLOSED[$row->key]);
+                    }
+
+                    continue;
+                }
+                $value = $parsed;
             } elseif ($definition['type'] === 'integer') {
                 if (! is_numeric($value)) {
                     $this->note($row->key, 'invalid');
@@ -255,6 +271,9 @@ final class IntegrationSettings
             if ($definition['type'] === 'integer' && ! is_numeric($value)) {
                 $this->note($row->key, 'invalid');
                 $problems[$row->key] = 'invalid';
+            } elseif ($definition['type'] === 'boolean' && $this->booleanFromStored($value) === null) {
+                $this->note($row->key, 'invalid');
+                $problems[$row->key] = 'invalid';
             }
         }
 
@@ -292,14 +311,23 @@ final class IntegrationSettings
                 try {
                     $value = $row->value;
                     $configured = $this->hasValue($value, $definition['type']);
+                    $invalidBoolean = $definition['type'] === 'boolean' && $this->booleanFromStored($value) === null;
                     if ($definition['type'] === 'integer' && ! is_numeric($value)) {
                         $this->note($key, 'invalid');
                         $problem = 'invalid';
                     }
+                    if ($invalidBoolean) {
+                        $this->note($key, 'invalid');
+                        $problem = 'invalid';
+                    }
                     if (! $definition['secret']) {
-                        $displayValue = $definition['type'] === 'boolean'
-                            ? (filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0')
-                            : (string) $value;
+                        if ($invalidBoolean) {
+                            $displayValue = (string) $value;
+                        } elseif ($definition['type'] === 'boolean') {
+                            $displayValue = $this->booleanFromStored($value) ? '1' : '0';
+                        } else {
+                            $displayValue = (string) $value;
+                        }
                     }
                 } catch (Throwable $exception) {
                     $this->note($key, 'unreadable', $exception);
@@ -358,6 +386,21 @@ final class IntegrationSettings
             // Logging failures must not break first boot or expose the original
             // exception message. The redacted diagnostic remains queryable.
         }
+    }
+
+    /**
+     * Recognised boolean strings stay those PHP already accepts.
+     * Anything else, including "maybe", is invalid rather than false.
+     */
+    private function booleanFromStored(mixed $value): ?bool
+    {
+        if (! is_string($value) && ! is_int($value) && ! is_bool($value)) {
+            return null;
+        }
+
+        $parsed = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+
+        return is_bool($parsed) ? $parsed : null;
     }
 
     private function hasValue(mixed $value, string $type): bool

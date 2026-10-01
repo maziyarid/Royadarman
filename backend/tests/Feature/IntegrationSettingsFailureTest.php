@@ -164,6 +164,34 @@ class IntegrationSettingsFailureTest extends TestCase
         $this->assertSame('0', $display['intake_enabled']['value']);
     }
 
+    public function test_stored_boolean_maybe_is_invalid_and_is_not_false(): void
+    {
+        config()->set('royadarman.intake_enabled', true);
+        config()->set('royadarman.opg.scanner.enabled', true);
+        IntegrationSetting::query()->create(['key' => 'intake_enabled', 'value' => 'maybe']);
+        IntegrationSetting::query()->create(['key' => 'scanner_enabled', 'value' => 'maybe']);
+        $settings = $this->settings();
+
+        $settings->applyToRuntimeConfig();
+
+        $this->assertFalse(config('royadarman.intake_enabled'));
+        $this->assertTrue(config('royadarman.opg.scanner.enabled'));
+        $this->assertFalse($settings->value('intake_enabled', true));
+        $this->assertTrue($settings->value('scanner_enabled', true));
+        $this->assertSame('maybe', IntegrationSetting::query()->where('key', 'intake_enabled')->firstOrFail()->value);
+        $this->assertSame([
+            'intake_enabled' => 'invalid',
+            'scanner_enabled' => 'invalid',
+        ], $settings->diagnostics()['problems']);
+
+        $display = $settings->forDisplay();
+        $this->assertSame('invalid', $display['intake_enabled']['problem']);
+        $this->assertSame('maybe', $display['intake_enabled']['value']);
+        $this->assertNotSame('0', $display['intake_enabled']['value']);
+        $this->assertSame('invalid', $display['scanner_enabled']['problem']);
+        $this->assertSame('maybe', $display['scanner_enabled']['value']);
+    }
+
     public function test_settings_page_exposes_a_redacted_warning_and_can_clear_unreadable_override(): void
     {
         $owner = User::factory()->create(['role' => 'owner', 'is_active' => true]);
