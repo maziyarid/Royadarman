@@ -110,6 +110,11 @@ final class PanelController extends Controller
                                 ->from('publication_events')
                                 ->whereColumn('publication_events.review_revision_id', 'review_revisions.id')
                                 ->where('publication_events.event', 'published');
+                        })
+                        ->whereNotExists(function ($query): void {
+                            $query->selectRaw('1')
+                                ->from('review_revisions as later_revisions')
+                                ->whereColumn('later_revisions.supersedes_id', 'review_revisions.id');
                         }),
                     fn ($query) => $query->whereNull('review_revisions.signed_at'),
                 )

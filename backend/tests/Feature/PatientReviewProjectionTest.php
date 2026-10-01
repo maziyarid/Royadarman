@@ -147,6 +147,52 @@ final class PatientReviewProjectionTest extends TestCase
             });
     }
 
+    public function test_clinician_panel_does_not_count_a_superseded_published_review(): void
+    {
+        $patient = User::factory()->create(['role' => 'patient']);
+        $clinician = User::factory()->create(['role' => 'clinician']);
+        $case = PatientCase::query()->create([
+            'public_reference' => 'RD-'.strtoupper(Str::random(8)),
+            'patient_user_id' => $patient->id,
+            'service_type' => 'opg_review',
+            'status' => CaseStatus::ClinicianReview,
+            'patient_mobile' => '09120000000',
+            'patient_mobile_hash' => hash('sha256', Str::random()),
+            'budget_band' => 'balanced',
+            'source_language' => 'fa',
+            'version' => 1,
+        ]);
+        $document = $this->document($case);
+        $this->review($case, $clinician, $document, 1);
+
+        $earlier = $this->review($case, $clinician, $document, 2);
+        $earlier->forceFill(['signed_at' => now()->subMinute()])->save();
+        $earlier->publicationEvents()->create([
+            'actor_user_id' => $clinician->id,
+            'event' => 'published',
+            'created_at' => now()->subMinute(),
+        ]);
+
+        $current = $this->review($case, $clinician, $document, 3);
+        $current->forceFill([
+            'signed_at' => now(),
+            'supersedes_id' => $earlier->id,
+        ])->save();
+        $current->publicationEvents()->create([
+            'actor_user_id' => $clinician->id,
+            'event' => 'published',
+            'created_at' => now(),
+        ]);
+
+        $this->actingAs($clinician)
+            ->get('/en/panel')
+            ->assertOk()
+            ->assertViewHas('metrics', function (array $metrics): bool {
+                return $metrics['published_reviews'] === 1
+                    && $metrics['draft_reviews'] === 1;
+            });
+    }
+
     private function practitioner(User $clinician): void
     {
         DB::table('practitioners')->insert([
