@@ -171,6 +171,24 @@ final class GranularRoleBoundaryTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_coordination_assign_capability_still_requires_case_view_authorization(): void
+    {
+        $supervisor = User::factory()->create(['role' => 'supervisor']);
+
+        $this->actingAs($supervisor)
+            ->postJson('/api/v1/staff/cases/'.$this->patientCase->id.'/referral-proposals/not-a-proposal/reassign', [
+                'clinic_id' => 'irrelevant', 'reason' => 'probe',
+            ])
+            ->assertNotFound();
+
+        $receptionist = User::factory()->create(['role' => 'receptionist']);
+        $this->actingAs($receptionist)
+            ->postJson('/api/v1/staff/cases/'.$this->patientCase->id.'/referral-proposals/not-a-proposal/reassign', [
+                'clinic_id' => 'irrelevant', 'reason' => 'probe',
+            ])
+            ->assertNotFound();
+    }
+
     public function test_customer_support_can_open_web_support_workspace_but_receptionist_cannot(): void
     {
         $support = User::factory()->create(['role' => 'customer_support', 'last_authenticated_at' => now()]);

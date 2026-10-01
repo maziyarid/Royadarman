@@ -153,6 +153,35 @@ Changes:
 
 Result: 429 passed / same 3 pre-existing failures.
 
+## Commit 5 — Audit for session revocation + capability-gated referral reassignment
+
+Hypotheses checked:
+1. Every privileged administrator mutation records an audit event.
+2. The `coordination.assign` capability is actually enforced anywhere it applies.
+
+Evidence:
+1. FALSE — `AdministratorController::revokeSessions` revoked all of a user's sessions
+   with NO audit event (store/update/resetMfa all audit). Fixed: now records
+   `staff.sessions_revoked` with actor, subject and revoked-session count.
+   New test asserts the `audit_events` row exists after revocation.
+2. `StaffCaseController::reassignReferral` hardcoded `role === Coordinator`; the
+   `coordination.assign` capability (supervisor/superadmin/owner) was declared but
+   never enforced. Fixed: coordinator OR capability holder, and the existing
+   `can('view', $case)` policy check still constrains per-case authorization —
+   a capability holder without case view authorization is still denied (tested).
+
+New tests: `test_session_revocation_is_audited`,
+`test_coordination_assign_capability_still_requires_case_view_authorization`
+(supervisor and receptionist both 404 without case authorization).
+`GranularRoleBoundaryTest` now 11 tests; `PrivilegedActionReauthenticationTest` now 4.
+
+Also verified safe (no change): `UserFactory` is role-agnostic; `PanelDemoRegistry`
+demo identities remain the six original roles; `CoordinatorAssignment::assignInitial`
+load-balances across active coordinators only (supervisors are not auto-assigned
+cases — correct, assignment is a capability, not an inbox).
+
+Result: 431 passed / same 3 pre-existing failures.
+
 ## Open items in this lane (not yet done)
 
 1. Explicit multi-membership workspace/branch chooser (roadmap §2 requires a user to
@@ -173,5 +202,5 @@ cd backend
 composer install            # once
 cp .env.example .env        # if absent
 php artisan key:generate --force
-php artisan test            # 429 passed / 3 pre-existing failures at time of writing
+php artisan test            # 431 passed / 3 pre-existing failures at time of writing
 ```

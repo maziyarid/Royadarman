@@ -216,6 +216,12 @@ final class AdministratorController extends Controller
         $this->guardMutable($request, $user);
 
         $count = $this->sessions->forceRevokeAll($user, $request->user(), 'staff_admin_revoke');
+        $this->audit(
+            (int) $request->user()->id,
+            'staff.sessions_revoked',
+            $user,
+            ['sessions' => $count],
+        );
 
         return redirect()
             ->route('administrators.index', ['locale' => $locale])

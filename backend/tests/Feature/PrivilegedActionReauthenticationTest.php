@@ -67,6 +67,27 @@ final class PrivilegedActionReauthenticationTest extends TestCase
         $this->assertNotSame(423, $response->status());
     }
 
+    public function test_session_revocation_is_audited(): void
+    {
+        $owner = User::factory()->create([
+            'role' => 'owner',
+            'is_active' => true,
+            'last_authenticated_at' => now(),
+        ]);
+        $target = User::factory()->create(['role' => 'coordinator', 'is_active' => true]);
+
+        $this->actingAs($owner)
+            ->post('/fa/panel/administrators/'.$target->id.'/revoke-sessions')
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('audit_events', [
+            'actor_user_id' => $owner->id,
+            'action' => 'staff.sessions_revoked',
+            'resource_type' => 'user',
+            'resource_id' => (string) $target->id,
+        ]);
+    }
+
     public function test_stale_superadmin_session_is_also_blocked(): void
     {
         config()->set('session.driver', 'array');
