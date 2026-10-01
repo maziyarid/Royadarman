@@ -82,6 +82,55 @@ final class ReviewSupersessionTest extends TestCase
             ->assertJsonFragment(['id' => $secondRevision->id]);
     }
 
+    public function test_publish_refuses_an_earlier_draft_after_a_later_revision_is_published(): void
+    {
+        $patient = User::factory()->create(['role' => 'patient']);
+        $clinician = User::factory()->create(['role' => 'clinician']);
+        $this->practitioner($clinician);
+        $case = $this->makeCase($patient);
+        $this->assign($clinician, $case);
+        $document = $this->document($case);
+
+        $created = $this->actingAs($clinician)->postJson("/api/v1/staff/cases/{$case->id}/reviews", [
+            'source_language' => 'fa',
+            'clinical_document_id' => $document->id,
+            'image_adequacy' => 'adequate',
+            'observations' => 'stale-draft',
+            'limitations' => 'limits',
+            'options' => 'options',
+            'recommended_next_step' => 'next',
+        ])->assertCreated();
+        $stale = ReviewRevision::query()->findOrFail($created->json('data.id'));
+
+        $current = $this->publish($clinician, $case, $document, 'current-text');
+        $this->assertGreaterThan($stale->revision_number, $current->revision_number);
+
+        $this->actingAs($clinician)
+            ->postJson("/api/v1/staff/cases/{$case->id}/reviews/{$stale->id}/publish")
+            ->assertStatus(409)
+            ->assertJsonPath('error.code', 'review.later_revision_published');
+
+        $stale->refresh();
+        $this->assertNull($stale->signed_at);
+        $this->assertNull($stale->supersedes_id);
+        $this->assertSame(0, DB::table('publication_events')->where('review_revision_id', $stale->id)->count());
+        $this->assertNull($current->fresh()->supersedes_id);
+
+        $this->actingAs($patient)
+            ->get('/en/panel/cases/'.$case->id)
+            ->assertOk()
+            ->assertSee('current-text', false)
+            ->assertDontSee('stale-draft', false);
+
+        $this->actingAs($clinician)
+            ->get('/en/panel')
+            ->assertOk()
+            ->assertViewHas('metrics', function (array $metrics): bool {
+                return $metrics['published_reviews'] === 1
+                    && $metrics['draft_reviews'] === 1;
+            });
+    }
+
     private function publish(User $clinician, PatientCase $case, ClinicalDocument $document, string $observation): ReviewRevision
     {
         $created = $this->actingAs($clinician)
