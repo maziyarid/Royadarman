@@ -19,7 +19,17 @@ final class ClinicalDocumentPolicy
 
     public function view(User $user, ClinicalDocument $document): bool
     {
-        if (! $user->is_active || $document->status !== DocumentStatus::Approved) {
+        return $document->status === DocumentStatus::Approved && $this->participant($user, $document);
+    }
+
+    public function learnStatus(User $user, ClinicalDocument $document): bool
+    {
+        return $this->participant($user, $document);
+    }
+
+    private function participant(User $user, ClinicalDocument $document): bool
+    {
+        if (! $user->is_active) {
             return false;
         }
         if ($user->role === UserRole::Patient) {
@@ -28,7 +38,6 @@ final class ClinicalDocumentPolicy
         if ($user->role !== UserRole::Clinician) {
             return false;
         }
-
         if ($document->consent_event_id === null) {
             return false;
         }
