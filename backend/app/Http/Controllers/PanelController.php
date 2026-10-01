@@ -18,7 +18,7 @@ final class PanelController extends Controller
         abort_unless($user?->is_active, 403);
         $isDemo = (bool) $request->session()->get('panel_demo', false);
 
-        [$metrics, $cases, $panelKey] = match ($user->role) {
+        [$metrics, $cases, $panelKey] = match ($user->role->dashboardFamily()) {
             UserRole::Patient => $this->patientPanel((int) $user->id, $isDemo),
             UserRole::Coordinator => $this->coordinatorPanel((int) $user->id, $isDemo),
             UserRole::Clinician => $this->clinicianPanel((int) $user->id, $isDemo),

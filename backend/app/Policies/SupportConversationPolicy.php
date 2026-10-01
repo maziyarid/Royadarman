@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Domain\Identity\Enums\UserRole;
+use App\Domain\Identity\Services\StaffCapabilities;
 use App\Models\SupportConversation;
 use App\Models\User;
 
@@ -22,7 +23,7 @@ final class SupportConversationPolicy
             return (int) $conversation->assignee_user_id === (int) $user->id;
         }
 
-        if ($user->role === UserRole::Owner || $user->role === UserRole::TechnicalAdministrator) {
+        if (StaffCapabilities::can($user->role, 'support.view')) {
             return true;
         }
 
@@ -41,7 +42,8 @@ final class SupportConversationPolicy
                 && (int) $conversation->assignee_user_id === (int) $user->id;
         }
 
-        return false;
+        return StaffCapabilities::can($user->role, 'support.reply')
+            && $this->view($user, $conversation);
     }
 
     public function addInternalNote(User $user, SupportConversation $conversation): bool
@@ -51,7 +53,12 @@ final class SupportConversationPolicy
                 && (int) $conversation->assignee_user_id === (int) $user->id;
         }
 
-        return $user->role === UserRole::Owner;
+        if ($user->role === UserRole::Owner) {
+            return true;
+        }
+
+        return StaffCapabilities::can($user->role, 'support.internal_note')
+            && $this->view($user, $conversation);
     }
 
     public function changePriority(User $user, SupportConversation $conversation): bool
@@ -61,7 +68,12 @@ final class SupportConversationPolicy
                 && (int) $conversation->assignee_user_id === (int) $user->id;
         }
 
-        return $user->role === UserRole::Owner;
+        if ($user->role === UserRole::Owner) {
+            return true;
+        }
+
+        return StaffCapabilities::can($user->role, 'support.change_status')
+            && $this->view($user, $conversation);
     }
 
     public function changeStatus(User $user, SupportConversation $conversation): bool
@@ -71,7 +83,12 @@ final class SupportConversationPolicy
                 && (int) $conversation->assignee_user_id === (int) $user->id;
         }
 
-        return $user->role === UserRole::Owner;
+        if ($user->role === UserRole::Owner) {
+            return true;
+        }
+
+        return StaffCapabilities::can($user->role, 'support.change_status')
+            && $this->view($user, $conversation);
     }
 
     public function assign(User $user, SupportConversation $conversation): bool
@@ -85,6 +102,7 @@ final class SupportConversationPolicy
                 || (int) $conversation->assignee_user_id === (int) $user->id;
         }
 
-        return false;
+        return StaffCapabilities::can($user->role, 'support.assign')
+            && $this->view($user, $conversation);
     }
 }

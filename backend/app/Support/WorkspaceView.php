@@ -19,7 +19,7 @@ final class WorkspaceView
 
         $role = $user->role;
         $isDemo = (bool) $request->session()->get('panel_demo', false);
-        $panelKey = match ($role) {
+        $panelKey = match ($role->dashboardFamily()) {
             UserRole::Patient => 'patient',
             UserRole::Coordinator => 'coordinator',
             UserRole::Clinician => 'clinician',

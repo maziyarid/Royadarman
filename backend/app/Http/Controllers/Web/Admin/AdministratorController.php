@@ -26,6 +26,13 @@ final class AdministratorController extends Controller
         UserRole::Coordinator,
         UserRole::Clinician,
         UserRole::ClinicRepresentative,
+        UserRole::Superadmin,
+        UserRole::Developer,
+        UserRole::Supervisor,
+        UserRole::Receptionist,
+        UserRole::Accountant,
+        UserRole::CustomerSupport,
+        UserRole::ClinicManager,
     ];
 
     public function __construct(
@@ -39,7 +46,7 @@ final class AdministratorController extends Controller
 
         $staff = User::query()
             ->whereIn('role', array_map(static fn (UserRole $role): string => $role->value, self::ROLES))
-            ->orderByRaw("FIELD(role, 'owner','tech_admin','coordinator','clinician','clinic_rep')")
+            ->orderByRaw("FIELD(role, 'owner','superadmin','tech_admin','developer','coordinator','supervisor','customer_support','clinician','clinic_rep','clinic_manager','receptionist','accountant')")
             ->orderBy('name')
             ->get()
             ->map(fn (User $user): array => [

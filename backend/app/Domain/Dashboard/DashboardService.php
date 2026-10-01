@@ -35,7 +35,7 @@ final class DashboardService
 
     public function build(User $user, bool $isDemo = false): array
     {
-        return match ($user->role) {
+        $payload = match ($user->role->dashboardFamily()) {
             UserRole::Patient => $this->patient($user, $isDemo),
             UserRole::Clinician => $this->clinician($user, $isDemo),
             UserRole::ClinicRepresentative => $this->clinicRepresentative($user, $isDemo),
@@ -43,6 +43,9 @@ final class DashboardService
             UserRole::Owner => $this->businessAdmin($user, $isDemo),
             UserRole::TechnicalAdministrator => $this->technicalAdmin($user, $isDemo),
         };
+        $payload['role'] = $user->role->value;
+
+        return $payload;
     }
 
     private function demoCases($query)
