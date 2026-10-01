@@ -3,13 +3,13 @@
 namespace Tests\Feature;
 
 use App\Domain\Documents\Enums\DocumentStatus;
+use App\Domain\Support\Enums\ConversationStatus;
 use App\Models\Clinic;
 use App\Models\ClinicalDocument;
 use App\Models\ClinicMembership;
 use App\Models\PatientCase;
 use App\Models\PolicyVersion;
 use App\Models\ReferralProposal;
-use App\Domain\Support\Enums\ConversationStatus;
 use App\Models\SupportConversation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
