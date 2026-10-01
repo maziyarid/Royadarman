@@ -18,7 +18,9 @@ Read the top draft and walk the base links. Do not rebase this stack onto main w
 | OPG | [#27](https://github.com/maziyarid/Royadarman/pull/27) | `8a35c56fca08b3bbdf69306ad241dc51ef0f5da0` | Scan is not a diagnosis. No tooth list. |
 | Finance | [#29](https://github.com/maziyarid/Royadarman/pull/29) | `0b9709bd3008df1c2a36f24aae5fdaa14cd1be75` | Labels only. No amount and no ledger. |
 | Inventory and guardian | [#30](https://github.com/maziyarid/Royadarman/pull/30) | `361bb206b08c892fcf9c6109fcacfa6f9b7a2b54` | Those tables are absent. |
-| Patient review projection | This branch, stacked on #30 | `a41bb43dac62933442a84f954477ea57302ed145` | Patient list requires `signed_at` and `event = published`. |
+| Patient review projection | [#31](https://github.com/maziyarid/Royadarman/pull/31) | `a41bb43dac62933442a84f954477ea57302ed145` | Patient list requires `signed_at` and `event = published`. |
+
+The follow-up commit `38d1b6756db7e70cbd75dc95cdea1a47acab0509` reads the patient list through `ReviewRevision` and the patient's own file name through `ClinicalDocument`. Commit `c0ce090c7321b5a8cfff7eceeff600e48a475a11` on the same pull request does that for the clinician document list too, and it still requires status `approved` plus an accepted consent whose `revoked_at` is null. Neither change grants the file bytes.
 
 #24 is Grok 1's calendar. Do not edit it from this lane.
 
