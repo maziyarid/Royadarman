@@ -1,0 +1,272 @@
+openapi: 3.1.0
+info:
+  title: Royadarman mobile API (draft)
+  version: 0.1.0-draft
+  description: |
+    DRAFT. Operations tagged x-status existing were read from routes/api.php,
+    AuthController, SessionController and bootstrap/app.php at main f99210e.
+    Operations tagged x-status proposed do NOT exist and need an ADR plus backend
+    work. Today every client route runs in the web middleware group, so
+    authentication is a cookie session with CSRF, not a native token.
+servers:
+  - url: https://example.invalid/api/v1
+    description: placeholder host, not a real environment
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: SESSION_COOKIE_NAME
+      x-status: existing
+    deviceBearer:
+      type: http
+      scheme: bearer
+      x-status: proposed
+      description: PROPOSED per-device short-lived access credential. Never a shared or global token.
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, minLength: 16, maxLength: 128 }
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code]
+          properties:
+            code: { type: string }
+            message: { type: string }
+            details: { type: object, additionalProperties: true }
+        request_id: { type: [string, 'null'] }
+    LoginResult:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            role: { type: string }
+            locale: { type: string, enum: [fa, ar, en] }
+  responses:
+    Error:
+      description: Error envelope
+      content:
+        application/json: { schema: { $ref: '#/components/schemas/Error' } }
+paths:
+  /auth/otp/challenge:
+    post:
+      x-status: existing
+      summary: Request an SMS one-time code (throttled)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mobile, locale]
+              properties:
+                mobile: { type: string, maxLength: 32 }
+                locale: { type: string, enum: [fa, ar, en] }
+      responses:
+        '202':
+          description: Challenge created; requires_mfa is true only for staff with MFA already configured
+        '429': { $ref: '#/components/responses/Error' }
+        '503': { $ref: '#/components/responses/Error' }
+  /auth/otp/verify:
+    post:
+      x-status: existing
+      summary: Verify OTP (and staff MFA when configured); starts a cookie session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [challenge_id, code]
+              properties:
+                challenge_id: { type: string }
+                code: { type: string }
+                totp_code: { type: [string, 'null'] }
+                recovery_code: { type: [string, 'null'], maxLength: 100 }
+      responses:
+        '200': { description: Logged in, content: { application/json: { schema: { $ref: '#/components/schemas/LoginResult' } } } }
+        '422': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+  /auth/password:
+    post:
+      x-status: existing
+      summary: Username and password login (returning accounts; throttled)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password, locale]
+              properties:
+                username: { type: string, maxLength: 32 }
+                password: { type: string, maxLength: 128 }
+                totp_code: { type: [string, 'null'], maxLength: 20 }
+                recovery_code: { type: [string, 'null'], maxLength: 100 }
+                locale: { type: string, enum: [fa, ar, en] }
+      responses:
+        '200': { description: Logged in, content: { application/json: { schema: { $ref: '#/components/schemas/LoginResult' } } } }
+        '422': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+  /auth/logout:
+    post:
+      x-status: existing
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: Session invalidated }
+  /me:
+    get:
+      x-status: existing
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: Current user profile (fields not documented here) }
+        '401': { $ref: '#/components/responses/Error' }
+  /me/sessions:
+    get:
+      x-status: existing
+      security: [{ sessionCookie: [] }]
+      summary: List this account's sessions (the closest existing concept to a device list)
+      responses:
+        '200': { description: Session rows; shape produced by SessionInventoryService (source not read) }
+  /me/sessions/{session}:
+    delete:
+      x-status: existing
+      security: [{ sessionCookie: [] }]
+      parameters: [{ name: session, in: path, required: true, schema: { type: string } }]
+      responses:
+        '200': { description: Revoked }
+        '404': { $ref: '#/components/responses/Error' }
+        '422': { description: Cannot revoke the current session }
+  /me/sessions/revoke-others:
+    post:
+      x-status: existing
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: Count of revoked sessions }
+  /me/sessions/revoke-all:
+    post:
+      x-status: existing
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: All sessions revoked and the caller logged out }
+  /cases/{case}/documents:
+    post:
+      x-status: existing
+      security: [{ sessionCookie: [] }]
+      summary: Upload a document (single request; request fields not read)
+      parameters: [{ name: case, in: path, required: true, schema: { type: string } }]
+      responses:
+        '200': { description: Accepted into quarantine and scan pipeline }
+  /cases/{case}/documents/{document}:
+    get:
+      x-status: existing
+      security: [{ sessionCookie: [] }]
+      summary: Document processing status
+      parameters:
+        - { name: case, in: path, required: true, schema: { type: string } }
+        - { name: document, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Status }
+  /devices:
+    post:
+      x-status: proposed
+      summary: Register this device after a successful login; returns a device credential
+      description: |
+        PROPOSED. Creates a revocable device record (id, platform, app version, created, last seen)
+        bound to the authenticated user. The credential is stored in Keychain (iOS) or in app storage
+        protected by an Android Keystore key. Recent-auth assurance is stored per device credential,
+        never read from users.last_authenticated_at.
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [platform, app_version]
+              properties:
+                platform: { type: string, enum: [android, ios] }
+                app_version: { type: string }
+                os_version: { type: string }
+      responses:
+        '201': { description: Device registered }
+        '423': { description: Fresh authentication required }
+  /devices/{device}:
+    delete:
+      x-status: proposed
+      security: [{ deviceBearer: [] }]
+      summary: Revoke one device; its credentials stop working immediately
+      parameters: [{ name: device, in: path, required: true, schema: { type: string } }]
+      responses:
+        '204': { description: Revoked }
+  /auth/token/refresh:
+    post:
+      x-status: proposed
+      summary: Rotate the refresh credential and issue a new short-lived access credential
+      description: |
+        PROPOSED. Reuse of an already-rotated refresh credential revokes that device.
+        Does not extend recent-auth assurance; only a fresh password, OTP or passkey on that device does.
+      responses:
+        '200': { description: New credential pair }
+        '401': { $ref: '#/components/responses/Error' }
+  /devices/{device}/push:
+    put:
+      x-status: proposed
+      security: [{ deviceBearer: [] }]
+      summary: Store a provider push token for this device
+      description: PROPOSED. Consent and preferences are separate and default off. Payloads carry no PHI, only an opaque identifier.
+      parameters: [{ name: device, in: path, required: true, schema: { type: string } }]
+      responses:
+        '204': { description: Stored }
+  /cases/{case}/documents/uploads:
+    post:
+      x-status: proposed
+      security: [{ deviceBearer: [] }]
+      summary: Start a resumable private upload
+      parameters:
+        - { name: case, in: path, required: true, schema: { type: string } }
+        - { $ref: '#/components/parameters/IdempotencyKey' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [byte_size, sha256, mime]
+              properties:
+                byte_size: { type: integer, minimum: 1 }
+                sha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+                mime: { type: string, enum: [image/jpeg, image/png] }
+      responses:
+        '201': { description: Upload created with expiry and next offset }
+        '403': { $ref: '#/components/responses/Error' }
+  /uploads/{upload}:
+    put:
+      x-status: proposed
+      security: [{ deviceBearer: [] }]
+      summary: Send a chunk; the server checks Upload-Offset against its own state
+      parameters:
+        - { name: upload, in: path, required: true, schema: { type: string } }
+        - { name: Upload-Offset, in: header, required: true, schema: { type: integer, minimum: 0 } }
+      responses:
+        '204': { description: Chunk stored }
+        '409': { description: Offset mismatch }
+  /uploads/{upload}/complete:
+    post:
+      x-status: proposed
+      security: [{ deviceBearer: [] }]
+      summary: Verify the declared hash, then hand off to the existing quarantine and scan pipeline
+      parameters:
+        - { name: upload, in: path, required: true, schema: { type: string } }
+        - { $ref: '#/components/parameters/IdempotencyKey' }
+      responses:
+        '200': { description: Completed; repeating the same key returns the same result }
+        '422': { description: Hash or size mismatch }
