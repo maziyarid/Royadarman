@@ -218,3 +218,9 @@ cp .env.example .env        # if absent
 php artisan key:generate --force
 php artisan test            # 432 passed / 3 pre-existing failures at time of writing
 ```
+
+## RPH-124 — 2026-10-01 (M1/M2/M3)
+
+- M1: compared PR #28 head 577764f vs PR #42 head 68c3f6e vs base dbcb114 (merge-base f99210e). Intersection vs fork-point = 4 PHP files (DashboardService, StaffCaseController, NetworkAdminController, PanelController); merge-tree clean (tree 4184364, 0 conflicts). 6 docs/mobile files are main-added, untouched by both. List posted on PR #28 (issuecomment-5936084950) and issue #14 (issuecomment-5936085736).
+- M2: collision check passed (G2 does not change DemoPanelAccessTest or PatientRequestPageTest). Reproduced all 3 failures on 577764f. Verdict: all product behavior, not fixture bugs — (1) RestrictPanelDemoSession allowlists patient.request.create (L44) so /en/panel/cases/new returns 200 vs test's expected 403 (DemoPanelAccessTest:420); (2) intake-disabled blade still renders form markup (patient-new-request.blade.php:44, hidden disabled submit) vs test's assertDontSee id="request-form" (PatientRequestPageTest:23); (3) blade ships inline <style> (L176) vs test's assertDontSee '<style>' (PatientRequestPageTest:47). No policy changed; fixes would require Blade edits (hard stop). Full suite re-run from backend/: 432 passed, 3 pre-existing failures, zero regressions.
+- M3: added docs/architecture/2026-10-01-branch-workspace-erd-proposal.md. Names only tables this lane engaged (users, clinics, clinic_memberships, referral_grants, consent_events, audit_events) + 3 PROPOSAL tables (workspace_memberships, capability_assignments, referral_grant_events). No migration, no UI. No branches table.
