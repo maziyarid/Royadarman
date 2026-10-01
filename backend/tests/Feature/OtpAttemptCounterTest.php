@@ -84,7 +84,7 @@ class OtpAttemptCounterTest extends TestCase
         ]);
 
         $this->assertInvalid(
-            fn () => $this->app->make(OtpService::class)->verify($challenge->id, $this->sender->code, '000000'),
+            fn () => $this->app->make(OtpService::class)->verify($challenge->id, $this->sender->code),
             'totp_code',
         );
 
