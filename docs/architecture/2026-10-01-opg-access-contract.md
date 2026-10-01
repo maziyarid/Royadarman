@@ -15,7 +15,7 @@ This revision does not add a table, a signer list, a tooth taxonomy, a retention
 | `storage_key`, `scan_reference`, and `scan_result` are hidden. The original name is encrypted | `ClinicalDocument` |
 | A clinician can view an approved document only with an active clinical assignment, accepted unrevoked consent, and a verified unexpired credential. A patient can view their own approved document. No other role is granted by that policy | `ClinicalDocumentPolicy` |
 | A review must point at a clinical document. The text columns are encrypted. Publishing sets `signed_at` and inserts `publication_events.event = published` in one transaction | Migrations through `2026_09_11_000200` and `StaffCaseController` |
-| The patient panel currently lists reviews with `signed_at` set and does not read `publication_events` | `PanelCaseController`. Not changed here |
+| The patient panel used to list reviews with `signed_at` set and did not read `publication_events`. That gap is closed on `g2/patient-review-projection-20261001`: the patient query requires a `published` event as well | `PanelCaseController` |
 | `retention_until` is written only when `ROYADARMAN_DOCUMENT_RETENTION_DAYS` is a positive number. The config default stays blank | `ScanClinicalDocument` and `config/royadarman.php` |
 | No `teeth`, `tooth_findings`, or `treatment_stages` table | Migration scan on this base |
 | Who may sign, which tooth codes exist, and how long a file is kept | Open. Not decided here |
@@ -34,7 +34,7 @@ A title does not grant the read. That includes owner, tech_admin, superadmin, de
 
 Unsigned text is withheld. `signed_at` without a `published` event is withheld. Both together describe released review text, not a grant of the image bytes.
 
-The patient panel's `signed_at` query is a recorded gap. This revision does not change it, because a presentation change is outside the contract.
+The patient panel now requires both `signed_at` and a `published` event. That follow-up does not grant the image bytes.
 
 ## What is not decided
 
