@@ -182,6 +182,20 @@ cases — correct, assignment is a capability, not an inbox).
 
 Result: 431 passed / same 3 pre-existing failures.
 
+## Commit 6 — Network administration gates on network.manage capability
+
+Evidence: `NetworkAdminController::authorizeOwner` hardcoded `role === Owner`,
+so the `network.manage` capability (Owner+Superadmin per the map) was unenforced.
+Fixed: gate is now `StaffCapabilities::can(role, 'network.manage')` + active user.
+Test: superadmin can open `/fa/panel/network`; supervisor (no capability) 403.
+
+Checked and deliberately NOT changed: `CoordinationTaskController` is a personal
+task board (own tasks, own cases) with coordinator-only authorization. Giving
+supervisors a team-wide task view would expand data scope; roadmap assigns that
+to RPH-102 (supervisor workload dashboard, P02). Deny-by-default stays.
+
+Result: 432 passed / same 3 pre-existing failures. GranularRoleBoundaryTest now 12.
+
 ## Open items in this lane (not yet done)
 
 1. Explicit multi-membership workspace/branch chooser (roadmap §2 requires a user to
@@ -202,5 +216,5 @@ cd backend
 composer install            # once
 cp .env.example .env        # if absent
 php artisan key:generate --force
-php artisan test            # 431 passed / 3 pre-existing failures at time of writing
+php artisan test            # 432 passed / 3 pre-existing failures at time of writing
 ```

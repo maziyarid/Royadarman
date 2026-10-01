@@ -171,6 +171,19 @@ final class GranularRoleBoundaryTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_network_management_follows_capability_and_denies_others(): void
+    {
+        $superadmin = User::factory()->create(['role' => 'superadmin', 'last_authenticated_at' => now()]);
+        $this->actingAs($superadmin)
+            ->get('/fa/panel/network')
+            ->assertOk();
+
+        $supervisor = User::factory()->create(['role' => 'supervisor', 'last_authenticated_at' => now()]);
+        $this->actingAs($supervisor)
+            ->get('/fa/panel/network')
+            ->assertForbidden();
+    }
+
     public function test_coordination_assign_capability_still_requires_case_view_authorization(): void
     {
         $supervisor = User::factory()->create(['role' => 'supervisor']);
