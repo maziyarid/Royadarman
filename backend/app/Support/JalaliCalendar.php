@@ -8,14 +8,17 @@ use InvalidArgumentException;
 final class JalaliCalendar
 {
     public const MONTHS = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+
     public const WEEKDAYS = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
+
     private const GREGORIAN_DAYS_BEFORE_MONTH = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+
     private const PERSIAN_DIGITS = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
 
     /** @return array{0:int,1:int,2:int} */
     public static function fromGregorian(int $gy, int $gm, int $gd): array
     {
-        if (!checkdate($gm, $gd, $gy)) {
+        if (! checkdate($gm, $gd, $gy)) {
             throw new InvalidArgumentException('Invalid Gregorian date.');
         }
         $jy = $gy <= 1600 ? 0 : 979;
@@ -34,15 +37,23 @@ final class JalaliCalendar
         if ($days < 186) {
             return [$jy, 1 + intdiv($days, 31), 1 + ($days % 31)];
         }
+
         return [$jy, 7 + intdiv($days - 186, 30), 1 + (($days - 186) % 30)];
     }
 
     /** @return array{0:int,1:int,2:int} */
     public static function toGregorian(int $jy, int $jm, int $jd): array
     {
-        if (!self::isValid($jy, $jm, $jd)) {
+        if (! self::isValid($jy, $jm, $jd)) {
             throw new InvalidArgumentException('Invalid Jalali date.');
         }
+
+        return self::gregorianFromCountedDays($jy, $jm, $jd);
+    }
+
+    /** @return array{0:int,1:int,2:int} */
+    private static function gregorianFromCountedDays(int $jy, int $jm, int $jd): array
+    {
         $gy = $jy <= 979 ? 621 : 1600;
         $year = $jy - ($jy <= 979 ? 0 : 979);
         $days = (365 * $year) + (intdiv($year, 33) * 8) + intdiv(($year % 33) + 3, 4) + 78 + $jd
@@ -68,6 +79,7 @@ final class JalaliCalendar
         for ($gm = 1; $gm <= 12 && $gd > $monthLengths[$gm]; $gm++) {
             $gd -= $monthLengths[$gm];
         }
+
         return [$gy, $gm, $gd];
     }
 
@@ -76,10 +88,19 @@ final class JalaliCalendar
         if ($jm < 1 || $jm > 12 || $jy < 1) {
             throw new InvalidArgumentException('Invalid Jalali month.');
         }
-        if ($jm <= 6) return 31;
-        if ($jm <= 11) return 30;
-        $cycleYear = (($jy - ($jy > 0 ? 474 : 473)) % 2820 + 2820) % 2820 + 474 + 38;
-        return (($cycleYear * 682) % 2816) < 682 ? 30 : 29;
+        if ($jm <= 6) {
+            return 31;
+        }
+        if ($jm <= 11) {
+            return 30;
+        }
+
+        // Esfand length must use the same day count as toGregorian. The old 2820-year
+        // remainder disagreed with that count around 1403 and 1404.
+        [$gy, $gm, $gd] = self::gregorianFromCountedDays($jy, 12, 30);
+        $back = self::fromGregorian($gy, $gm, $gd);
+
+        return $back === [$jy, 12, 30] ? 30 : 29;
     }
 
     public static function isValid(int $jy, int $jm, int $jd): bool
@@ -99,7 +120,10 @@ final class JalaliCalendar
 
     public static function monthLabel(int $jy, int $jm): string
     {
-        if ($jm < 1 || $jm > 12) throw new InvalidArgumentException('Invalid Jalali month.');
+        if ($jm < 1 || $jm > 12) {
+            throw new InvalidArgumentException('Invalid Jalali month.');
+        }
+
         return self::toPersianDigits(self::MONTHS[$jm - 1].' '.$jy);
     }
 
