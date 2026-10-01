@@ -151,6 +151,36 @@ final class WorkspaceGrantCatalogueTest extends TestCase
             'invalid_expiry',
             WorkspaceGrantCatalogue::evaluate('dentist', 'clinical_read', false, 'not-a-date', $now)->reason,
         );
+        $this->assertSame(
+            'invalid_expiry',
+            WorkspaceGrantCatalogue::evaluate('dentist', 'clinical_read', false, 'tomorrow', $now)->reason,
+        );
+        $this->assertSame(
+            'invalid_expiry',
+            WorkspaceGrantCatalogue::evaluate('dentist', 'clinical_read', false, 'yesterday', $now)->reason,
+        );
+        $this->assertSame(
+            'grant_expired',
+            WorkspaceGrantCatalogue::evaluate('dentist', 'clinical_read', false, $now, $now)->reason,
+        );
+        $this->assertSame(
+            'invalid_expiry',
+            WorkspaceGrantCatalogue::evaluate('dentist', 'clinical_read', false, '2026-10-02 00:00:00', $now)->reason,
+        );
+        $this->assertSame(
+            'invalid_expiry',
+            WorkspaceGrantCatalogue::evaluate('dentist', 'clinical_read', false, '2099-01-01T00:00:00Z', '2026-10-01 06:40:00')->reason,
+        );
+        $this->assertSame(
+            'grant_not_activated',
+            WorkspaceGrantCatalogue::evaluate(
+                'dentist',
+                'clinical_read',
+                false,
+                '2099-01-01T00:00:00.5+03:30',
+                '2026-10-01T06:40:00+03:30',
+            )->reason,
+        );
         $this->assertFalse(
             WorkspaceGrantCatalogue::evaluate('dentist', 'clinical_sign', false, 'not-a-date', $now)->allowed,
         );

@@ -37,7 +37,7 @@ Stable ids for later grants. They must not be written into `users.role`.
 
 `tech_admin`, `coordinator` and `clinic_rep` are current account roles. They are not workspace ids. This slice does not alias `tech_admin` to `developer`, `coordinator` to `customer_support` or `treatment_specialist`, or `clinic_rep` to `clinic_manager`.
 
-The only roadmap slash-pairs recorded, and they are labels rather than grants, are `owner`/`owner`, `dentist`/`clinician` and `patient`/`patient`.
+The workspace-to-enum label pairs recorded here, not grants or literal roadmap slash-pairs, are `owner`/`owner`, `dentist`/`clinician` and `patient`/`patient`.
 
 ## What a later grant row would have to prove
 
@@ -51,7 +51,7 @@ No migration in this slice. A later table, after a fresh backup and a separately
 - granting actor and a reason that is not clinical text, a phone number or a secret
 - uniqueness of an active `(user, workspace, scope kind, scope id)`, so a repeat is an update rather than a second active row
 
-Revocation is `revoked_at` set immediately. Expiry is `expires_at <= now`. A later reader on UI, API, search, jobs, export, files and cache must treat either state as absent. This slice does not add those readers and does not claim cache invalidation.
+Revocation is `revoked_at` set immediately. Expiry is an absolute `expires_at` that is earlier than or equal to an absolute `now`. Both values must use `YYYY-MM-DDTHH:MM:SS[.fraction](Z|±HH:MM)`. A space-separated timestamp or a relative word is not an expiry instant. A later reader on UI, API, search, jobs, export, files and cache must treat either state as absent. This slice does not add those readers and does not claim cache invalidation.
 
 Invitation, acceptance, suspension, offboarding and rehire are named lifecycles from the roadmap. They are not stored.
 
@@ -70,7 +70,7 @@ Actions named only so callers cannot invent a quieter allow:
 - `tenant_admin`
 - `diagnostic_read`
 
-Reasons: `unknown_workspace`, `unknown_action`, `grant_revoked`, `grant_expired`, `invalid_expiry`, `grant_not_activated`. None of them means allowed. Revocation is reported before expiry.
+Reasons: `unknown_workspace`, `unknown_action`, `grant_revoked`, `grant_expired`, `invalid_expiry`, `grant_not_activated`. None of them means allowed. Revocation is reported before expiry. When an expiry is supplied, both `expiresAt` and `now` must match `YYYY-MM-DDTHH:MM:SS[.fraction](Z|±HH:MM)`. A space-separated clock time, `tomorrow`, or `yesterday` is `invalid_expiry` and is not passed to the clock. An expiry equal to a valid `now` is `grant_expired`.
 
 Existing case, document and support policies stay as they are. Membership still does not open a clinical record or a support conversation. This catalogue must not be wired in as a replacement for those positive authorised paths.
 

@@ -157,6 +157,10 @@ final class WorkspaceGrantCatalogue
             return null;
         }
 
+        if (! self::isAbsoluteTimestamp($expiresAt) || ! self::isAbsoluteTimestamp($now)) {
+            return 'invalid_expiry';
+        }
+
         try {
             $expiry = new DateTimeImmutable($expiresAt);
             $moment = new DateTimeImmutable($now);
@@ -165,5 +169,13 @@ final class WorkspaceGrantCatalogue
         }
 
         return $expiry <= $moment ? 'grant_expired' : null;
+    }
+
+    private static function isAbsoluteTimestamp(string $value): bool
+    {
+        return preg_match(
+            '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/',
+            $value,
+        ) === 1;
     }
 }
