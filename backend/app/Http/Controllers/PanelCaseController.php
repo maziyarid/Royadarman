@@ -101,13 +101,19 @@ final class PanelCaseController extends Controller
 
     private function clinicianData(Request $request, PatientCase $case): array
     {
-        $documents = DB::table('clinical_documents')
-            ->join('consent_events', 'consent_events.id', '=', 'clinical_documents.consent_event_id')
-            ->where('clinical_documents.case_id', $case->id)
-            ->where('clinical_documents.status', 'approved')
-            ->where('consent_events.decision', 'accepted')->whereNull('consent_events.revoked_at')
-            ->whereNull('clinical_documents.deleted_at')->orderByDesc('clinical_documents.created_at')
-            ->get(['clinical_documents.id', 'clinical_documents.original_name', 'clinical_documents.status', 'clinical_documents.created_at']);
+        $documents = ClinicalDocument::query()
+            ->where('case_id', $case->id)
+            ->where('status', 'approved')
+            ->whereNull('deleted_at')
+            ->whereHas('consentEvent', fn ($query) => $query->where('decision', 'accepted')->whereNull('revoked_at'))
+            ->orderByDesc('created_at')
+            ->get(['id', 'original_name', 'status', 'created_at'])
+            ->map(fn (ClinicalDocument $document): object => (object) [
+                'id' => $document->id,
+                'original_name' => $document->original_name,
+                'status' => $document->status->value,
+                'created_at' => $document->created_at,
+            ]);
 
         return [
             'documents' => $documents, 'reviews' => collect(), 'referrals' => collect(), 'clinics' => collect(), 'assignments' => collect(), 'eligibleClinicians' => collect(), 'shared' => [],

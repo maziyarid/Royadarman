@@ -11,6 +11,7 @@ use App\Models\PolicyVersion;
 use App\Models\ReviewRevision;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -64,14 +65,74 @@ final class PatientReviewProjectionTest extends TestCase
         });
     }
 
-    private function document(PatientCase $case): ClinicalDocument
+    public function test_assigned_clinician_sees_the_decrypted_name_only_for_current_consent(): void
     {
+        $patient = User::factory()->create(['role' => 'patient']);
+        $clinician = User::factory()->create(['role' => 'clinician']);
+        $this->practitioner($clinician);
+        $case = PatientCase::query()->create([
+            'public_reference' => 'RD-'.strtoupper(Str::random(8)),
+            'patient_user_id' => $patient->id,
+            'service_type' => 'opg_review',
+            'status' => CaseStatus::ClinicianReview,
+            'patient_mobile' => '09120000000',
+            'patient_mobile_hash' => hash('sha256', Str::random()),
+            'budget_band' => 'balanced',
+            'source_language' => 'fa',
+            'version' => 1,
+        ]);
+        DB::table('case_assignments')->insert([
+            'id' => (string) Str::ulid(),
+            'case_id' => $case->id,
+            'assignee_user_id' => $clinician->id,
+            'assigned_by_user_id' => $clinician->id,
+            'purpose' => 'clinical_review',
+            'assigned_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $visible = $this->document($case, 'visible.png');
+        $revoked = $this->document($case, 'revoked.png');
+        $revoked->consentEvent()->update(['revoked_at' => now()]);
+        $scanning = $this->document($case, 'scanning.png', DocumentStatus::Scanning);
+
+        $response = $this->actingAs($clinician)->get('/en/panel/cases/'.$case->id);
+        $response->assertOk();
+        $response->assertSee('visible.png', false);
+        $response->assertDontSee('revoked.png', false);
+        $response->assertDontSee('scanning.png', false);
+        $response->assertViewHas('documents', function ($documents) use ($visible): bool {
+            return $documents->pluck('id')->all() === [$visible->id]
+                && $documents->first()->original_name === 'visible.png'
+                && $documents->first()->status === 'approved';
+        });
+    }
+
+    private function practitioner(User $clinician): void
+    {
+        DB::table('practitioners')->insert([
+            'id' => (string) Str::ulid(),
+            'user_id' => $clinician->id,
+            'licence_number' => encrypt('LIC-'.$clinician->id),
+            'licence_hash' => hash('sha256', 'LIC-'.$clinician->id),
+            'credential_status' => 'verified',
+            'verified_at' => now()->subDay(),
+            'expires_at' => now()->addYear(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function document(PatientCase $case, string $name = 'opg.png', DocumentStatus $status = DocumentStatus::Approved): ClinicalDocument
+    {
+        $version = 'projection-'.Str::lower((string) Str::ulid());
         $policy = PolicyVersion::query()->create([
             'policy_key' => 'opg_document_sharing',
-            'version' => 'projection-1',
+            'version' => $version,
             'locale' => 'fa',
-            'content' => 'sharing',
-            'content_hash' => hash('sha256', 'sharing'),
+            'content' => 'sharing '.$version,
+            'content_hash' => hash('sha256', 'sharing '.$version),
             'published_at' => now(),
         ]);
         $consent = ConsentEvent::query()->create([
@@ -91,13 +152,13 @@ final class PatientReviewProjectionTest extends TestCase
             'case_id' => $case->id,
             'uploaded_by_user_id' => $case->patient_user_id,
             'consent_event_id' => $consent->id,
-            'original_name' => 'opg.png',
+            'original_name' => $name,
             'storage_disk' => 'private-opg',
             'storage_key' => 'cases/'.$case->id.'/'.Str::ulid().'.png',
             'detected_mime' => 'image/png',
             'byte_size' => 68,
-            'sha256' => hash('sha256', 'image-bytes'),
-            'status' => DocumentStatus::Approved,
+            'sha256' => hash('sha256', $name),
+            'status' => $status,
         ]);
     }
 
