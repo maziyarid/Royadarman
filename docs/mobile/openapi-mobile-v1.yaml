@@ -8,6 +8,9 @@ info:
     Operations tagged x-status proposed do NOT exist and need an ADR plus backend
     work. Today every client route runs in the web middleware group, so
     authentication is a cookie session with CSRF, not a native token.
+    Non-browser clients must send the CSRF token that the existing web middleware
+    group already requires on state-changing cookie calls (PreventRequestForgery,
+    listed in routes/web.php). The code does not name a header, so none is named here.
 servers:
   - url: https://example.invalid/api/v1
     description: placeholder host, not a real environment
@@ -95,6 +98,8 @@ paths:
         '200': { description: Logged in, content: { application/json: { schema: { $ref: '#/components/schemas/LoginResult' } } } }
         '422': { $ref: '#/components/responses/Error' }
         '403': { $ref: '#/components/responses/Error' }
+        '429': { description: Throttled by throttle:otp-verify }
+        '503': { description: Returned when the number is unknown and intake is disabled (intake_not_enabled) }
   /auth/password:
     post:
       x-status: existing
