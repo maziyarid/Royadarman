@@ -8,6 +8,8 @@ use App\Domain\Identity\Services\SessionAssurance;
 use App\Http\Middleware\EnsureRecentAuthentication;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Passkeys\Events\PasskeyVerified;
+use Laravel\Passkeys\Passkey;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
@@ -41,7 +43,7 @@ class RecentAuthenticationSessionTest extends TestCase
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow();
+        Carbon::setUp();
         parent::tearDown();
     }
 
@@ -167,6 +169,28 @@ class RecentAuthenticationSessionTest extends TestCase
 
         $this->assertNotNull(session(SessionAssurance::KEY));
         $this->assertSame('otp', session(SessionAssurance::METHOD_KEY));
+    }
+
+
+    public function test_passkey_verified_event_stamps_this_session(): void
+    {
+        $user = $this->staff();
+        $passkey = new Passkey;
+        $passkey->forceFill([
+            'name' => 'synthetic-passkey',
+            'credential_id' => 'synthetic-credential',
+            'credential' => ['id' => 'synthetic'],
+        ]);
+
+        Route::middleware('web')->get('/__probe/dispatch-passkey-verified', function () use ($user, $passkey) {
+            PasskeyVerified::dispatch($user, $passkey);
+
+            return response()->noContent();
+        });
+
+        $this->actingAs($user)->get('/__probe/dispatch-passkey-verified')->assertNoContent();
+
+        $this->actingAs($user)->getJson(self::PROBE)->assertOk();
     }
 
     public function test_logout_clears_assurance_and_authentication(): void
