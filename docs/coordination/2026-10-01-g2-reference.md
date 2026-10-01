@@ -20,7 +20,7 @@ Read the top draft and walk the base links. Do not rebase this stack onto main w
 | Inventory and guardian | [#30](https://github.com/maziyarid/Royadarman/pull/30) | `361bb206b08c892fcf9c6109fcacfa6f9b7a2b54` | Those tables are absent. |
 | Patient review projection | [#31](https://github.com/maziyarid/Royadarman/pull/31) | `a41bb43dac62933442a84f954477ea57302ed145` | Patient list requires `signed_at` and `event = published`. |
 
-The follow-up on `g2/patient-review-plaintext-20261001` reads that list through `ReviewRevision` and the patient's own file name through `ClinicalDocument`, so the encrypted casts apply. The clinician document query still uses `DB::table`. Neither change grants the file bytes.
+The follow-up commit `38d1b6756db7e70cbd75dc95cdea1a47acab0509` on `g2/patient-review-plaintext-20261001` reads that list through `ReviewRevision` and the patient's own file name through `ClinicalDocument`, so the encrypted casts apply. The clinician document query still uses `DB::table`. Neither change grants the file bytes.
 
 #24 is Grok 1's calendar. Do not edit it from this lane.
 
