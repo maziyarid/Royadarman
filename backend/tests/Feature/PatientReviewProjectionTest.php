@@ -109,6 +109,44 @@ final class PatientReviewProjectionTest extends TestCase
         });
     }
 
+    public function test_clinician_panel_counts_only_a_review_with_a_published_event(): void
+    {
+        $patient = User::factory()->create(['role' => 'patient']);
+        $clinician = User::factory()->create(['role' => 'clinician']);
+        $case = PatientCase::query()->create([
+            'public_reference' => 'RD-'.strtoupper(Str::random(8)),
+            'patient_user_id' => $patient->id,
+            'service_type' => 'opg_review',
+            'status' => CaseStatus::ClinicianReview,
+            'patient_mobile' => '09120000000',
+            'patient_mobile_hash' => hash('sha256', Str::random()),
+            'budget_band' => 'balanced',
+            'source_language' => 'fa',
+            'version' => 1,
+        ]);
+        $document = $this->document($case);
+        $this->review($case, $clinician, $document, 1);
+
+        $signedOnly = $this->review($case, $clinician, $document, 2);
+        $signedOnly->forceFill(['signed_at' => now()])->save();
+
+        $published = $this->review($case, $clinician, $document, 3);
+        $published->forceFill(['signed_at' => now()])->save();
+        $published->publicationEvents()->create([
+            'actor_user_id' => $clinician->id,
+            'event' => 'published',
+            'created_at' => now(),
+        ]);
+
+        $this->actingAs($clinician)
+            ->get('/en/panel')
+            ->assertOk()
+            ->assertViewHas('metrics', function (array $metrics): bool {
+                return $metrics['published_reviews'] === 1
+                    && $metrics['draft_reviews'] === 1;
+            });
+    }
+
     private function practitioner(User $clinician): void
     {
         DB::table('practitioners')->insert([

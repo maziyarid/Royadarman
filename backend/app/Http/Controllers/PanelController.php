@@ -104,7 +104,13 @@ final class PanelController extends Controller
                 ->where('review_revisions.clinician_user_id', $userId)
                 ->when($isDemo, fn ($query) => $query->where('patient_cases.public_reference', 'like', PanelDemoRegistry::CASE_REFERENCE_PREFIX.'%'))
                 ->when($signed,
-                    fn ($query) => $query->whereNotNull('review_revisions.signed_at'),
+                    fn ($query) => $query->whereNotNull('review_revisions.signed_at')
+                        ->whereExists(function ($query): void {
+                            $query->selectRaw('1')
+                                ->from('publication_events')
+                                ->whereColumn('publication_events.review_revision_id', 'review_revisions.id')
+                                ->where('publication_events.event', 'published');
+                        }),
                     fn ($query) => $query->whereNull('review_revisions.signed_at'),
                 )
                 ->count();
