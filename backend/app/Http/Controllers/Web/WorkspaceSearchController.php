@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domain\Identity\Enums\UserRole;
+use App\Domain\Identity\Services\StaffCapabilities;
 use App\Http\Controllers\Controller;
 use App\Models\Cms\Post;
 use App\Models\PatientCase;
@@ -54,7 +55,8 @@ final class WorkspaceSearchController extends Controller
             ['key' => 'panel.nav.profile', 'route' => route('panel.profile', ['locale' => $locale])],
         ];
 
-        if (in_array($role, [UserRole::Patient, UserRole::Coordinator, UserRole::Owner, UserRole::TechnicalAdministrator], true)) {
+        if (in_array($role, [UserRole::Patient, UserRole::Coordinator], true)
+            || StaffCapabilities::can($role, 'support.view')) {
             $items[] = ['key' => 'panel.nav.support', 'route' => route('panel.support.index', ['locale' => $locale])];
         }
         if (in_array($role, [UserRole::Coordinator, UserRole::Clinician], true)) {
@@ -151,7 +153,8 @@ final class WorkspaceSearchController extends Controller
 
     private function supportResults(User $user, string $locale, string $query): Collection
     {
-        if (! in_array($user->role, [UserRole::Patient, UserRole::Coordinator], true)) {
+        if (! in_array($user->role, [UserRole::Patient, UserRole::Coordinator], true)
+            && ! StaffCapabilities::can($user->role, 'support.view')) {
             return collect();
         }
 

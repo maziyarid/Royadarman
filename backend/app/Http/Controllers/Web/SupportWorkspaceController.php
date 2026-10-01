@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domain\Identity\Enums\UserRole;
+use App\Domain\Identity\Services\StaffCapabilities;
 use App\Domain\Support\Enums\ConversationStatus;
 use App\Domain\Support\Enums\SupportCategory;
 use App\Domain\Support\Enums\SupportPriority;
@@ -28,12 +29,11 @@ final class SupportWorkspaceController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
-        abort_unless(in_array($user->role, [
-            UserRole::Patient,
-            UserRole::Coordinator,
-            UserRole::Owner,
-            UserRole::TechnicalAdministrator,
-        ], true), 403);
+        abort_unless(
+            in_array($user->role, [UserRole::Patient, UserRole::Coordinator], true)
+            || StaffCapabilities::can($user->role, 'support.view'),
+            403,
+        );
 
         $base = SupportConversation::query()
             ->with(['patient:id,name,role', 'assignee:id,name,role', 'case:id,public_reference'])

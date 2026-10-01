@@ -171,6 +171,19 @@ final class GranularRoleBoundaryTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_customer_support_can_open_web_support_workspace_but_receptionist_cannot(): void
+    {
+        $support = User::factory()->create(['role' => 'customer_support', 'last_authenticated_at' => now()]);
+        $this->actingAs($support)
+            ->get('/fa/panel/support')
+            ->assertOk();
+
+        $receptionist = User::factory()->create(['role' => 'receptionist', 'last_authenticated_at' => now()]);
+        $this->actingAs($receptionist)
+            ->get('/fa/panel/support')
+            ->assertForbidden();
+    }
+
     public function test_receptionist_and_accountant_cannot_answer_or_note_support_conversation(): void
     {
         $conversation = SupportConversation::query()->create([
