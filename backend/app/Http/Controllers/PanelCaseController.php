@@ -66,6 +66,7 @@ final class PanelCaseController extends Controller
                 ]),
             'reviews' => ReviewRevision::query()->where('case_id', $case->id)->whereNotNull('signed_at')
                 ->whereHas('publicationEvents', fn ($query) => $query->where('event', 'published'))
+                ->whereDoesntHave('supersededBy')
                 ->orderByDesc('signed_at')
                 ->get(['id', 'revision_number', 'source_language', 'image_adequacy', 'observations', 'limitations', 'options', 'recommended_next_step', 'budget_band', 'signed_at']),
             'referrals' => DB::table('referral_proposals')->join('clinics', 'clinics.id', '=', 'referral_proposals.clinic_id')
