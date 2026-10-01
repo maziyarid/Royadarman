@@ -105,7 +105,7 @@ final class OpgAccessContractTest extends TestCase
 
         $panel = (string) file_get_contents(dirname(__DIR__, 2).'/app/Http/Controllers/PanelCaseController.php');
         $this->assertStringContainsString("whereNotNull('signed_at')", $panel);
-        $this->assertStringNotContainsString('publication_events', $panel);
+        $this->assertStringContainsString("'publication_events.event', 'published'", $panel);
     }
 
     private function migrations(): string

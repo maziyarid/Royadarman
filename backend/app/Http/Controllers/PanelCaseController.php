@@ -57,6 +57,12 @@ final class PanelCaseController extends Controller
             'documents' => DB::table('clinical_documents')->where('case_id', $case->id)->whereNull('deleted_at')
                 ->orderByDesc('created_at')->get(['id', 'original_name', 'status', 'created_at']),
             'reviews' => DB::table('review_revisions')->where('case_id', $case->id)->whereNotNull('signed_at')
+                ->whereExists(function ($query): void {
+                    $query->selectRaw('1')
+                        ->from('publication_events')
+                        ->whereColumn('publication_events.review_revision_id', 'review_revisions.id')
+                        ->where('publication_events.event', 'published');
+                })
                 ->orderByDesc('signed_at')->get(['id', 'revision_number', 'source_language', 'image_adequacy', 'observations', 'limitations', 'options', 'recommended_next_step', 'budget_band', 'signed_at']),
             'referrals' => DB::table('referral_proposals')->join('clinics', 'clinics.id', '=', 'referral_proposals.clinic_id')
                 ->where('case_id', $case->id)->orderByDesc('proposed_at')

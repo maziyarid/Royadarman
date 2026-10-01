@@ -1,0 +1,51 @@
+# G2 reference for other workers
+
+Snapshot: 2026-10-01. Worker: Grok 2. Issue: #14.
+
+This is a map of the draft stack. Nothing in it is deployed. Nothing in it is an agreed clinical, finance, retention, or merge policy. A later commit can supersede a sentence; the class and the test are the check.
+
+## Stack
+
+Read the top draft and walk the base links. Do not rebase this stack onto main while another worker owns the same path.
+
+| Slice | Draft | Head at this snapshot | What it is |
+| --- | --- | --- | --- |
+| Membership map | [#21](https://github.com/maziyarid/Royadarman/pull/21) | `cd1517a513d27574fa61344f3f965f8ee795bd7b` | Live assignment bytes. Not a new role. |
+| Assignment regressions | [#22](https://github.com/maziyarid/Royadarman/pull/22) | `94376951fd4fd1f7d980926b5be7c69b6a8b5d16` | SQLite tests. MariaDB race not run. |
+| Workspace catalogue | [#23](https://github.com/maziyarid/Royadarman/pull/23) | `a85de6c473df0ccfcd455f21a25845ed4270d2a4` | Twelve names, all fail closed. |
+| Branch tenant | [#25](https://github.com/maziyarid/Royadarman/pull/25) | `21f6951c4dd78471a0e3079e511b332421e43fb7` | Clinic grain. No branch table. |
+| Audit | [#26](https://github.com/maziyarid/Royadarman/pull/26) | `71ad7e8ed2f705796dd6da2ed858a06682184945` | No retention. One assignment write uses `AuditEvent`. |
+| OPG | [#27](https://github.com/maziyarid/Royadarman/pull/27) | `8a35c56fca08b3bbdf69306ad241dc51ef0f5da0` | Scan is not a diagnosis. No tooth list. |
+| Finance | [#29](https://github.com/maziyarid/Royadarman/pull/29) | `0b9709bd3008df1c2a36f24aae5fdaa14cd1be75` | Labels only. No amount and no ledger. |
+| Inventory and guardian | [#30](https://github.com/maziyarid/Royadarman/pull/30) | `361bb206b08c892fcf9c6109fcacfa6f9b7a2b54` | Those tables are absent. |
+| Patient review projection | This branch | See the commit on `g2/patient-review-projection-20261001` | Patient list requires `signed_at` and `event = published`. |
+
+#24 is Grok 1's calendar. Do not edit it from this lane.
+
+## Parallel draft that is not this stack
+
+[#28](https://github.com/maziyarid/Royadarman/pull/28) (`vibe/p01-identity-tenancy-f264e5`, head `6da7ca04072e64e8d8d1701f145eecfc42a4cea0` at this snapshot) is based on main, not on this stack. It adds `StaffCapabilities`, more `UserRole` cases, `isClinicalSigner()` for `clinician`, and `finance.view` for accountant, owner, and superadmin.
+
+That draft is not merged here and is not an agreed grant. G2 classes still return false for a title-based document read and still have no money amount. Do not edit `UserRole.php` or `StaffCapabilities.php` from the G2 lane while #28 is open. Do not treat `finance.view` or `isClinicalSigner()` as permission to sign or to post a ledger.
+
+## Reason codes other workers can assert
+
+These classes are not called by the controllers, except the patient query, which now matches `OpgAccessContract::releasedText` without calling it.
+
+| Class | A clean or successful-looking input still denies with |
+| --- | --- |
+| `MembershipPermissionMap` | The live map. Illegal pairs deny. Six `users.role` values stay. |
+| `WorkspaceGrantCatalogue` | `grant_not_activated` and the other closed reasons. No title signs. |
+| `BranchTenantContract` | `migration_not_in_this_contract` even when backup flags are passed. |
+| `AuditAccessContract` | `redaction_passed_not_a_writer`. `authorisesClinicalRead` is `privileged_read_not_authorised`. |
+| `OpgAccessContract` | `bytes_not_granted_by_this_contract`, `malware_verdict_not_a_diagnosis`, `released_text_not_a_byte_grant`. |
+| `FinanceIntegerContract` | `band_is_not_an_amount`, `amount_column_absent`, `conversion_not_stored`, `ledger_table_absent`. |
+| `InventoryGuardianContract` | `stock_table_absent`, `guardian_column_absent`, `patient_merge_not_defined`. |
+
+## Still not decided
+
+A fresh backup and a separate restore target before any migration. A named signer, tooth taxonomy, and retention period. A merchant and a money factor. A guardian rule, a patient-merge policy, and a stock rule. Device and auth stay with Perplexity. Calendar stays with Grok 1. Shared frontend stays with Codex.
+
+## Rollback of the projection fix
+
+Revert the projection commit. The patient query returns to `signed_at` alone. Do not restore a database.
