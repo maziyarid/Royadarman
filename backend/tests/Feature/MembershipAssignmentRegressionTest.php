@@ -209,12 +209,27 @@ class MembershipAssignmentRegressionTest extends TestCase
         $first = $this->clinicId($owner, 'Clinic North');
         $second = $this->clinicId($owner, 'Clinic South');
         $clinician = User::factory()->create(['role' => 'clinician', 'is_active' => true]);
+        $southUntil = now()->addMonths(6)->startOfSecond()->format('Y-m-d H:i:s');
 
         $this->actingAs($owner)->post('/en/panel/network/memberships', [
             'clinic_id' => $first,
             'user_id' => $clinician->id,
             'membership_role' => 'contact',
         ])->assertRedirect();
+
+        $this->actingAs($owner)->post('/en/panel/network/memberships', [
+            'clinic_id' => $second,
+            'user_id' => $clinician->id,
+            'membership_role' => 'contact',
+            'active_until' => $southUntil,
+        ])->assertRedirect();
+
+        $southBefore = DB::table('clinic_memberships')
+            ->where('clinic_id', $second)
+            ->where('user_id', $clinician->id)
+            ->first();
+        $this->assertNotNull($southBefore);
+        $this->assertSame('contact', $southBefore->membership_role);
 
         $this->verifyClinician($owner, $clinician, 'verified', null);
         $this->actingAs($owner)->post('/en/panel/network/memberships', [
@@ -229,10 +244,17 @@ class MembershipAssignmentRegressionTest extends TestCase
             'user_id' => $clinician->id,
             'membership_role' => 'reviewer',
         ]);
-        $this->assertDatabaseMissing('clinic_memberships', [
-            'clinic_id' => $second,
-            'user_id' => $clinician->id,
-        ]);
+
+        $southAfter = DB::table('clinic_memberships')
+            ->where('clinic_id', $second)
+            ->where('user_id', $clinician->id)
+            ->first();
+        $this->assertNotNull($southAfter);
+        $this->assertSame($southBefore->id, $southAfter->id);
+        $this->assertSame('contact', $southAfter->membership_role);
+        $this->assertSame($southBefore->active_from, $southAfter->active_from);
+        $this->assertSame($southBefore->active_until, $southAfter->active_until);
+        $this->assertSame(2, DB::table('clinic_memberships')->where('user_id', $clinician->id)->count());
     }
 
     public function test_demo_seed_membership_matches_the_map_and_stays_idempotent(): void
