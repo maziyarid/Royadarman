@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Domain\Cases\Enums\ServiceType;
 use App\Domain\Discovery\Enums\SuitabilityStatus;
+use App\Domain\Identity\Authorization\MembershipPermissionMap;
 use App\Domain\Identity\Enums\UserRole;
 use App\Models\ClinicServiceCapability;
 use App\Support\PanelDemoRegistry;
@@ -178,7 +179,7 @@ final class NetworkAdminController extends Controller
         $data = $request->validate([
             'clinic_id' => ['required', 'exists:clinics,id'],
             'user_id' => ['required', 'exists:users,id'],
-            'membership_role' => ['required', Rule::in(['reviewer', 'contact'])],
+            'membership_role' => ['required', Rule::in(MembershipPermissionMap::knownMembershipRoles())],
             'active_until' => ['nullable', 'date', 'after:now'],
         ]);
 
@@ -189,17 +190,20 @@ final class NetworkAdminController extends Controller
         $staff = DB::table('users')->where('id', $data['user_id'])->first(['id', 'role', 'is_active', 'email']);
         abort_unless($staff && $staff->is_active, 422);
         abort_if($this->isDemoIdentity((string) $staff->email), 403, 'Reserved demonstration identities cannot be mutated from network administration.');
-        if ($data['membership_role'] === 'reviewer') {
-            abort_unless($staff->role === UserRole::Clinician->value, 422);
-            $verified = DB::table('practitioners')
+        $reviewerCredentialCurrent = $data['membership_role'] === MembershipPermissionMap::ROLE_REVIEWER
+            && $staff->role === UserRole::Clinician->value
+            && DB::table('practitioners')
                 ->where('user_id', $staff->id)
                 ->where('credential_status', 'verified')
                 ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
                 ->exists();
-            abort_unless($verified, 422);
-        } else {
-            abort_unless(in_array($staff->role, [UserRole::Clinician->value, UserRole::ClinicRepresentative->value], true), 422);
-        }
+        $membershipDecision = MembershipPermissionMap::assignMembership(
+            UserRole::tryFrom((string) $staff->role),
+            (string) $data['membership_role'],
+            (bool) $staff->is_active,
+            $reviewerCredentialCurrent,
+        );
+        abort_unless($membershipDecision->allowed, 422);
 
         $existing = DB::table('clinic_memberships')
             ->where('clinic_id', $data['clinic_id'])
