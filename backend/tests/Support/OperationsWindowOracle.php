@@ -8,7 +8,8 @@ declare(strict_types=1);
  * Synthetic ids only. No production database, patient data, SMS, or holiday API.
  * SQL predicates are the same comparisons as OperationsCalendarController
  * (due_at / scheduled_for / expires_at half-open, assignee + case coordinator,
- * revoked referrals excluded). The controller file is not modified.
+ * revoked referrals excluded). The fa month bounds now come from
+ * OperationsMonthWindow, which the controller also calls.
  *
  * The window itself is built the same way as the controller: toGregorian of
  * day 1 and of the next month's day 1, Asia/Tehran midnight, then UTC.
@@ -20,6 +21,7 @@ declare(strict_types=1);
  */
 
 require_once dirname(__DIR__, 2).'/app/Support/JalaliCalendar.php';
+require_once dirname(__DIR__, 2).'/app/Domain/Scheduling/OperationsMonthWindow.php';
 
 use App\Support\JalaliCalendar;
 
@@ -270,18 +272,9 @@ function operations_window_month_status(string $monthInput): ?int
 /** @return array{0:string,1:string} UTC 'Y-m-d H:i:s' start inclusive, end exclusive */
 function operations_window_utc(int $jy, int $jm): array
 {
-    [$sy, $sm, $sd] = JalaliCalendar::toGregorian($jy, $jm, 1);
-    $nextYear = $jm === 12 ? $jy + 1 : $jy;
-    $nextMonth = $jm === 12 ? 1 : $jm + 1;
-    [$ey, $em, $ed] = JalaliCalendar::toGregorian($nextYear, $nextMonth, 1);
-    $tz = new DateTimeZone('Asia/Tehran');
-    $start = new DateTimeImmutable(sprintf('%04d-%02d-%02d 00:00:00', $sy, $sm, $sd), $tz);
-    $end = new DateTimeImmutable(sprintf('%04d-%02d-%02d 00:00:00', $ey, $em, $ed), $tz);
+    $window = \App\Domain\Scheduling\OperationsMonthWindow::jalali($jy, $jm);
 
-    return [
-        $start->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s'),
-        $end->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s'),
-    ];
+    return [$window['start_utc'], $window['end_utc']];
 }
 
 function operations_window_day_count(int $jy, int $jm): int
