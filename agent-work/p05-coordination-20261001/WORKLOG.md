@@ -30,18 +30,28 @@ Reused `App\Domain\Identity\Authorization\MembershipPermission` (PR #28) as the 
 ## Verification status — honest labels
 
 - Implemented: yes, on branch `vibe/p05-followup-escalation-20261001`.
-- Tested: NOT RUN. The authoring environment has no PHP binary (apt/npm installs forbidden in this sandbox); PHPUnit could not be executed. Manual syntax and reason-code review only. The host must re-run the suite (`php artisan test` from `backend/`, or `phpunit --filter FollowUpEscalationContractTest`) before any merge or activation. SQLite passes would not be MariaDB proof.
-- Published: draft PR against `vibe/p01-identity-tenancy-f264e5`.
+- Tested: NOT RUN at publication time. The authoring environment had no PHP binary; PHPUnit could not be executed. Manual syntax and reason-code review only. See the follow-up entry below for the host-executable runner and the double-checked PHP unavailability.
+- Published: draft PR #46 against `vibe/p01-identity-tenancy-f264e5`.
 - Deployed: no. VPS untouched.
 
-## Read-back evidence
+## Read-back evidence (initial publication)
 
-Recorded after push: branch ref, commit SHA, PR number, file blob SHAs (see the run report comment on RPH-124 and the issue #14 checkpoint).
+- Branch `vibe/p05-followup-escalation-20261001` created from P01 head `a32edd06` (verified unchanged before branching); single commit `749ef8d3e5aeec924e0dd9ecb6e11e5cf0c67892` with exactly the 5 expected added files; PR #46 read back open/draft with base `vibe/p01-identity-tenancy-f264e5`; pushed content marker-checked against authoring copies (no `declare(strict_types=1)` header; corrected `invalid_timestamp` vs `invalid_expiry` ordering present).
+- Slice record on issue #14 (issuecomment-5949913269); follow-on note on PR #28 (issuecomment-5949914244); Agiflow run report on RPH-124 (comment `01M3Y27SRTSNTCNMDN0Q6VZ91J`).
 
 ## Rollback
 
-Revert the single commit; delete the three code/test files and the two docs. Nothing references the new classes, no schema or config is touched.
+Revert the commits on this branch (see below). Nothing references the new classes, no schema or config is touched.
+
+## Follow-up entry — verification slice and host runner (2026-10-02)
+
+- UTC: 2026-10-02T10:59:52Z · Tehran: 2026-10-02T14:29:52+0330.
+- Trigger: Maziyar said "Proceed" after the slice publication. The outstanding blocker (executing the suite) was re-attempted honestly: PHP was still unavailable. In the upgraded native execution environment, `php`/`git`/`composer` are absent and package installation is explicitly forbidden (apt-get refuses with "Package installation is forbidden in this sandbox"), so PHPUnit still cannot be executed here. **Tests remain NOT RUN by the worker.** No test result is claimed.
+- Evidence re-verification against the stored base patches: `coordination_tasks` columns `assignee_user_id`/`task_type`/`operational_note`/`due_at` confirmed; `referral_lifecycle_events` append-only (`updating`/`deleting` throw) with encrypted `reason` confirmed; `CoordinationTaskController` personal scope (`assignee_user_id = current_coordinator_id`) confirmed. No correction needed to the contract or its evidence table.
+- Added `checks/p05-followup-escalation-20261001/run.php` — a standalone, vendor-free, database-free runner for the host (one command: `php checks/p05-followup-escalation-20261001/run.php` from the repository root), mirroring the G2.1 `checks/membership-permission-map-20260930/run.php` precedent. It asserts every contract reason code and positive path (37 checks), prints `passed=N failed=M`, and exits non-zero on failure. The PHPUnit suite remains canonical; this runner only gives the host a dependency-free verification path.
+- The runner itself was NOT executed here (no PHP binary). It received a manual syntax review plus a structural balance check (braces/brackets/parens outside strings and comments) executed with the available Node runtime: all four PHP artifacts pass the structural check. This is not PHP syntax proof; only the host's `php` run is.
+- Scope unchanged: no migration, no UI, no route, no policy, no activation; PR #28 and the G2 stack untouched; no merge, no deploy.
 
 ## Next exact item
 
-Host review of the P05 contract slice and re-run of the suite. P06 (clinic workspaces/appointments) opens only after P05 completion; P08 requires the unbuilt P04; P09 requires P06+P08. Do not activate any contract decision without a separate reviewed slice.
+Host review of the P05 contract slice: run `php artisan test --filter FollowUpEscalationContractTest` (or the standalone runner) from the repository root, review PR #46, then decide the P05 implementation slice. P06 (clinic workspaces/appointments) opens only after P05 completion; P08 requires the unbuilt P04; P09 requires P06+P08. Do not activate any contract decision without a separate reviewed slice.
