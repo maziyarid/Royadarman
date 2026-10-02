@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CoordinationTask;
 use App\Models\HomeServiceRequest;
 use App\Models\ReferralGrant;
+use App\Domain\Scheduling\OperationsMonthWindow;
 use App\Support\JalaliCalendar;
 use App\Support\WorkspaceView;
 use Carbon\CarbonImmutable;
@@ -30,6 +31,7 @@ final class OperationsCalendarController extends Controller
         $jalaliMode = $locale === 'fa';
         $jalaliYear = null;
         $jalaliMonth = null;
+        $serverWindow = null;
 
         if ($jalaliMode) {
             [$currentJalaliYear, $currentJalaliMonth] = JalaliCalendar::fromGregorian(
@@ -42,13 +44,19 @@ final class OperationsCalendarController extends Controller
             [$jalaliYear, $jalaliMonth] = array_map('intval', explode('-', $monthInput));
             abort_unless($jalaliYear >= 1200 && $jalaliYear <= 1600 && $jalaliMonth >= 1 && $jalaliMonth <= 12, 422);
             $monthInput = JalaliCalendar::monthKey($jalaliYear, $jalaliMonth);
-            [$startYear, $startMonth, $startDay] = JalaliCalendar::toGregorian($jalaliYear, $jalaliMonth, 1);
-            $nextJalaliYear = $jalaliMonth === 12 ? $jalaliYear + 1 : $jalaliYear;
-            $nextJalaliMonth = $jalaliMonth === 12 ? 1 : $jalaliMonth + 1;
-            [$endYear, $endMonth, $endDay] = JalaliCalendar::toGregorian($nextJalaliYear, $nextJalaliMonth, 1);
-            $start = CarbonImmutable::create($startYear, $startMonth, $startDay, 0, 0, 0, $timezone);
-            $endExclusive = CarbonImmutable::create($endYear, $endMonth, $endDay, 0, 0, 0, $timezone);
-            $daysInMonth = JalaliCalendar::monthLength($jalaliYear, $jalaliMonth);
+            $window = OperationsMonthWindow::jalali($jalaliYear, $jalaliMonth, (string) $timezone);
+            $serverWindow = [
+                'start_utc' => $window['start_utc'],
+                'end_utc' => $window['end_utc'],
+                'day_count' => $window['day_count'],
+                'half_open' => true,
+                'client_must_not_recompute_bounds' => true,
+            ];
+            $start = CarbonImmutable::create($window['start_year'], $window['start_month'], $window['start_day'], 0, 0, 0, $timezone);
+            $endExclusive = CarbonImmutable::create($window['end_year'], $window['end_month'], $window['end_day'], 0, 0, 0, $timezone);
+            $daysInMonth = $window['day_count'];
+            $nextJalaliYear = $window['next_year'];
+            $nextJalaliMonth = $window['next_month'];
             $monthLabel = JalaliCalendar::monthLabel($jalaliYear, $jalaliMonth);
             $previousMonth = $jalaliMonth === 1
                 ? JalaliCalendar::monthKey($jalaliYear - 1, 12)
@@ -188,6 +196,7 @@ final class OperationsCalendarController extends Controller
             'days' => $days,
             'events' => $events,
             'summary' => $summary,
+            'serverWindow' => $serverWindow,
         ])->with('locale', $locale);
     }
 }
