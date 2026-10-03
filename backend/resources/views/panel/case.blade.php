@@ -15,6 +15,9 @@
 @if($roleKey === 'patient')
 <link rel="stylesheet" href="/assets/patient-case.css?v=20261003">
 @endif
+@if($roleKey === 'clinician')
+<link rel="stylesheet" href="/assets/clinician-case.css?v=20261003">
+@endif
 @endpush
 @section('content')
 <div data-panel-case data-locale="{{ $locale }}" data-case-id="{{ $case->id }}" data-case-version="{{ (int) $case->version }}" data-source-language="{{ $case->source_language }}" data-error="{{ __('panel_case.error') }}" data-accept="{{ __('panel_case.accept_policy') }}" data-cancel="{{ __('panel_case.decline') }}">
@@ -232,56 +235,113 @@
 @endif
 
 @if($roleKey === 'clinician')
-<section class="card pad">
-    <h2>{{ __('panel_case.documents') }}</h2>
-    @forelse($documents as $document)
-        <div class="item">
-            <bdi>{{ $document->original_name }}</bdi>
-            @if(empty($isDemo))
-                <a class="btn" target="_blank" rel="noopener" href="/api/v1/cases/{{ $case->id }}/documents/{{ $document->id }}/content">{{ __('panel_case.open_document') }}</a>
-            @endif
-        </div>
-    @empty
-        <p class="muted">{{ __('panel_case.no_items') }}</p>
-    @endforelse
-</section>
-@if(empty($isDemo))
-    <section class="card pad">
-        <h2>{{ __('panel_case.clinician_actions') }}</h2>
-        <form id="review-form">
-            <div class="field">
-                <label>{{ __('panel_case.review_document') }}</label>
-                <select name="clinical_document_id" required>
-                    @foreach($documents as $document)
-                        <option value="{{ $document->id }}">{{ $document->original_name }}</option>
+@php
+    $draftPreviews = $draftReviewPreviews ?? collect();
+    $clinicianDate = static function ($value) {
+        if ($value instanceof \DateTimeInterface) return \DateTimeImmutable::createFromInterface($value);
+        if (!is_string($value) || strlen($value) > 40) return null;
+        $format = preg_match('/^\d{4}-\d{2}-\d{2}T/', $value) ? \DateTimeInterface::ATOM : (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/D', $value) ? 'Y-m-d H:i:s' : null);
+        if (!$format) return null;
+        try {
+            $date = \DateTimeImmutable::createFromFormat($format, $value, new \DateTimeZone('UTC'));
+            return $date && \DateTimeImmutable::getLastErrors() === false ? $date : null;
+        } catch (\Throwable) { return null; }
+    };
+    $draftFields = ['image_adequacy' => ['image_adequacy', 1000], 'observations' => ['observations', 5000], 'limitations' => ['limitations', 3000], 'options' => ['options', 5000], 'recommended_next_step' => ['next_step', 3000]];
+@endphp
+<div class="clinician-case">
+    <section class="clinician-case-hero" aria-labelledby="clinician-case-title">
+        <p class="clinician-case-eyebrow">{{ __('clinician_case.eyebrow') }}</p>
+        <h2 id="clinician-case-title">{{ __('clinician_case.title') }}</h2>
+        <p>{{ __('clinician_case.intro') }}</p>
+    </section>
+    <nav class="clinician-case-nav" aria-label="{{ __('clinician_case.sections') }}">
+        <a href="#clinician-case-documents">{{ __('clinician_case.documents') }}</a>
+        @if(empty($isDemo))<a href="#clinician-case-new-draft">{{ __('clinician_case.new_draft') }}</a>@endif
+        <a href="#clinician-case-saved-drafts">{{ __('clinician_case.saved_drafts') }}</a>
+    </nav>
+    <section class="clinician-case-card" id="clinician-case-documents" aria-labelledby="clinician-case-documents-title">
+        <h2 id="clinician-case-documents-title">{{ __('clinician_case.documents') }}</h2>
+        <p class="clinician-case-note">{{ __('clinician_case.source_help') }}</p>
+        <ul class="clinician-case-documents">
+            @forelse($documents as $document)
+                <li><strong><bdi>{{ $document->original_name }}</bdi></strong>
+                    @if(empty($isDemo))
+                        <a class="btn" target="_blank" rel="noopener" href="/api/v1/cases/{{ $case->id }}/documents/{{ $document->id }}/content">{{ __('panel_case.open_document') }}</a>
+                    @endif
+                </li>
+            @empty
+                <li class="clinician-case-empty">{{ __('clinician_case.no_documents') }}</li>
+            @endforelse
+        </ul>
+    </section>
+    @if(empty($isDemo))
+        <section class="clinician-case-card" id="clinician-case-new-draft" aria-labelledby="clinician-case-new-title">
+            <h2 id="clinician-case-new-title">{{ __('clinician_case.new_draft') }}</h2>
+            <p class="clinician-case-note" id="clinician-case-form-help">{{ __('clinician_case.form_help') }}</p>
+            <form id="review-form" aria-describedby="clinician-case-form-help">
+                <div class="field">
+                    <label for="review-document">{{ __('panel_case.review_document') }}</label>
+                    <select id="review-document" name="clinical_document_id" required>
+                        @foreach($documents as $document)
+                            <option value="{{ $document->id }}">{{ $document->original_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <input type="hidden" name="source_language" value="{{ $case->source_language }}">
+                <div class="clinician-case-form-fields">
+                    @foreach($draftFields as $field => [$label, $limit])
+                        <div class="field"><label for="review-{{ $field }}">{{ __('panel_case.'.$label) }}</label><textarea id="review-{{ $field }}" name="{{ $field }}" required maxlength="{{ $limit }}"></textarea></div>
                     @endforeach
-                </select>
-            </div>
-            <input type="hidden" name="source_language" value="{{ $case->source_language }}">
-            <div class="field"><label>{{ __('panel_case.image_adequacy') }}</label><textarea name="image_adequacy" required maxlength="1000"></textarea></div>
-            <div class="field"><label>{{ __('panel_case.observations') }}</label><textarea name="observations" required maxlength="5000"></textarea></div>
-            <div class="field"><label>{{ __('panel_case.limitations') }}</label><textarea name="limitations" required maxlength="3000"></textarea></div>
-            <div class="field"><label>{{ __('panel_case.options') }}</label><textarea name="options" required maxlength="5000"></textarea></div>
-            <div class="field"><label>{{ __('panel_case.next_step') }}</label><textarea name="recommended_next_step" required maxlength="3000"></textarea></div>
-            <button class="btn primary" @disabled($documents->isEmpty())>{{ __('panel_case.save_review') }}</button>
-        </form>
-        <h3>{{ __('panel_case.drafts') }}</h3>
+                </div>
+                <button class="btn primary" @disabled($documents->isEmpty())>{{ __('panel_case.save_review') }}</button>
+            </form>
+            <noscript><p class="clinician-case-note">{{ __('clinician_case.javascript_help') }}</p></noscript>
+        </section>
+    @endif
+    <section class="clinician-case-card" id="clinician-case-saved-drafts" aria-labelledby="clinician-case-saved-title">
+        <h2 id="clinician-case-saved-title">{{ __('clinician_case.saved_drafts') }}</h2>
+        <p class="clinician-case-note">{{ __('clinician_case.draft_help') }}</p>
         @forelse($draftReviews as $draft)
-            <div class="item">#{{ $draft->revision_number }} · <button class="btn primary" type="button" data-publish-review="{{ $draft->id }}">{{ __('panel_case.publish') }}</button></div>
+            @php
+                $preview = $draftPreviews->get($draft->id);
+                $savedAt = $clinicianDate($preview->created_at ?? $draft->created_at ?? null);
+                $sourceLanguage = $preview && in_array($preview->source_language ?? null, ['fa', 'ar', 'en'], true) ? $preview->source_language : null;
+            @endphp
+            <article class="clinician-case-draft" aria-labelledby="clinician-draft-{{ $draft->id }}">
+                <header>
+                    <h3 id="clinician-draft-{{ $draft->id }}">{{ __('clinician_case.draft_revision', ['number' => $draft->revision_number]) }}</h3>
+                    @if(empty($isDemo))
+                        <button class="btn primary" type="button" data-publish-review="{{ $draft->id }}" @disabled(!$preview) aria-describedby="clinician-draft-note-{{ $draft->id }}">{{ __('panel_case.publish') }}</button>
+                    @else
+                        <p class="clinician-case-note">{{ __('panel.demo_notice') }}</p>
+                    @endif
+                </header>
+                <dl class="clinician-case-draft-meta">
+                    <div><dt>{{ __('clinician_case.saved_at') }}</dt><dd>@if($savedAt)<time dir="ltr" datetime="{{ $savedAt->setTimezone(new \DateTimeZone('UTC'))->format(\DateTimeInterface::ATOM) }}">{{ $savedAt->setTimezone(new \DateTimeZone('Asia/Tehran'))->format('Y-m-d H:i') }}</time>@else{{ __('clinician_case.date_unknown') }}@endif</dd></div>
+                    @if($preview)
+                        <div><dt>{{ __('clinician_case.source_name') }}</dt><dd><bdi>{{ is_string($preview->source_name ?? null) && trim($preview->source_name) !== '' ? $preview->source_name : __('clinician_case.source_unknown') }}</bdi></dd></div>
+                        <div><dt>{{ __('clinician_case.source_language') }}</dt><dd>{{ $sourceLanguage ? __('clinician_case.languages.'.$sourceLanguage) : __('clinician_case.language_unknown') }}</dd></div>
+                    @endif
+                </dl>
+                @if($preview)
+                    <dl class="clinician-case-draft-fields">
+                        @foreach($draftFields as $field => [$label, $limit])
+                            @php $narrative = $preview->{$field} ?? null; @endphp
+                            <div data-draft-field="{{ $field }}"><dt>{{ __('panel_case.'.$label) }}</dt><dd @if($sourceLanguage) lang="{{ $sourceLanguage }}" @endif dir="{{ $sourceLanguage ? (in_array($sourceLanguage, ['fa', 'ar'], true) ? 'rtl' : 'ltr') : 'auto' }}">{{ is_string($narrative) && trim($narrative) !== '' ? $narrative : __('clinician_case.not_recorded') }}</dd></div>
+                        @endforeach
+                    </dl>
+                    <p class="clinician-case-note clinician-case-draft-note" id="clinician-draft-note-{{ $draft->id }}">{{ __('clinician_case.publish_help') }}</p>
+                @else
+                    <p class="clinician-case-empty clinician-case-draft-note" id="clinician-draft-note-{{ $draft->id }}">{{ __('clinician_case.preview_unavailable') }}</p>
+                @endif
+            </article>
         @empty
-            <p class="muted">{{ __('panel_case.no_items') }}</p>
+            <p class="clinician-case-empty">{{ __('clinician_case.no_drafts') }}</p>
         @endforelse
+        <p class="clinician-case-note">{{ __('clinician_case.timezone_hint') }}</p>
     </section>
-@else
-    <section class="card pad">
-        <h2>{{ __('panel_case.reviews') }}</h2>
-        @forelse($draftReviews as $draft)
-            <div class="item">#{{ $draft->revision_number }} · {{ __('panel.demo_notice') }}</div>
-        @empty
-            <p class="muted">{{ __('panel_case.no_items') }}</p>
-        @endforelse
-    </section>
-@endif
+</div>
 @endif
 </div>
 @endsection

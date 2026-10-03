@@ -6,8 +6,9 @@ Canonical feature coverage/evidence owner: RPH-57. Decision and hypothesis owner
 
 The dated evidence below retains its history; the September host/source blockers
 are superseded by actual source reconciliation and releases PR49 through PR52.
-The verified pre-patient-report source baseline is PR53 mergea00407c,459 matching
-live hashes; the final patient checkpoint records its later merge/deployment identity.
+The verified pre-clinician-preview baseline is PR54 merge `2b6dee2`, 464 matching
+live source hashes. The final clinician checkpoint records the subsequent tested
+merge, direct-root deployment and private backup identity.
 The root site now includes per-session authentication assurance, committed OTP
 failure counters, integration corruption/operational-readiness handling, real
 profile affiliations and audited preferences, CSP-safe profile controls, clinic
@@ -50,8 +51,12 @@ read and foreign-patient denial are exercised with synthetic persisted records.
 See its dated release record and RPH108 checkpoint for exact tests/deployment.
 This is not the tooth-level dental-status/workbench milestone. Release notification
 template/event/recipient binding is still absent (F-2026-10-03-07, RPH85/109).
-Next safe clinician work is own unsigned draft preview under existing source
-approval/consent/assignment/credential rules; no new signer policy is inferred.
+The bounded clinician slice reads own saved unsigned drafts under existing source
+approval/consent/assignment/credential rules and improves real creation/publication
+controls. Actual endpoint tests reproduced approved-plus-deleted source acceptance;
+narrow creation/publication and document status/content guards close that invariant
+without inventing retention or signer policy. See the dated clinician release and
+RPH107/issue15 checkpoints for executed verification and deployed identity.
 
 Twelve-workspace/branch persistence, capacity-safe clinic booking, clinical report
 sign/release and dental status, clinic ledger/payment rules, authenticated recovery

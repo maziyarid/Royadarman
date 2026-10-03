@@ -125,8 +125,30 @@ final class PanelCaseController extends Controller
                 'created_at' => $document->created_at,
             ]);
 
+        $sourceDocuments = $documents->keyBy('id');
+        $draftReviewPreviews = ReviewRevision::query()
+            ->where('case_id', $case->id)
+            ->where('clinician_user_id', $request->user()->id)
+            ->whereNull('signed_at')
+            // Decrypt only after the existing source-document read gates have passed.
+            ->whereIn('clinical_document_id', $sourceDocuments->keys()->all())
+            ->get(['id', 'clinical_document_id', 'revision_number', 'source_language', 'created_at', 'image_adequacy', 'observations', 'limitations', 'options', 'recommended_next_step'])
+            ->mapWithKeys(fn (ReviewRevision $draft): array => [$draft->id => (object) [
+                'id' => $draft->id,
+                'revision_number' => $draft->revision_number,
+                'source_language' => $draft->source_language,
+                'created_at' => $draft->created_at,
+                'source_name' => $sourceDocuments->get($draft->clinical_document_id)->original_name,
+                'image_adequacy' => $draft->image_adequacy,
+                'observations' => $draft->observations,
+                'limitations' => $draft->limitations,
+                'options' => $draft->options,
+                'recommended_next_step' => $draft->recommended_next_step,
+            ]]);
+
         return [
             'documents' => $documents, 'reviews' => collect(), 'referrals' => collect(), 'clinics' => collect(), 'assignments' => collect(), 'eligibleClinicians' => collect(), 'shared' => [],
+            'draftReviewPreviews' => $draftReviewPreviews,
             'draftReviews' => DB::table('review_revisions')->where('case_id', $case->id)
                 ->where('clinician_user_id', $request->user()->id)->whereNull('signed_at')
                 ->orderByDesc('created_at')->get(['id', 'revision_number', 'clinical_document_id', 'created_at']),
