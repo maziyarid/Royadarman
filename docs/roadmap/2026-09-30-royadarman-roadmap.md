@@ -6,8 +6,8 @@ Canonical feature coverage/evidence owner: RPH-57. Decision and hypothesis owner
 
 The dated evidence below retains its history; the September host/source blockers
 are superseded by actual source reconciliation and releases PR49 through PR52.
-The verified pre-analytics source baseline is PR52 merge4a87ceb; the final
-analytics checkpoint records its later merge and deployed identity.
+The verified pre-patient-report source baseline is PR53 mergea00407c,459 matching
+live hashes; the final patient checkpoint records its later merge/deployment identity.
 The root site now includes per-session authentication assurance, committed OTP
 failure counters, integration corruption/operational-readiness handling, real
 profile affiliations and audited preferences, CSP-safe profile controls, clinic
@@ -36,12 +36,22 @@ avoided any production DB privilege expansion; the temporary restore was removed
 Authenticated patient/document recovery and disaster failover are not inferred
 from those guest probes.
 
-The subsequent bounded owner analytics release adds exclusive-end cohorts,
+Deployed PR53 owner analytics adds exclusive-end cohorts,
 Tehran Saturday zero-filled weeks, fixed private count projections, current
 referral decisions/withdrawal and already-recorded proposal SLA evidence, and
 real multilingual CSP-safe charts. It creates no lifecycle events or new access
 grants. Its exact tests and limitations are in the dated analytics release record;
 its final publication/deployment checkpoint is mirrored to RPH49/57/85/98/99.
+
+The bounded patient-report slice improves already-existing signed/published/current
+narratives, dates/original language, document processing and withdrawal controls,
+with explicit private/no-store responses. Actual clinician create/publish/patient
+read and foreign-patient denial are exercised with synthetic persisted records.
+See its dated release record and RPH108 checkpoint for exact tests/deployment.
+This is not the tooth-level dental-status/workbench milestone. Release notification
+template/event/recipient binding is still absent (F-2026-10-03-07, RPH85/109).
+Next safe clinician work is own unsigned draft preview under existing source
+approval/consent/assignment/credential rules; no new signer policy is inferred.
 
 Twelve-workspace/branch persistence, capacity-safe clinic booking, clinical report
 sign/release and dental status, clinic ledger/payment rules, authenticated recovery
