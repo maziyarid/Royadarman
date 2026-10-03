@@ -1,4 +1,4 @@
-import { LngLatBounds, Map, Marker, NavigationControl } from "maplibre-gl";
+import { LngLatBounds, Map as MapLibreMap, Marker, NavigationControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 const GPS_KEYS = ["latitude", "longitude", "lat", "lng", "gps", "origin_lat", "origin_lng"];
@@ -203,13 +203,36 @@ async function loadMatches(endpoint, neighborhoodId, serviceType) {
   return body.data;
 }
 
+function showMapFallback(root, container) {
+  const fallback = root.querySelector("[data-discovery-map-fallback]");
+  if (fallback) fallback.hidden = false;
+  if (container) container.hidden = true;
+}
+
+function retireMap(state, root, container) {
+  if (state.failed) return;
+  state.failed = true;
+  state.markers.forEach(({ marker }) => {
+    try { marker.remove(); } catch { /* Fallback must remain usable if cleanup fails. */ }
+  });
+  state.markers.clear();
+  try { state.userMarker?.remove(); } catch { /* Continue disposing the map. */ }
+  state.userMarker = null;
+  try { state.map.remove(); } catch { /* No library errors are exposed to patients. */ }
+  showMapFallback(root, container);
+}
+
 function createMap(root, onSelect) {
   const container = root.querySelector("[data-discovery-map]");
   const tileUrl = root.dataset.tileUrl;
-  if (!container || !tileUrl || typeof WebGLRenderingContext === "undefined") return null;
+  if (!container || !tileUrl || typeof WebGLRenderingContext === "undefined") {
+    showMapFallback(root, container);
+    return null;
+  }
 
+  let state = null;
   try {
-    const map = new Map({
+    const map = new MapLibreMap({
       container,
       center: [Number(root.dataset.originLng), Number(root.dataset.originLat)],
       zoom: 12,
@@ -228,21 +251,27 @@ function createMap(root, onSelect) {
       attributionControl: true,
     });
 
-    map.addControl(new NavigationControl({ visualizePitch: false }), "top-left");
+    state = { map, markers: new Map(), userMarker: null, onSelect, failed: false };
     map.on("error", () => {
       container.classList.add("has-map-error");
+      retireMap(state, root, container);
     });
+    map.addControl(new NavigationControl({ visualizePitch: false }), "top-left");
 
-    return { map, markers: new Map(), userMarker: null, onSelect };
+    if (state.failed) return null;
+    container.hidden = false;
+    return state;
   } catch {
+    if (state) retireMap(state, root, container);
+    else showMapFallback(root, container);
     return null;
   }
 }
 
 function updateMap(state, root, matches, origin) {
-  if (!state) return;
+  if (!state || state.failed) return;
 
-  state.markers.forEach((marker) => marker.remove());
+  state.markers.forEach(({ marker }) => marker.remove());
   state.markers.clear();
 
   const bounds = new LngLatBounds();
@@ -273,7 +302,7 @@ function updateMap(state, root, matches, origin) {
 }
 
 function updateEphemeralUserMarker(state, origin) {
-  if (!state) return;
+  if (!state || state.failed) return;
   if (state.userMarker) state.userMarker.remove();
 
   if (!origin) {
@@ -332,7 +361,7 @@ function initRoot(root) {
 
     const selected = matches.find((row) => row.clinic_id === id);
     if (selected) setStatus(root, text(copy, "clinic_selected_status").replace(":clinic", selected.name || ""));
-    if (selected && mapState) {
+    if (selected && mapState && !mapState.failed) {
       mapState.map.easeTo({
         center: [Number(selected.longitude), Number(selected.latitude)],
         zoom: Math.max(mapState.map.getZoom(), 14),

@@ -6,8 +6,9 @@ Canonical feature coverage/evidence owner: RPH-57. Decision and hypothesis owner
 
 The dated evidence below retains its history; the September host/source blockers
 are superseded by actual source reconciliation and releases PR49 through PR52.
-The verified pre-public-home baseline is PR55 merge `c9749fd`, 469 matching
-live source hashes. The final homepage checkpoint records the subsequent tested
+The verified pre-map-runtime baseline is deployed PR56 merge `af24b5e`,490 matching
+live source hashes in the expanded map/served-build capture (previous scope474).
+The final map checkpoint records the subsequent tested
 merge, direct-root deployment and private backup identity.
 The root site now includes per-session authentication assurance, committed OTP
 failure counters, integration corruption/operational-readiness handling, real
@@ -68,6 +69,13 @@ remains intact. See the dated public-home release and RPH57 checkpoints.
 Verified social destinations, other misleading image captions and lost reference
 screenshot files remain explicit gaps. The design CLI was blocked for unverified
 telemetry; source-based implementation continues without a canvas claim.
+PR56 is deployed: actual guest homepage/filter behavior was observed, but a blank
+map is a separate acceptance failure. The next bounded map release reproduces
+and repairs constructor/marker/fallback defects, builds the exact pinned map entry
+and narrowly permits the default raster origin/blob worker. Read the dated map
+release and RPH57 checkpoint for actual tests/merge/live identity. GPS control
+versus disabled Permissions-Policy (F-2026-10-03-09) and clipboard false-success
+(F-2026-10-03-10) are separate observed gaps; neither is silently marked complete.
 
 Twelve-workspace/branch persistence, capacity-safe clinic booking, clinical report
 sign/release and dental status, clinic ledger/payment rules, authenticated recovery

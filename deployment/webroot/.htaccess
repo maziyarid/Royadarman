@@ -25,7 +25,7 @@ Options -Indexes
     Header always set Permissions-Policy "camera=(), geolocation=(), microphone=()"
     Header always set X-Frame-Options "DENY"
     Header always set Strict-Transport-Security "max-age=31536000"
-    Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'self'"
+    Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self'; script-src 'self'; worker-src 'self' blob:; connect-src 'self' https://tile.openstreetmap.org"
 
     <FilesMatch "\.(css|js|svg|png|jpg|jpeg|webp|gif|ico)$">
         Header set Cache-Control "public, max-age=604800"
