@@ -4,8 +4,8 @@
 
 Read this section before the historical September baseline below. The queue and
 ownership rules still apply; dated access/source blockers do not override fresh
-observations. The source baseline verified before this analytics release is
-`4a87ceb70b08f298fe7144ec229130d156392018` (PR52). PR49 reconciled live source
+observations. The source baseline verified before the patient-report release is
+`a00407c5856d94cedd9ea94ca16705cd6c7a1c19` (PR53),459 matching source hashes. PR49 reconciled live source
 and security fixes; PR50 added shared persisted month windows, accepted-referral
 notification correlation, clinic dashboard isolation and real personal profiles;
 PR51 secured all four existing privileged administrator mutations using current
@@ -18,7 +18,7 @@ captured source hashes match. The earlier checkpoint in this file was stale;
 latest Agiflow/GitHub checkpoints remained authoritative. See the four dated
 release records and latest GitHub issues13/14/15 and RPH49/57/85 comments.
 
-Full isolated VPS PHP8.3.33 suite656 tests/34,317 assertions passes. MariaDB
+PR53 full isolated VPS PHP8.3.33 suite689 tests/34,588 assertions passes. MariaDB
 checks use a separate physical datadir/socket, synthetic records and disabled
 networking. These are not tests against the production database or authenticated
 production browser demonstrations. The queue service and minute cron were
@@ -39,13 +39,21 @@ PX1 session assurance and PX4 corruption handling are integrated; PX2 staff MFA
 enrolment/recovery activation still awaits explicit policy. Codex claim on issue15
 completed harmless per-queue/scheduler runtime probes and bound readiness UI.
 Their explicit activation/retirement lifecycle must be preserved; read the
-runtime release document before removing job code. The next bounded analytics release delivers real owner count/window corrections,
+runtime release document before removing job code. PR53 deployed real owner count/window corrections,
 recorded referral lifecycle projection, Tehran Saturday series and CSP-safe charts.
 See docs/operations/2026-10-03-analytics-release.md and the final issue15 checkpoint
 for its executed tests, merge/deployment SHA and private backup identity. No
 accountant/supervisor access follows from the owner's projection. The next
 backend lanes remain G1 week/capacity and G2 scoped workspace/branch persistence;
 clinical/finance/mobile activation gates and assigned decisions remain explicit.
+The bounded patient release improves already-existing signed/published/current
+case narratives, original language and actual dates, document progress and withdrawn
+referral controls; case responses prevent storage. See its dated release record
+and final issue15/RPH108 checkpoints for tests and later merge/live identity.
+Next safe Codex work is own unsigned clinician draft preview only while its
+existing approved/consented source remains readable; exact method ownership must
+be claimed first. Clinical release notifications remain a separate source-verified
+gap F-2026-10-03-07. No new signing/dental taxonomy or publication policy is enabled.
 Native Android and iOS remain required and
 unimplemented; proposals, Studio screens and responsive web do not satisfy them.
 

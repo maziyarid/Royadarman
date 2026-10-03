@@ -10,13 +10,13 @@ use App\Models\ReferralProposal;
 use App\Models\ReviewRevision;
 use App\Support\PanelDemoRegistry;
 use App\Support\WorkspaceView;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 final class PanelCaseController extends Controller
 {
-    public function show(Request $request, string $locale, PatientCase $case): View
+    public function show(Request $request, string $locale, PatientCase $case): Response
     {
         abort_unless($request->user()?->can('view', $case), 404);
         $role = $request->user()->role;
@@ -34,7 +34,7 @@ final class PanelCaseController extends Controller
             default => abort(404),
         };
 
-        return view('panel.case', [
+        return response()->view('panel.case', [
             ...WorkspaceView::data($request, 'panel'),
             'case' => $case,
             'roleKey' => $role->value,
@@ -42,7 +42,7 @@ final class PanelCaseController extends Controller
             'isDemo' => $isDemo,
             'allowedStatuses' => $role === UserRole::Coordinator ? $case->status->allowedTargets() : [],
             ...$data,
-        ]);
+        ])->header('Cache-Control', 'private, no-store');
     }
 
     private function patientData(Request $request, PatientCase $case): array
@@ -68,10 +68,19 @@ final class PanelCaseController extends Controller
                 ->whereHas('publicationEvents', fn ($query) => $query->where('event', 'published'))
                 ->whereDoesntHave('supersededBy')
                 ->orderByDesc('signed_at')
-                ->get(['id', 'revision_number', 'source_language', 'image_adequacy', 'observations', 'limitations', 'options', 'recommended_next_step', 'budget_band', 'signed_at']),
+                ->select(['id', 'revision_number', 'source_language', 'image_adequacy', 'observations', 'limitations', 'options', 'recommended_next_step', 'budget_band', 'signed_at'])
+                // First recorded release of this exact revision, not a credential or diagnosis claim.
+                ->withMin(['publicationEvents as published_at' => fn ($query) => $query->where('event', 'published')], 'created_at')
+                ->withCasts(['published_at' => 'immutable_datetime'])
+                ->get(),
             'referrals' => DB::table('referral_proposals')->join('clinics', 'clinics.id', '=', 'referral_proposals.clinic_id')
                 ->where('case_id', $case->id)->orderByDesc('proposed_at')
-                ->get(['referral_proposals.id', 'referral_proposals.status', 'referral_proposals.source_language', 'referral_proposals.proposed_at', 'clinics.name as clinic_name']),
+                ->get(['referral_proposals.id', 'referral_proposals.status', 'referral_proposals.withdrawn_at', 'referral_proposals.source_language', 'referral_proposals.proposed_at', 'clinics.name as clinic_name'])
+                ->map(function (object $proposal): object {
+                    $proposal->effective_status = $proposal->withdrawn_at !== null ? 'withdrawn' : $proposal->status;
+
+                    return $proposal;
+                }),
             'clinics' => collect(), 'assignments' => collect(), 'draftReviews' => collect(), 'eligibleClinicians' => collect(), 'shared' => [],
         ];
     }
