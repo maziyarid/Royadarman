@@ -1,5 +1,46 @@
 # Roya Darman continuing delivery runbook
 
+## Verified continuation checkpoint — 3 October 2026
+
+Read this section before the historical September baseline below. The queue and
+ownership rules still apply; dated access/source blockers do not override fresh
+observations. Current released main and canonical cPanel repo are
+`a5d7df5fb348d1b6c22939aa0e6adfd24b524626` (PR51). PR49 reconciled live source
+and security fixes; PR50 added shared persisted month windows, accepted-referral
+notification correlation, clinic dashboard isolation and real personal profiles;
+PR51 secured all four existing privileged administrator mutations using current
+browser-session assurance and improved their real forms. See the three dated
+release records and latest GitHub issues13/14/15 and RPH49/57/85 comments.
+
+Full isolated VPS PHP8.3.33 suite610 tests/33,823 assertions passes. MariaDB
+checks use a separate physical datadir/socket, synthetic records and disabled
+networking. These are not tests against the production database or authenticated
+production browser demonstrations. The queue service and minute cron were
+observed; provider delivery was not inferred from an active process.
+
+The actual 14:18Z SQL/site backup restored into isolated MariaDB:61 tables,
+83 foreign keys;10,697 regular archive members hash-verified; restored guest
+login200/panel302. Production DB privileges were not widened. The original
+CREATE DATABASE obstacle has a tested safe alternative. Authenticated patient
+and document recovery, off-host failover and agreed RPO/RTO remain open. Private
+backup/rehearsal records stay on the VPS, never in Git or public webroot.
+
+For next work: G1 month seams and persisted month/referral correlation are
+integrated, so review current source before selecting week/capacity contracts.
+G2 live membership publication and assignment regressions are integrated; retain
+own-clinic isolation and build scoped workspace/branch persistence on fresh main.
+PX1 session assurance and PX4 corruption handling are integrated; PX2 staff MFA
+enrolment/recovery activation still awaits explicit policy. Codex claim on issue15
+adds harmless per-queue/scheduler runtime probes and bound readiness UI; leave
+those exact paths to this slice. Native Android and iOS remain required and
+unimplemented; proposals, Studio screens and responsive web do not satisfy them.
+
+Draft PR28/45/46/47 are not wholesale integration approvals. In particular,
+global role maps cannot replace workspace-scoped grants, accountants cannot
+inherit unrestricted owner projections, and the current Jalali public API must
+be preserved. Rebase bounded reviewed slices, not historical packages. No
+unresolved clinical/finance/MFA/store-signing decision is silently activated.
+
 Revision: 30 September 2026, after PR #11 and the frontend deployment.
 This is a durable work-selection and handover contract. It supplements, rather
 than replaces, docs/roadmap/2026-09-30-royadarman-roadmap.md and the 18 open decisions.
