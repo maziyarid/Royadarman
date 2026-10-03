@@ -42,4 +42,11 @@ return [
         'last_owner' => 'The last active owner cannot be deactivated or moved to another role.',
         'self_change' => 'Do not change the role or active state of your current account from this screen.',
     ],
+    'sections' => 'User management sections',
+    'reauthentication_title' => 'Sensitive account changes',
+    'reauthentication_help' => 'Creating accounts, changing access, signing out devices and resetting security require a recent sign-in. If a request is locked, sign out and sign in again before retrying.',
+    'confirm_revoke_sessions' => 'Sign out all devices for :name? They will need to sign in again.',
+    'authenticator' => 'Authenticator app',
+    'authenticator_on' => 'Configured',
+    'authenticator_off' => 'Not configured',
 ];

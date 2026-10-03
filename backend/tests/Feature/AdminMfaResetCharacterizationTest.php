@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Identity\Services\SessionAssurance;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +43,7 @@ class AdminMfaResetCharacterizationTest extends TestCase
         }
 
         $this->actingAs($owner)
+            ->withSession([SessionAssurance::KEY => now()->timestamp])
             ->post('/en/panel/administrators/'.$staff->id.'/reset-mfa')
             ->assertRedirect();
 
@@ -56,7 +58,8 @@ class AdminMfaResetCharacterizationTest extends TestCase
     public function test_known_gap_after_reset_the_account_logs_in_with_password_alone(): void
     {
         $staff = $this->staffWithMfa();
-        $this->actingAs($this->owner())->post('/en/panel/administrators/'.$staff->id.'/reset-mfa');
+        $this->actingAs($this->owner())->withSession([SessionAssurance::KEY => now()->timestamp])
+            ->post('/en/panel/administrators/'.$staff->id.'/reset-mfa')->assertRedirect();
         auth()->logout();
 
         $this->postJson('/api/v1/auth/password', [
@@ -69,10 +72,12 @@ class AdminMfaResetCharacterizationTest extends TestCase
         $staff = $this->staffWithMfa();
         $technical = User::factory()->create(['role' => 'tech_admin', 'is_active' => true]);
 
-        $this->actingAs($technical)->post('/en/panel/administrators/'.$staff->id.'/reset-mfa')->assertForbidden();
+        $this->actingAs($technical)->withSession([SessionAssurance::KEY => now()->timestamp])
+            ->post('/en/panel/administrators/'.$staff->id.'/reset-mfa')->assertForbidden();
         $this->assertNotNull($staff->fresh()->totp_secret);
 
         $owner = $this->owner();
-        $this->actingAs($owner)->post('/en/panel/administrators/'.$owner->id.'/reset-mfa')->assertStatus(422);
+        $this->actingAs($owner)->withSession([SessionAssurance::KEY => now()->timestamp])
+            ->post('/en/panel/administrators/'.$owner->id.'/reset-mfa')->assertStatus(422);
     }
 }

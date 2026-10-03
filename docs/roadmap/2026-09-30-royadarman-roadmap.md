@@ -2,6 +2,43 @@
 Version: 2026-09-30 · Medical Websites — Operations & Growth · Master RPH-WU-1.
 Canonical feature coverage/evidence owner: RPH-57. Decision and hypothesis owner: RPH-85.
 
+## Current verified delivery update — 3 October 2026
+
+The dated evidence below retains its history; the September host/source blockers
+are superseded by actual source reconciliation and releases PR49 and PR50.
+GitHub main and the cPanel canonical checkout are synced at PR50 merge50cf02f.
+The root site now includes per-session authentication assurance, committed OTP
+failure counters, integration corruption/operational-readiness handling, real
+profile affiliations and audited preferences, CSP-safe profile controls, clinic
+dashboard own-membership isolation, shared server month query/grid bounds and
+accepted-referral persisted recipient/delivery correlation. See the two release
+documents in docs/operations for exact tested/deployed scope.
+
+Latest evidence: full568 tests/33,607 assertions, isolated VPS PHP8.3.33; synthetic
+private MariaDB52 tests/475 assertions; source440 hashes match the deployed
+release; private source backup/rollback evidence retained. Existing queue process
+was observed active and gracefully reloaded; automated heartbeat and actual
+provider delivery remain unproven. ntp.time.ir is the selected chrony source.
+Cloud-browser guest inspection reaches the real password/passkey login through
+the protected profile redirect; no authenticated staff walkthrough is claimed.
+
+Fresh14:18Z SQL/site backup subsequently passed an isolated restore rehearsal:
+61 tables/83 foreign keys restored,10,697 archive files hash-verified; restored
+guest login200/protected panel302. A private socket with networking disabled
+avoided any production DB privilege expansion; the temporary restore was removed.
+Authenticated patient/document recovery and disaster failover are not inferred
+from those guest probes.
+
+Twelve-workspace/branch persistence, capacity-safe clinic booking, clinical report
+sign/release and dental status, clinic ledger/payment rules, authenticated recovery
+walkthroughs and native Android/iOS apps remain unfinished. Static Studio
+screens and unwired agent contracts are labelled prototypes/proposals. Staff MFA
+enrolment/recovery, clinical signatures/retention, merchant rules and mobile
+stack/signing decisions remain explicit gates. Existing delegated worker plans
+continue in their claimed lanes; a clean textual merge does not authorise unsafe
+global role/capability activation. No completion percentage is inferred from
+tests or screenshots.
+
 ## 1. Objective, scope and evidence
 Deliver a professional, Persian-first dental coordination platform and clinic product with dedicated dashboards and personal profiles for the owner, developer, superadmins, supervisors, receptionists, accountants, customer support, treatment specialists, clinic managers, dentists/clinical staff and patients. Each feature must be supported by a real authorised backend. Clinical and finance modules are explicit planned scope inside the Smart Teb shared core; their existence is not dismissed because the deployed support module is narrower.
 
@@ -507,4 +544,3 @@ Backend proof: schema/invariants, policy, API/command, lifecycle, failure/retry/
 Reference staff dashboard includes inventory, clinic maintenance, compliance/onboarding and staff calendar. Retain these as active clinic-scoped module requirements: stock items/batches/expiry/usage, suppliers/purchase approvals, staff shifts/leave/credentials/training and planned maintenance/task signoff. Backend contracts, audit/permission/retention and accountant linkage required. Sterilisation/compliance templates need clinical owner; exact payroll/tax/procurement/legal rules require decisions, not invented automation.
 
 Backend proof: schema/invariants, policy, API/command, lifecycle, failure/retry/concurrency, audit/retention and positive/negative/E2E evidence. Acceptance criteria and test cases are stored unchecked on the task. Dependencies: RPH-58, RPH-68, RPH-71, RPH-76.
-
