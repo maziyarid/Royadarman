@@ -91,8 +91,11 @@ def main():
             return 0
         stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
         # Older root-owned archives retain their existing private permissions.
-        backup = pathlib.Path('/home/royadarman/royadarman-source-backups') / ('codex-source-' + stamp)
-        backup.mkdir(mode=0o700, parents=True, exist_ok=False)
+        backup_root = pathlib.Path('/home/royadarman/royadarman-source-backups')
+        backup_root.mkdir(mode=0o700, exist_ok=True)
+        os.chmod(backup_root, 0o700)
+        backup = backup_root / ('codex-source-' + stamp)
+        backup.mkdir(mode=0o700, exist_ok=False)
         records, written = {}, []
         for name in changes:
             destination = target(name)
@@ -103,6 +106,8 @@ def main():
                 saved.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(destination, saved)
                 os.chmod(saved, 0o600)
+                if digest(saved) != records[name]['before']:
+                    raise RuntimeError('Backup integrity mismatch')
         record_path = backup / 'release.json'
         record_path.write_text(json.dumps({'commit': commit, 'files': records, 'state': 'backed_up'}, indent=2))
         os.chmod(record_path, 0o600)
@@ -133,6 +138,8 @@ def main():
                     target(name).unlink()
                 else:
                     replace(backup / name, target(name), records[name]['mode'])
+            if any(digest(target(name)) != records[name]['before'] for name in written):
+                raise RuntimeError('Rollback hash mismatch')
             clear_caches()
             record_path.write_text(json.dumps({'commit': commit, 'files': records, 'state': 'rolled_back',
                                               'error_class': type(error).__name__}, indent=2))
