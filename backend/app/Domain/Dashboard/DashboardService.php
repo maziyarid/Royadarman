@@ -151,9 +151,11 @@ final class DashboardService
 
     private function clinicRepresentative(User $user, bool $isDemo): array
     {
+        $now = now();
         $clinicIds = $user->clinicMemberships()
-            ->whereNull('active_until')
-            ->orWhere('active_until', '>', now())
+            ->where('active_from', '<=', $now)
+            ->where(fn ($query) => $query->whereNull('active_until')->orWhere('active_until', '>', $now))
+            ->whereHas('clinic', fn ($query) => $query->where('is_active', true))
             ->pluck('clinic_id');
 
         $clinics = Clinic::query()->whereIn('id', $clinicIds)
@@ -163,7 +165,10 @@ final class DashboardService
             ->whereIn('clinic_id', $clinicIds)
             ->when($isDemo, fn ($q) => $q->whereHas('case', fn ($case) => $this->demoCases($case)))
             ->whereNull('revoked_at')
-            ->with('case:id,status,patient_name,public_reference')
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '>', $now)
+            ->whereIn('consent_event_id', ConsentEvent::query()->where('decision', 'accepted')->whereNull('revoked_at')->select('id'))
+            ->with('case:id,status,public_reference')
             ->latest('granted_at')->limit(20)->get();
 
         return [

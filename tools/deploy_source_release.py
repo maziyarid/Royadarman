@@ -59,10 +59,14 @@ def clear_caches():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--source', required=True)
+    parser.add_argument('--baseline', default='docs/operations/2026-10-03-live-reconciliation.json')
     parser.add_argument('--apply', action='store_true')
     args = parser.parse_args()
     source = pathlib.Path(args.source).resolve()
-    baseline = json.loads((source / 'docs/operations/2026-10-03-live-reconciliation.json').read_text())['files']
+    baseline_path = (source / args.baseline).resolve()
+    if not baseline_path.is_relative_to(source):
+        raise RuntimeError('Baseline must be inside the reviewed source checkout')
+    baseline = json.loads(baseline_path.read_text())['files']
     commit = subprocess.check_output(['git', '-C', str(source), 'rev-parse', 'HEAD'], text=True).strip()
     dirty = subprocess.check_output(['git', '-C', str(source), 'status', '--porcelain', '--untracked-files=no'], text=True)
     if dirty:
@@ -120,6 +124,8 @@ def main():
             for url, expected in [('https://royadarman.com/fa/login', '200'),
                                   ('https://royadarman.com/fa/panel', '302'),
                                   ('https://royadarman.com/assets/patient-request.css?v=20261003', '200'),
+                                  ('https://royadarman.com/assets/profile-workspace.css?v=20261003', '200'),
+                                  ('https://royadarman.com/assets/profile-workspace.js?v=20261003', '200'),
                                   ('https://royadarman.com/studio/', '200')]:
                 result = subprocess.run(['curl', '-sS', '-o', '/dev/null', '-w', '%{http_code}',
                                          '--max-time', '15', url], capture_output=True, text=True)

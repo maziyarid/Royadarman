@@ -7,7 +7,10 @@
 @endpush
 @section('content')
 <link rel="stylesheet" href="/assets/rph98-presentation.css?v=20260930-worker-b">
-<div class="rph98-calendar" data-rph98-calendar>
+<div class="rph98-calendar" data-rph98-calendar
+     data-calendar-window-start="{{ $serverWindow['start_utc'] }}"
+     data-calendar-window-end="{{ $serverWindow['end_utc'] }}"
+     data-calendar-timezone="{{ config('royadarman.display_timezone') }}">
     <section class="rph98-hero">
         <h2>{{ __('panel.calendar.title') }}</h2>
         <p>{{ __('panel.calendar.intro') }}</p>

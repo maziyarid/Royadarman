@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Domain\Operations\Contracts\NotificationSender;
 use App\Models\OutboxEvent;
 use App\Models\PatientCase;
+use App\Models\ReferralProposal;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -60,7 +61,17 @@ final class ProcessOutboxEvent implements ShouldQueue
             ]);
         }
 
-        $case = $event->aggregate_type === PatientCase::class ? PatientCase::query()->with('patient')->find($event->aggregate_id) : null;
+        // Only known persisted aggregates determine a recipient. Never accept
+        // a destination phone or replacement case id from an outbox payload.
+        $case = match ($event->aggregate_type) {
+            PatientCase::class => PatientCase::query()->with('patient')->find($event->aggregate_id),
+            ReferralProposal::class => $event->event_type === 'referral.accepted'
+                ? ReferralProposal::query()->with('case.patient')
+                    ->where('status', 'accepted')->whereNull('withdrawn_at')
+                    ->find($event->aggregate_id)?->case
+                : null,
+            default => null,
+        };
         if (! $case?->patient?->phone) {
             throw new RuntimeException('Notification recipient is unavailable.');
         }
