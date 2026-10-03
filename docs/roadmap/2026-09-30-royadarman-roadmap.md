@@ -5,20 +5,27 @@ Canonical feature coverage/evidence owner: RPH-57. Decision and hypothesis owner
 ## Current verified delivery update — 3 October 2026
 
 The dated evidence below retains its history; the September host/source blockers
-are superseded by actual source reconciliation and releases PR49 and PR50.
-GitHub main and the cPanel canonical checkout are synced at PR50 merge50cf02f.
+are superseded by actual source reconciliation and releases PR49 through PR52.
+The verified pre-analytics source baseline is PR52 merge4a87ceb; the final
+analytics checkpoint records its later merge and deployed identity.
 The root site now includes per-session authentication assurance, committed OTP
 failure counters, integration corruption/operational-readiness handling, real
 profile affiliations and audited preferences, CSP-safe profile controls, clinic
 dashboard own-membership isolation, shared server month query/grid bounds and
-accepted-referral persisted recipient/delivery correlation. See the two release
+accepted-referral persisted recipient/delivery correlation, current-session
+assurance on all four administrator mutations, and scheduler/per-queue execution
+evidence with a bound readiness page. See the four dated release
 documents in docs/operations for exact tested/deployed scope.
 
-Latest evidence: full568 tests/33,607 assertions, isolated VPS PHP8.3.33; synthetic
-private MariaDB52 tests/475 assertions; source440 hashes match the deployed
-release; private source backup/rollback evidence retained. Existing queue process
-was observed active and gracefully reloaded; automated heartbeat and actual
-provider delivery remain unproven. ntp.time.ir is the selected chrony source.
+PR52 evidence: full656 tests/34,317 assertions, isolated VPS PHP8.3.33; focused
+synthetic private MariaDB50 tests/510 assertions for PR52; source453 hashes match
+the deployed release. Earlier PR50/51 database checks retain their dated scope.
+Private source backup/rollback evidence is retained. Existing queue process was
+observed active and gracefully reloaded; real scheduled ticks after activation
+processed all four harmless queue probes. At15:03:48Z scheduler and each queue
+had issued-age45s, runtime stateok and independent backlog stateok. This is
+recent execution evidence, not provider delivery or a current-process/capacity
+guarantee. ntp.time.ir was observed selected as the chrony source.
 Cloud-browser guest inspection reaches the real password/passkey login through
 the protected profile redirect; no authenticated staff walkthrough is claimed.
 
@@ -28,6 +35,13 @@ guest login200/protected panel302. A private socket with networking disabled
 avoided any production DB privilege expansion; the temporary restore was removed.
 Authenticated patient/document recovery and disaster failover are not inferred
 from those guest probes.
+
+The subsequent bounded owner analytics release adds exclusive-end cohorts,
+Tehran Saturday zero-filled weeks, fixed private count projections, current
+referral decisions/withdrawal and already-recorded proposal SLA evidence, and
+real multilingual CSP-safe charts. It creates no lifecycle events or new access
+grants. Its exact tests and limitations are in the dated analytics release record;
+its final publication/deployment checkpoint is mirrored to RPH49/57/85/98/99.
 
 Twelve-workspace/branch persistence, capacity-safe clinic booking, clinical report
 sign/release and dental status, clinic ledger/payment rules, authenticated recovery
@@ -415,9 +429,9 @@ The accountable job titles below must be assigned to named people; this roadmap 
 ## 11. Status and scope reconciliation
 - Existing support workspace, session/referral foundation, public matching and integration settings are reused; tasks marked Done historically keep their evidence but do not imply expanded roles/modules are complete.
 - RPH-36 remains Review for its earlier support-workspace scope. The expanded appearance/dashboards are RPH-60/RPH-98–108 and do not retroactively change its acceptance claim.
-- RPH-49 remains In Progress: active live source differs from Git candidate and private inspection is now quota-blocked. Production tests directory was absent in the 29 September handover; do not invent a production PHPUnit result.
+- RPH-49 remains In Progress for broader delivery. Source reconciliation and direct-root releases PR49–52 are verified; canonical Git and live source match PR52 as recorded above. The September quota/source mismatch blocker is historical. Tests ran in isolated checkouts; no production PHPUnit workflow is claimed.
 - RPH-59 remains In Progress for authenticated password/credential setup E2E, despite reported deployment of routes and login UI.
-- RPH-65/RPH-94 remain In Progress. Coordinator Jalali date foundation/delivery filters/NTP are not a complete clinic scheduler. Holiday dataset, tenant scheduling, concurrent slots, authenticated browser journeys and populated notification correlation remain open.
+- RPH-65/RPH-94 remain In Progress. Shared coordinator month bounds, persisted-event inclusion/exclusion and accepted-referral notification correlation are verified in synthetic SQLite/MariaDB tests. That is not a complete clinic scheduler or actual provider-delivery proof. Holiday dataset, tenant/resource scheduling, concurrent slots and authenticated browser journeys remain open.
 - RPH-69/70 and the new RPH-107–109 clinical workflows are Planning; no claim that patients can currently receive a signed dental chart after OPG upload.
 - Clinic billing/instalments/cheques/accountant module and native Android/iOS remain Planning. A PWA is not the Android/iOS app.
 - Advanced AI/3D/DICOM/interoperability, insurance and regional expansion remain active assessment tasks, not dismissed features. Their decisions and conditions must be documented on RPH-86/87/92 and RPH-85.
