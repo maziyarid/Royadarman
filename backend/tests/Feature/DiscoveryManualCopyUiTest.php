@@ -25,6 +25,8 @@ final class DiscoveryManualCopyUiTest extends TestCase
         $wrappers = $xpath->query('//*[@data-discovery-copy-fallback]');
         $this->assertSame(1, $wrappers->length);
         $this->assertTrue($wrappers->item(0)->hasAttribute('hidden'));
+        $this->assertSame(2, $xpath->query('//*[@data-discovery-geo or @data-discovery-geo-clear]')->length);
+        $this->assertSame(2, $xpath->query('//*[@hidden and (@data-discovery-geo or @data-discovery-geo-clear)]')->length);
         $fields = $xpath->query('//*[@data-discovery-copy-fallback]/textarea[@data-discovery-copy-value]');
         $this->assertSame(1, $fields->length);
         $field = $fields->item(0);
@@ -48,7 +50,7 @@ final class DiscoveryManualCopyUiTest extends TestCase
         $this->assertSame(1, $xpath->query('//form[@data-discovery-form]')->length);
         $this->assertSame(1, $xpath->query('//ul[@data-discovery-list]')->length);
         $this->assertSame(1, $xpath->query('//*[@data-discovery-map-fallback]')->length);
-        $this->assertStringContainsString('href="/assets/discovery-copy.css?v=20261003"', $html);
+        $this->assertStringContainsString('href="/assets/discovery-copy.css?v=20261003-geo"', $html);
     }
 
     #[DataProvider('locales')]
@@ -59,6 +61,7 @@ final class DiscoveryManualCopyUiTest extends TestCase
         $html = view('public.partials.discovery-map', ['locale' => $locale, 'discovery' => $discovery])->render();
         $xpath = $this->xpath($html);
         $this->assertSame(0, $xpath->query('//*[@data-discovery-copy-fallback or @data-discovery-copy-value]')->length);
+        $this->assertSame(0, $xpath->query('//*[@data-discovery-geo or @data-discovery-geo-clear]')->length);
         $this->assertStringNotContainsString('/assets/discovery-copy.css', $html);
         $this->assertSame(1, $xpath->query('//form[@data-discovery-form]')->length);
         $this->assertSame(1, $xpath->query('//ul[@data-discovery-list]')->length);
@@ -70,6 +73,8 @@ final class DiscoveryManualCopyUiTest extends TestCase
         $this->assertSame(1, $this->xpath($html)->query('//*[@data-discovery-copy-fallback]')->length);
         $this->assertFileExists(base_path('public/assets/discovery-copy.css'));
         $this->assertSame(file_get_contents(base_path('public/assets/discovery-copy.css')), file_get_contents(base_path('../deployment/webroot/assets/discovery-copy.css')));
+        $css = file_get_contents(base_path('public/assets/discovery-copy.css'));
+        $this->assertStringContainsString('[data-discovery-root] [data-discovery-geo][hidden],[data-discovery-root] [data-discovery-geo-clear][hidden]{display:none!important}', $css);
         $this->assertSame('', trim(view('public.partials.discovery-map', ['locale' => 'en', 'discovery' => null])->render()));
     }
 

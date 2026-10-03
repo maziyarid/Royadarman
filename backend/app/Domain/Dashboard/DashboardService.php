@@ -53,7 +53,11 @@ final class DashboardService
     private function patient(User $user, bool $isDemo): array
     {
         $cases = $user->cases()
-            ->with(['documents', 'reviewRevisions.publicationEvents'])
+            ->with(['documents'])
+            ->withExists(['reviewRevisions as has_published_review' => fn ($query) => $query
+                ->whereNotNull('signed_at')
+                ->whereHas('publicationEvents', fn ($events) => $events->where('event', 'published'))
+                ->whereDoesntHave('supersededBy')])
             ->when($isDemo, fn ($q) => $this->demoCases($q))
             ->latest()->limit(20)->get();
         $openReferrals = ReferralProposal::query()
@@ -82,7 +86,7 @@ final class DashboardService
                     ? $c->service_type->value : (string) $c->service_type,
                 'created_at' => $c->created_at,
                 'documents_count' => $c->documents->count(),
-                'has_published_review' => $c->reviewRevisions->contains(fn ($r) => $r->isPublished()),
+                'has_published_review' => (bool) $c->has_published_review,
                 ...WaitClock::waiting($c->updated_at ?? $c->created_at),
             ]),
             'open_referral_proposals' => $openReferrals->count(),

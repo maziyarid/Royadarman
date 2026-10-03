@@ -2,6 +2,17 @@
 
 ## Verified continuation checkpoint — 3 October 2026
 
+PR58 is deployed at `97f08947`:496 bounded source hashes match; full VPS
+771/35,612, Pint398files, private synthetic MariaDB70/659 and controlled
+copy11/map7/release16 checks passed. F10 tested copy defects are closed.
+The next independently reviewed slice aligns patient availability to existing
+current signed/published review gates, excludes reserved demo staffing, and
+respects known browser geolocation denial/cleared-request callbacks without
+weakening the header. Read the dated policy/patient proof release and final
+issue15 checkpoint for subsequent exact merge/live/backup evidence. It does
+not implement release notification delivery or native applications.
+
+
 PR57 is deployed at `d99eae3`:492 source hashes matched, full VPS764/35,520,
 private MariaDB63/567, Node map7/7 and release-helper16/16 checks passed.
 The real guest browser showed the translated map fallback and functioning

@@ -2,9 +2,10 @@
 
 Dates are not assumed. Each milestone needs evidence before it is called done.
 
-## Toolchain and store gates (checked 2026-10-01)
-- Google Play: from 31 August 2026, new apps and updates must target Android 16 (API level 36). Source: Android Developers target-API requirements page.
-- Apple: since 28 April 2026, uploads to App Store Connect must be built with Xcode 26 or later using the iOS 26 SDK; App Store Connect added Xcode 27 / iOS 27 SDK uploads on 14 September 2026. Source: Apple Developer upcoming requirements and App Store Connect release notes.
+## Toolchain and store gates (primary sources rechecked 2026-10-03)
+- Google Play phone apps: since 31 August 2026, new apps and updates must target Android 16/API 36 or higher. This is a target SDK requirement, not our minimum supported Android OS. [Android Developers](https://developer.android.com/google/play/requirements/target-sdk), updated 1 October 2026.
+- Apple: since 28 April 2026, App Store Connect builds require Xcode 26 or later and iOS 26 SDK; since 9 September 2026, iOS/iPadOS uploads must target iOS 13 or later. [Apple upcoming requirements](https://developer.apple.com/news/upcoming-requirements/). SDK choice and minimum deployment target are separate; our supported device/OS matrix remains undecided.
+- Xcode 27/iOS 27 SDK uploads were accepted from 14 September 2026. Availability does not mean Xcode 27 is the minimum upload requirement. [App Store Connect release notes](https://developer.apple.com/help/app-store-connect/release-notes/).
 - iOS builds need macOS with Xcode and Apple signing. If no Mac, account or device exists, M2/M6/M7 for iOS stay open with the exact owner and action. Never mark iOS done from Android work.
 - Re-verify both policies at release time; they change yearly.
 
@@ -36,5 +37,5 @@ Device registry, credential issue and rotation with reuse detection, per-device 
 1. Contract tests against a fake server generated from the OpenAPI file.
 2. Backend device and refresh endpoints with the tests above (new PR, not auth shortcuts).
 3. App shell for the chosen stack with login and device list.
-4. Upload client with resume against the staging contract.
+4. Upload client with resume against an isolated synthetic contract checkout; no public staging site is required. Reviewed production releases follow the authorised backed-up direct-root process.
 5. Patient journey screens bound to real APIs as they land; no permanent fake-success buttons.

@@ -38,7 +38,7 @@
             <p class="discovery-privacy">{{ $copy['location_ephemeral'] }}</p>
             <p class="discovery-status" data-discovery-status role="status" aria-live="polite"></p>
             @if($enhancementReady)
-                <link rel="stylesheet" href="/assets/discovery-copy.css?v=20261003">
+                <link rel="stylesheet" href="/assets/discovery-copy.css?v=20261003-geo">
                 <div class="discovery-copy-fallback" data-discovery-copy-fallback hidden>
                     <label for="discovery-copy-value">{{ $copy['destination_manual_copy_label'] }}</label>
                     <textarea id="discovery-copy-value" data-discovery-copy-value readonly dir="ltr" rows="2" spellcheck="false" autocomplete="off" aria-describedby="discovery-copy-help"></textarea>
@@ -50,8 +50,10 @@
                 <div>
                     <div class="discovery-list-head">
                         <h3>{{ $copy['fallback_heading'] }}</h3>
-                        <button type="button" class="button ghost" data-discovery-geo hidden>{{ $copy['use_location'] }}</button>
-                        <button type="button" class="button ghost" data-discovery-geo-clear hidden>{{ $copy['clear_location'] }}</button>
+                        @if($enhancementReady)
+                            <button type="button" class="button ghost" data-discovery-geo hidden>{{ $copy['use_location'] }}</button>
+                            <button type="button" class="button ghost" data-discovery-geo-clear hidden>{{ $copy['clear_location'] }}</button>
+                        @endif
                     </div>
                     <ul class="discovery-list" data-discovery-list>
                         @forelse($discovery['matches'] as $clinic)
