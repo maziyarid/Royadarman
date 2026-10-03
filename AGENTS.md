@@ -15,3 +15,9 @@ backend/ is sanitised production source. deployment/webroot/ is the separately
 served webroot snapshot; its index points at production. Do not serve that
 snapshot as an isolated development application. agent-work/ is pending,
 explicitly undeployed work, not accepted application code.
+
+Continuing worker coordination: read docs/coordination/CONTINUING-DELIVERY-RUNBOOK.md
+and your lane prompt/issue when present. GitHub issues #13/#14/#15 carry worker
+claims/checkpoints; missing Agiflow access does not block the GitHub-only lane.
+Preserve file ownership, evidence gates and Android/iOS scope. These instructions
+select work on resumed sessions; they do not schedule agents or grant new access.

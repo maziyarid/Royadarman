@@ -5,7 +5,8 @@
     <a class="btn" href="{{ route('panel', ['locale' => $locale]) }}">{{ __('request.back') }}</a>
 @endsection
 @push('scripts')
-    <script src="/assets/patient-request.js?v=20260917" defer></script>
+    <link rel="stylesheet" href="/assets/patient-request.css?v=20261003">
+    <script src="/assets/patient-request.js?v=20261003" defer></script>
 @endpush
 @section('content')
 @php
@@ -36,9 +37,10 @@
     @if($isDemo)
         <div class="notice">{{ __('request.demo_readonly') }}</div>
     @endif
+    @if($intakeEnabled || $isDemo)
     <section class="card pad request-wizard">
         <div class="request-progress" role="progressbar" aria-valuemin="1" aria-valuemax="8" aria-valuenow="1" data-progress>
-            <div class="request-progress-bar" data-progress-bar style="width:12.5%"></div>
+            <progress class="request-progress-bar" data-progress-bar value="1" max="8"></progress>
             <span class="request-progress-label" data-progress-label>{{ __('request.step_of', ['current' => 1, 'total' => 8]) }}</span>
         </div>
         <form id="request-form" novalidate>
@@ -172,27 +174,6 @@
             </div>
         </form>
     </section>
+    @endif
 </div>
-<style>
-.request-wizard{display:grid;gap:20px}
-.request-progress{display:grid;gap:8px}
-.request-progress-bar{height:6px;border-radius:999px;background:linear-gradient(90deg,#2947A3,#162B70);transition:width .2s ease}
-.request-progress-label{font-size:13px;color:#5b6475}
-.request-step-title{margin:0 0 8px;font-size:1.25rem;color:#162B70}
-.request-choice-grid{display:grid;gap:12px}
-@media(min-width:720px){.request-choice-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.request-choice{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid #d7dce8;border-radius:14px;background:#fff;cursor:pointer}
-.request-choice:has(input:checked){border-color:#2947A3;box-shadow:0 0 0 2px rgba(41,71,163,.15);background:#F7F5EF}
-.request-choice input{margin-top:3px}
-.request-choice strong{display:block;color:#162B70}
-.request-choice small{display:block;color:#5b6475;margin-top:4px;line-height:1.4}
-.request-neighborhoods{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
-.request-neighborhoods .chip{min-height:40px;padding:8px 14px;border-radius:999px;border:1px solid #d7dce8;background:#fff;font:inherit;cursor:pointer}
-.request-neighborhoods .chip.is-on{border-color:#2947A3;background:#F7F5EF;color:#162B70;font-weight:700}
-.request-summary{display:grid;gap:10px;margin:0}
-.request-summary>div{display:grid;gap:2px;padding:10px 12px;border-radius:12px;background:#F7F5EF}
-.request-summary dt{font-size:12px;color:#5b6475}
-.request-summary dd{margin:0;color:#162B70;font-weight:600;white-space:pre-wrap}
-.request-nav{flex-wrap:wrap}
-</style>
 @endsection

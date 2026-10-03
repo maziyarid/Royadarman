@@ -108,9 +108,14 @@ final class IntegrationSettingsController extends Controller
                     ? (filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0')
                     : trim((string) $value);
 
-                IntegrationSetting::query()->updateOrCreate(
-                    ['key' => $key],
-                    ['value' => $stored, 'updated_by_user_id' => $actorId],
+                // Encrypt the validated replacement through the existing cast.
+                // Eloquent dirty comparisons would decrypt an unreadable old
+                // value and prevent the operator from repairing that override.
+                $encrypted = (new IntegrationSetting(['value' => $stored]))->getAttributes()['value'];
+                IntegrationSetting::query()->upsert(
+                    [['key' => $key, 'value' => $encrypted, 'updated_by_user_id' => $actorId]],
+                    ['key'],
+                    ['value', 'updated_by_user_id', 'updated_at'],
                 );
 
                 $changed[] = [$key, 'updated'];

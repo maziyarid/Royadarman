@@ -101,7 +101,10 @@
       step.hidden = num !== current;
     });
     if (progress) progress.setAttribute('aria-valuenow', String(current));
-    if (progressBar) progressBar.style.width = `${(current / total) * 100}%`;
+    if (progressBar) {
+      progressBar.max = total;
+      progressBar.value = current;
+    }
     if (progressLabel) {
       const template = root.dataset.stepOf || ':current / :total';
       progressLabel.textContent = template

@@ -9,6 +9,8 @@ use App\Support\WorkspaceView;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -64,12 +66,12 @@ final class ProfileWorkspaceController extends Controller
         $request->merge(['username' => mb_strtolower(trim((string) $request->input('username')))]);
 
         $data = $request->validate([
-            'username' => ['required', 'string', 'min:3', 'max:32', 'regex:/\A[a-zA-Z0-9][a-zA-Z0-9._-]{2,31}\z/', \Illuminate\Validation\Rule::unique('users', 'username')->ignore($user->id)],
+            'username' => ['required', 'string', 'min:3', 'max:32', 'regex:/\A[a-zA-Z0-9][a-zA-Z0-9._-]{2,31}\z/', Rule::unique('users', 'username')->ignore($user->id)],
             'password' => ['required', 'string', 'min:12', 'max:128', 'confirmed'],
         ]);
 
         $otpRecovery = $request->session()->get('auth_method') === 'otp';
-        if (filled($user->password) && ! $otpRecovery && ! \Illuminate\Support\Facades\Hash::check((string) $request->input('current_password'), (string) $user->password)) {
+        if (filled($user->password) && ! $otpRecovery && ! Hash::check((string) $request->input('current_password'), (string) $user->password)) {
             throw ValidationException::withMessages(['current_password' => __('panel.credentials.current_password_invalid')]);
         }
 

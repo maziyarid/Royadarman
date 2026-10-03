@@ -417,7 +417,10 @@ final class DemoPanelAccessTest extends TestCase
             ->assertSee(PanelDemoRegistry::OPG_CASE_REFERENCE)
             ->assertSee(PanelDemoRegistry::HOME_CASE_REFERENCE);
 
-        $this->get('/en/panel/cases/new')->assertForbidden();
+        $this->get('/en/panel/cases/new')->assertOk()->assertSee(__('request.demo_readonly'));
+        $casesBefore = DB::table('patient_cases')->count();
+        $this->postJson('/api/v1/cases/draft', ['service_type' => 'guidance_referral'])->assertForbidden();
+        $this->assertSame($casesBefore, DB::table('patient_cases')->count());
         $this->get('/en/panel/marketing')->assertForbidden();
         $this->get('/en/panel/network')->assertForbidden();
     }

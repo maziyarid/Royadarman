@@ -106,15 +106,24 @@ final class OtpService
 
     public function verify(string $challengeId, string $code, ?string $totpCode = null, ?string $recoveryCode = null): User
     {
-        return DB::transaction(function () use ($challengeId, $code, $totpCode, $recoveryCode): User {
+        // Failures that must keep the attempt counter are recorded here and thrown
+        // AFTER the transaction commits. Throwing inside DB::transaction() rolls
+        // the attempts increment back, so max_attempts would never be enforced.
+        $failure = null;
+
+        $user = DB::transaction(function () use ($challengeId, $code, $totpCode, $recoveryCode, &$failure): ?User {
             $challenge = OtpChallenge::query()->lockForUpdate()->findOrFail($challengeId);
             $maxAttempts = (int) config('royadarman.sms.otp.max_attempts', 5);
             if ($challenge->used_at || $challenge->superseded_at || $challenge->expires_at->isPast() || $challenge->attempts >= $maxAttempts) {
-                throw ValidationException::withMessages(['code' => __('ui.errors.otp_invalid')]);
+                $failure = ValidationException::withMessages(['code' => __('ui.errors.otp_invalid')]);
+
+                return null;
             }
             $challenge->increment('attempts');
             if (! Hash::check(DigitNormalizer::latin($code), $challenge->code_hash)) {
-                throw ValidationException::withMessages(['code' => __('ui.errors.otp_invalid')]);
+                $failure = ValidationException::withMessages(['code' => __('ui.errors.otp_invalid')]);
+
+                return null;
             }
 
             $user = User::query()->where('phone_hash', $challenge->phone_hash)->first();
@@ -133,12 +142,20 @@ final class OtpService
             }
             if ($user->role->isStaff() && $this->mfa->isConfigured($user)
                 && ! $this->mfa->verifyAndConsume($user, $totpCode, $recoveryCode)) {
-                throw ValidationException::withMessages(['totp_code' => __('ui.errors.mfa_invalid')]);
+                $failure = ValidationException::withMessages(['totp_code' => __('ui.errors.mfa_invalid')]);
+
+                return null;
             }
             $challenge->update(['used_at' => now()]);
             $user->update(['last_authenticated_at' => now(), 'locale' => $challenge->locale]);
 
             return $user;
         });
+
+        if ($failure !== null) {
+            throw $failure;
+        }
+
+        return $user;
     }
 }

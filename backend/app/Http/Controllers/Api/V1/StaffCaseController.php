@@ -276,7 +276,32 @@ final class StaffCaseController extends Controller
                 throw new DomainException(403, 'review.consent_revoked');
             }
 
-            $locked->update(['signed_at' => now()]);
+            $laterPublished = ReviewRevision::query()
+                ->where('case_id', $case->id)
+                ->where('clinician_user_id', $request->user()->id)
+                ->where('revision_number', '>', $locked->revision_number)
+                ->whereNotNull('signed_at')
+                ->whereHas('publicationEvents', fn ($query) => $query->where('event', 'published'))
+                ->lockForUpdate()
+                ->exists();
+            if ($laterPublished) {
+                throw new DomainException(409, 'review.later_revision_published');
+            }
+
+            $previousId = ReviewRevision::query()
+                ->where('case_id', $case->id)
+                ->where('clinician_user_id', $request->user()->id)
+                ->where('revision_number', '<', $locked->revision_number)
+                ->whereNotNull('signed_at')
+                ->whereHas('publicationEvents', fn ($query) => $query->where('event', 'published'))
+                ->orderByDesc('revision_number')
+                ->value('id');
+
+            $updates = ['signed_at' => now()];
+            if ($locked->supersedes_id === null && $previousId !== null) {
+                $updates['supersedes_id'] = $previousId;
+            }
+            $locked->update($updates);
 
             DB::table('publication_events')->insert([
                 'id' => (string) Str::ulid(),

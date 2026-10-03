@@ -1,6 +1,29 @@
 (() => {
   const root = document.querySelector('[data-workspace]');
-  document.querySelectorAll('[data-mobile-nav]').forEach(btn => btn.addEventListener('click', () => root?.classList.toggle('nav-open')));
+  const navButtons = document.querySelectorAll('[data-mobile-nav]');
+  const sidebar = document.getElementById('workspace-navigation');
+  const mobile = window.matchMedia('(max-width: 900px)');
+  const setNavigation = (open, restoreFocus = false) => {
+    root?.classList.toggle('nav-open', open);
+    navButtons.forEach(btn => btn.setAttribute('aria-expanded', String(open)));
+    if (sidebar) sidebar.inert = mobile.matches && !open;
+    if (restoreFocus) navButtons[0]?.focus();
+  };
+  navButtons.forEach(btn => btn.addEventListener('click', () => {
+    const open = !root?.classList.contains('nav-open');
+    setNavigation(open);
+    if (open) sidebar?.querySelector('a')?.focus();
+  }));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && root?.classList.contains('nav-open')) setNavigation(false, true);
+  });
+  document.addEventListener('click', event => {
+    if (mobile.matches && root?.classList.contains('nav-open') && !sidebar?.contains(event.target) &&
+        !event.target.closest('[data-mobile-nav]')) setNavigation(false);
+  });
+  document.querySelector('[data-nav-dismiss]')?.addEventListener('click', () => setNavigation(false, true));
+  mobile.addEventListener('change', () => setNavigation(false));
+  setNavigation(false);
 
 
   const connectivityLabel = () => {
