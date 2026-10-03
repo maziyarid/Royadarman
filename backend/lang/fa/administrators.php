@@ -36,6 +36,13 @@ return [
         'coordinator' => 'هماهنگ‌کننده',
         'clinician' => 'دندان‌پزشک',
         'clinic_rep' => 'نماینده مرکز',
+        'superadmin' => 'مدیر ارشد',
+        'developer' => 'توسعه‌دهنده',
+        'supervisor' => 'سرپرست',
+        'receptionist' => 'پذیرش',
+        'accountant' => 'حسابدار',
+        'customer_support' => 'پشتیبان مشتری',
+        'clinic_manager' => 'مدیر مرکز',
     ],
     'errors' => [
         'mobile_exists' => 'برای این شماره همراه قبلاً حساب ساخته شده است.',

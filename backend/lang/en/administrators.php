@@ -36,6 +36,13 @@ return [
         'coordinator' => 'Coordinator',
         'clinician' => 'Dentist',
         'clinic_rep' => 'Clinic representative',
+        'superadmin' => 'Superadmin',
+        'developer' => 'Developer',
+        'supervisor' => 'Supervisor',
+        'receptionist' => 'Receptionist',
+        'accountant' => 'Accountant',
+        'customer_support' => 'Customer support',
+        'clinic_manager' => 'Clinic manager',
     ],
     'errors' => [
         'mobile_exists' => 'An account already exists for this mobile number.',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Identity\Enums\UserRole;
+use App\Domain\Identity\Services\StaffCapabilities;
 use App\Domain\Support\Enums\ConversationStatus;
 use App\Domain\Support\Enums\SupportCategory;
 use App\Http\Controllers\Controller;
@@ -31,8 +32,9 @@ final class SupportController extends Controller
                 $q->where('assignee_user_id', $user->id)
                     ->orWhereNull('assignee_user_id');
             });
-        } elseif ($user->role === UserRole::Owner || $user->role === UserRole::TechnicalAdministrator) {
-            // Owners and technical administrators may browse all support conversations.
+        } elseif (StaffCapabilities::can($user->role, 'support.view')) {
+            // Roles holding support.view may browse support conversations,
+            // filtered later by the same policy used for individual reads.
         } else {
             abort(403);
         }

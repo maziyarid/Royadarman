@@ -36,6 +36,13 @@ return [
         'coordinator' => 'المنسق',
         'clinician' => 'طبيب الأسنان',
         'clinic_rep' => 'ممثل المركز',
+        'superadmin' => 'المدير الأعلى',
+        'developer' => 'المطور',
+        'supervisor' => 'المشرف',
+        'receptionist' => 'موظف الاستقبال',
+        'accountant' => 'المحاسب',
+        'customer_support' => 'دعم العملاء',
+        'clinic_manager' => 'مدير المركز',
     ],
     'errors' => [
         'mobile_exists' => 'يوجد حساب بالفعل لهذا الرقم.',

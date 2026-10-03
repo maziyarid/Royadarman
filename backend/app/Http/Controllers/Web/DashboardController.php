@@ -16,7 +16,8 @@ final class DashboardController extends Controller
     {
         $user = $request->user();
         $payload = $this->dashboard->build($user, (bool) $request->session()->get('panel_demo', false));
-        $role = $payload['role'];
+        $role = $user->role->dashboardFamily()->value;
+        $payload['role'] = $role;
 
         return view("dashboard.{$role}", [
             ...WorkspaceView::data($request, 'dashboard'),

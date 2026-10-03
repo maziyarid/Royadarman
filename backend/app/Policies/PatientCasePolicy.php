@@ -24,7 +24,7 @@ final class PatientCasePolicy
                 ->whereNull('released_at')
                 ->exists(),
             UserRole::Clinician => $this->activeClinicalAssignment($user, $case),
-            UserRole::ClinicRepresentative => DB::table('referral_grants')
+            UserRole::ClinicRepresentative, UserRole::ClinicManager => DB::table('referral_grants')
                 ->join('clinics', 'clinics.id', '=', 'referral_grants.clinic_id')
                 ->join('clinic_memberships', 'clinic_memberships.clinic_id', '=', 'referral_grants.clinic_id')
                 ->join('consent_events', 'consent_events.id', '=', 'referral_grants.consent_event_id')

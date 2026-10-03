@@ -175,10 +175,10 @@ Route::prefix('{locale}')->whereIn('locale', ['fa', 'ar', 'en'])->middleware(Set
         Route::get('/panel/integrations', [IntegrationSettingsController::class, 'index'])->name('integrations.index');
         Route::put('/panel/integrations', [IntegrationSettingsController::class, 'update'])->name('integrations.update');
         Route::get('/panel/administrators', [AdministratorController::class, 'index'])->name('administrators.index');
-        Route::post('/panel/administrators', [AdministratorController::class, 'store'])->name('administrators.store');
-        Route::patch('/panel/administrators/{user}', [AdministratorController::class, 'update'])->name('administrators.update');
-        Route::post('/panel/administrators/{user}/reset-mfa', [AdministratorController::class, 'resetMfa'])->name('administrators.mfa.reset');
-        Route::post('/panel/administrators/{user}/revoke-sessions', [AdministratorController::class, 'revokeSessions'])->name('administrators.sessions.revoke');
+        Route::post('/panel/administrators', [AdministratorController::class, 'store'])->middleware(EnsureRecentAuthentication::class)->name('administrators.store');
+        Route::patch('/panel/administrators/{user}', [AdministratorController::class, 'update'])->middleware(EnsureRecentAuthentication::class)->name('administrators.update');
+        Route::post('/panel/administrators/{user}/reset-mfa', [AdministratorController::class, 'resetMfa'])->middleware(EnsureRecentAuthentication::class)->name('administrators.mfa.reset');
+        Route::post('/panel/administrators/{user}/revoke-sessions', [AdministratorController::class, 'revokeSessions'])->middleware(EnsureRecentAuthentication::class)->name('administrators.sessions.revoke');
         Route::post('/panel/profile/security/totp/start', [ProfileWorkspaceController::class, 'startTotp'])->middleware(EnsureRecentAuthentication::class)->name('panel.profile.security.totp.start');
         Route::post('/panel/profile/security/totp/confirm', [ProfileWorkspaceController::class, 'confirmTotp'])->middleware(EnsureRecentAuthentication::class)->name('panel.profile.security.totp.confirm');
         Route::post('/panel/profile/security/totp/cancel', [ProfileWorkspaceController::class, 'cancelTotp'])->middleware(EnsureRecentAuthentication::class)->name('panel.profile.security.totp.cancel');

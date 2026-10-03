@@ -6,6 +6,7 @@ use App\Domain\Cases\Enums\ServiceType;
 use App\Domain\Discovery\Enums\SuitabilityStatus;
 use App\Domain\Identity\Authorization\MembershipPermissionMap;
 use App\Domain\Identity\Enums\UserRole;
+use App\Domain\Identity\Services\StaffCapabilities;
 use App\Models\ClinicServiceCapability;
 use App\Support\PanelDemoRegistry;
 use App\Support\WorkspaceView;
@@ -309,6 +310,10 @@ final class NetworkAdminController extends Controller
 
     private function authorizeOwner(Request $request): void
     {
-        abort_unless($request->user()?->role === UserRole::Owner && $request->user()->is_active, 403);
+        abort_unless(
+            $request->user()?->is_active
+            && StaffCapabilities::can($request->user()->role, 'network.manage'),
+            403,
+        );
     }
 }

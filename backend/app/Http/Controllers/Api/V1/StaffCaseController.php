@@ -7,6 +7,7 @@ use App\Domain\Cases\Services\CaseWorkflow;
 use App\Domain\Coordination\Services\ReferralLifecycle;
 use App\Domain\Documents\Enums\DocumentStatus;
 use App\Domain\Identity\Enums\UserRole;
+use App\Domain\Identity\Services\StaffCapabilities;
 use App\Http\Controllers\Controller;
 use App\Models\ClinicalDocument;
 use App\Models\PatientCase;
@@ -145,7 +146,11 @@ final class StaffCaseController extends Controller
 
     public function reassignReferral(Request $request, PatientCase $case, ReferralProposal $proposal, ReferralLifecycle $lifecycle): JsonResponse
     {
-        abort_unless($request->user()->role === UserRole::Coordinator && $request->user()->can('view', $case), 404);
+        abort_unless(
+            ($request->user()->role === UserRole::Coordinator || StaffCapabilities::can($request->user()->role, 'coordination.assign'))
+            && $request->user()->can('view', $case),
+            404,
+        );
         abort_unless($proposal->case_id === $case->id, 404);
         $data = $request->validate([
             'clinic_id' => ['required', Rule::exists('clinics', 'id')->where(fn ($query) => $query->where('is_active', true))],
