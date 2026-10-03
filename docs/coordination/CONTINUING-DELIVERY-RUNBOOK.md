@@ -4,8 +4,8 @@
 
 Read this section before the historical September baseline below. The queue and
 ownership rules still apply; dated access/source blockers do not override fresh
-observations. The source baseline verified before the clinician-preview release is
-`2b6dee2c9d4041ebacd2ac1de74509a4c0c495c9` (PR54), 464 matching source hashes. PR49 reconciled live source
+observations. The source baseline verified before the public-home release is
+`c9749fddcae1ffab8b885cfbced4201efbfb3970` (PR55), 469 matching source hashes. PR49 reconciled live source
 and security fixes; PR50 added shared persisted month windows, accepted-referral
 notification correlation, clinic dashboard isolation and real personal profiles;
 PR51 secured all four existing privileged administrator mutations using current
@@ -13,8 +13,8 @@ browser-session assurance and improved their real forms. PR52 added scheduler
 and per-queue execution evidence, strict probe retirement/recovery, and a bound
 readiness interface. Actual live post-activation ticks were observed at15:03:48Z:
 all five components recent, age45s, and independent backlog stateok. This is
-recent execution, not a current-process/provider/capacity guarantee. All453
-captured source hashes match. The earlier checkpoint in this file was stale;
+recent execution, not a current-process/provider/capacity guarantee. PR52
+verified all453 source hashes at its dated release. The earlier checkpoint in this file was stale;
 latest Agiflow/GitHub checkpoints remained authoritative. See the four dated
 release records and latest GitHub issues13/14/15 and RPH49/57/85 comments.
 
@@ -50,12 +50,21 @@ The bounded patient release improves already-existing signed/published/current
 case narratives, original language and actual dates, document progress and withdrawn
 referral controls; case responses prevent storage. See its dated release record
 and final issue15/RPH108 checkpoints for tests and later merge/live identity.
-The bounded clinician slice provides own unsigned saved-draft previews only while
+Deployed PR55 provides own unsigned saved-draft previews only while
 the approved, non-deleted, consented source remains readable. Separate ownership
 addenda claim narrow source guards in createReview/publishReview and document
 status/content. Actual synthetic endpoint regressions, not policy speculation,
 justify the guards. Read the dated clinician release and final issue15/RPH107
-checkpoint before choosing further work; no new signer or retention policy follows. Clinical release notifications remain a separate source-verified
+checkpoint before choosing further work; no new signer or retention policy follows.
+Its full local/VPS 738 tests / 35,191 assertions and private MariaDB85 / 810 pass.
+The subsequent public-home slice embeds the existing real map/discovery payload,
+refreshes the multilingual layout with the actual brand and fixes malformed
+neighborhood array input. It does not expand clinic eligibility/regions or implement
+appointment capacity. CMS-authored home precedence remains unchanged. Read the
+dated homepage release and final issue15/RPH57 checkpoint for actual deployment.
+Verified social targets, remaining placeholder captions and unavailable reference
+images stay tracked; source-based UI work continues after design CLI telemetry
+was rejected, without claiming canvas generation. Clinical release notifications remain a separate source-verified
 gap F-2026-10-03-07. No new signing/dental taxonomy or publication policy is enabled.
 Native Android and iOS remain required and
 unimplemented; proposals, Studio screens and responsive web do not satisfy them.

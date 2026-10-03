@@ -89,7 +89,7 @@ final class PublicPageController extends Controller
 
         return $page
             ? $this->publicResponse('public.marketing-page', $this->viewData($page, $locale, 'home'))
-            : $this->publicResponse('public.home', ['locale' => $locale, 'pageKey' => 'home']);
+            : $this->publicResponse('public.home', ['locale' => $locale, 'pageKey' => 'home', 'discovery' => $this->discoveryViewData($locale)]);
     }
 
     public function services(string $locale): Response
@@ -263,8 +263,8 @@ final class PublicPageController extends Controller
     private function discoveryViewData(string $locale): array
     {
         $ids = array_column(config('royadarman.tehran_neighborhoods', []), 'id');
-        $requested = (string) request()->query('neighborhood_id', 'vanak');
-        $neighborhoodId = in_array($requested, $ids, true) ? $requested : 'vanak';
+        $requested = request()->query('neighborhood_id', 'vanak');
+        $neighborhoodId = is_string($requested) && in_array($requested, $ids, true) ? $requested : 'vanak';
 
         $neighborhoods = [];
         foreach (config('royadarman.tehran_neighborhoods', []) as $n) {

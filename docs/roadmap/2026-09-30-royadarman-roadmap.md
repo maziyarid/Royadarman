@@ -6,8 +6,8 @@ Canonical feature coverage/evidence owner: RPH-57. Decision and hypothesis owner
 
 The dated evidence below retains its history; the September host/source blockers
 are superseded by actual source reconciliation and releases PR49 through PR52.
-The verified pre-clinician-preview baseline is PR54 merge `2b6dee2`, 464 matching
-live source hashes. The final clinician checkpoint records the subsequent tested
+The verified pre-public-home baseline is PR55 merge `c9749fd`, 469 matching
+live source hashes. The final homepage checkpoint records the subsequent tested
 merge, direct-root deployment and private backup identity.
 The root site now includes per-session authentication assurance, committed OTP
 failure counters, integration corruption/operational-readiness handling, real
@@ -51,12 +51,23 @@ read and foreign-patient denial are exercised with synthetic persisted records.
 See its dated release record and RPH108 checkpoint for exact tests/deployment.
 This is not the tooth-level dental-status/workbench milestone. Release notification
 template/event/recipient binding is still absent (F-2026-10-03-07, RPH85/109).
-The bounded clinician slice reads own saved unsigned drafts under existing source
+Deployed PR55 reads own saved unsigned drafts under existing source
 approval/consent/assignment/credential rules and improves real creation/publication
 controls. Actual endpoint tests reproduced approved-plus-deleted source acceptance;
 narrow creation/publication and document status/content guards close that invariant
-without inventing retention or signer policy. See the dated clinician release and
-RPH107/issue15 checkpoints for executed verification and deployed identity.
+without inventing retention or signer policy. Full local/VPS 738 tests / 35,191
+assertions and private MariaDB85 / 810 pass. See the dated clinician release and
+RPH107/issue15 checkpoints for complete verification and deployed identity.
+
+The bounded public homepage slice refreshes the factual multilingual layout and
+embeds the real existing discovery map/list. Strict neighborhood input shape
+normalization fixes reproduced array-query500s. Current Tehran eligibility and
+public redaction stay unchanged; no expanded regions, clinic availability or
+booking backend follows from the new presentation. CMS-authored home precedence
+remains intact. See the dated public-home release and RPH57 checkpoints.
+Verified social destinations, other misleading image captions and lost reference
+screenshot files remain explicit gaps. The design CLI was blocked for unverified
+telemetry; source-based implementation continues without a canvas claim.
 
 Twelve-workspace/branch persistence, capacity-safe clinic booking, clinical report
 sign/release and dental status, clinic ledger/payment rules, authenticated recovery
