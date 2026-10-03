@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Domain\Documents\Enums\DocumentStatus;
+use App\Domain\Identity\Authorization\MembershipPermissionMap;
+use App\Domain\Identity\Enums\UserRole;
 use App\Models\AuditEvent;
 use App\Models\CaseAssignment;
 use App\Models\Clinic;
@@ -95,6 +97,21 @@ final class SeedPanelDemo extends Command
                 }
 
                 $clinic = $this->resolveSyntheticDemoClinic();
+                $clinicUser = $users['clinic'];
+                $accountRole = $clinicUser->role instanceof UserRole
+                    ? $clinicUser->role
+                    : UserRole::tryFrom((string) $clinicUser->getRawOriginal('role'));
+                $membershipDecision = MembershipPermissionMap::assignMembership(
+                    $accountRole,
+                    MembershipPermissionMap::ROLE_CONTACT,
+                    (bool) $clinicUser->is_active,
+                    false,
+                );
+                if (! $membershipDecision->allowed) {
+                    throw new RuntimeException(
+                        'Synthetic demo clinic membership refused by the assignment map: '.$membershipDecision->reason,
+                    );
+                }
 
                 ClinicMembership::query()->updateOrCreate(
                     ['clinic_id' => $clinic->id, 'user_id' => $users['clinic']->id],

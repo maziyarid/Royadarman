@@ -17,7 +17,7 @@
     $showDeliveries = in_array($panelKey, ['owner', 'tech_admin'], true) && !$isDemo;
     $showPolicies = in_array($panelKey, ['owner', 'tech_admin'], true) && !$isDemo;
     $showCases = in_array($panelKey, ['coordinator', 'clinician'], true);
-    $showCalendar = in_array($panelKey, ['coordinator', 'clinic_rep'], true) && !$isDemo;
+    $showCalendar = $panelKey === 'coordinator' && !$isDemo;
 @endphp
 <!doctype html>
 <html lang="{{ $locale }}" dir="{{ $rtl ? 'rtl' : 'ltr' }}">
@@ -34,13 +34,14 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="/assets/workspace.css?v=20260929-deliveries">
-    <script src="/assets/workspace.js?v=20260921" defer></script>
+    <link rel="stylesheet" href="/assets/workspace-refinement.css?v=20260930">
+    <script src="/assets/workspace.js?v=20260930" defer></script>
     @stack('scripts')
 </head>
 <body class="workspace-body" data-dialog-ok="{{ __('panel.dialog.ok') }}" data-dialog-cancel="{{ __('panel.dialog.cancel') }}" data-dialog-url="{{ __('panel.dialog.url') }}">
 <a class="skip-link" href="#main">{{ __('ui.skip') }}</a>
 <div class="app-shell" data-workspace>
-    <aside class="app-sidebar">
+    <aside class="app-sidebar" id="workspace-navigation">
         <div class="app-brand">
             <img src="/assets/brand-mark.svg" width="38" height="38" alt="">
             <div>
@@ -59,6 +60,12 @@
             @endif
             @if($panelKey === 'coordinator' && !$isDemo)
                 <a class="{{ $nav === 'tasks' ? 'active' : '' }}" href="{{ route('panel.tasks.index', ['locale' => $locale]) }}">{{ __('panel.nav.tasks') }}</a>
+            @endif
+            @if($showCalendar)
+                <a class="{{ $nav === 'calendar' ? 'active' : '' }}" href="{{ route('panel.calendar.index', ['locale' => $locale]) }}">{{ __('panel.nav.calendar') }}</a>
+            @endif
+            @if($showAnalytics)
+                <a class="{{ $nav === 'analytics' ? 'active' : '' }}" href="{{ route('panel.analytics.index', ['locale' => $locale]) }}">{{ __('panel.nav.analytics') }}</a>
             @endif
             @if($showHome)
                 <a class="{{ $nav === 'home-service' ? 'active' : '' }}" href="{{ route('panel.home-service.index', ['locale' => $locale]) }}">{{ __('panel.nav.home_service') }}</a>
@@ -98,9 +105,10 @@
             <button class="btn" type="button" data-logout data-locale="{{ $locale }}" data-home="{{ $home }}">{{ __('panel.logout') }}</button>
         </div>
     </aside>
+    <button class="nav-backdrop" type="button" data-nav-dismiss tabindex="-1" aria-label="{{ __('panel.dialog.cancel') }}"></button>
     <div class="app-main">
         <header class="app-topbar">
-            <button class="btn mobile-nav" type="button" data-mobile-nav aria-label="{{ __('site.menu') }}">☰</button>
+            <button class="btn mobile-nav" type="button" data-mobile-nav aria-controls="workspace-navigation" aria-expanded="false" aria-label="{{ __('site.menu') }}">☰</button>
             <h1>@yield('heading', __('panel.roles.'.$panelKey.'.title'))</h1>
             @if(!$isDemo)
                 <form class="topbar-search" method="get" action="{{ route('panel.search.index', ['locale' => $locale]) }}" role="search">

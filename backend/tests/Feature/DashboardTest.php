@@ -13,6 +13,7 @@ use App\Models\OutboxEvent;
 use App\Models\PatientCase;
 use App\Models\PolicyVersion;
 use App\Models\Practitioner;
+use App\Models\PublicationEvent;
 use App\Models\ReferralGrant;
 use App\Models\ReferralProposal;
 use App\Models\ReviewRevision;
@@ -253,5 +254,53 @@ final class DashboardTest extends TestCase
             $this->assertSame(200, $resp->status(), "Role {$role->value} failed");
             $this->assertSame($role->value, $resp->json('data.role'), "Role mismatch for {$role->value}");
         }
+    }
+
+    public function test_signed_review_without_a_publication_event_is_not_an_open_draft(): void
+    {
+        $clinician = User::factory()->create(['role' => 'clinician']);
+        $patient = User::factory()->create(['role' => 'patient', 'phone_hash' => hash('sha256', 'draft-gap')]);
+        $case = $this->makeCase($patient);
+        $document = $this->approvedDocument($case);
+
+        $fields = [
+            'case_id' => $case->id,
+            'clinical_document_id' => $document->id,
+            'clinician_user_id' => $clinician->id,
+            'source_language' => 'fa',
+            'image_adequacy' => 'adequate',
+            'observations' => 'obs',
+            'limitations' => 'none',
+            'options' => 'opt',
+            'recommended_next_step' => 'visit',
+        ];
+
+        $draft = ReviewRevision::query()->create($fields + ['revision_number' => 1]);
+        $signedOnly = ReviewRevision::query()->create($fields + [
+            'revision_number' => 2,
+            'signed_at' => now(),
+        ]);
+        $published = ReviewRevision::query()->create($fields + [
+            'revision_number' => 3,
+            'signed_at' => now(),
+        ]);
+        PublicationEvent::query()->create([
+            'review_revision_id' => $published->id,
+            'actor_user_id' => $clinician->id,
+            'event' => 'published',
+            'created_at' => now(),
+        ]);
+
+        $resp = $this->actingAs($clinician)->getJson('/api/v1/dashboard')->assertOk();
+        $ids = collect($resp->json('data.assigned_reviews'))->pluck('id');
+
+        $this->assertSame(1, $resp->json('data.open_drafts_count'));
+        $this->assertTrue($ids->contains($draft->id));
+        $this->assertFalse($ids->contains($signedOnly->id));
+        $this->assertTrue($ids->contains($published->id));
+        $row = collect($resp->json('data.assigned_reviews'))->firstWhere('id', $published->id);
+        $this->assertTrue($row['is_published']);
+        $draftRow = collect($resp->json('data.assigned_reviews'))->firstWhere('id', $draft->id);
+        $this->assertFalse($draftRow['is_published']);
     }
 }

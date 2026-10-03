@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'read_failure' => 'The stored setting could not be read or validated. Review the override and effective server configuration before relying on this integration.',
     'title' => 'API & integration settings',
     'intro' => 'Add external-service credentials here after you obtain them. Database overrides apply immediately; environment configuration remains the fallback.',
     'security_note' => 'Secret values are encrypted at rest and are never displayed again after saving. A blank secret field keeps the existing value. Use “Remove database override” to fall back to the server environment.',
@@ -13,6 +14,7 @@ return [
     'clear_override' => 'Remove database override',
     'generic_http' => 'Generic HTTPS provider',
     'source' => [
+        'safety_fallback' => 'Temporarily disabled for safety',
         'database' => 'Admin setting',
         'environment' => 'Server environment',
         'none' => 'No active value',

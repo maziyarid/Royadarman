@@ -8,11 +8,9 @@ use App\Support\DigitNormalizer;
 use App\Support\JalaliCalendar;
 use App\Support\WorkspaceView;
 use Carbon\CarbonImmutable;
-use DateTimeZone;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -70,11 +68,21 @@ final class NotificationDeliveryController extends Controller
                     ->orWhere('d.failure_code', 'like', '%'.$search.'%');
             });
         }
-        if (! empty($filters['status'])) $query->where('d.status', $filters['status']);
-        if (! empty($filters['locale'])) $query->where('d.recipient_locale', $filters['locale']);
-        if (! empty($filters['channel'])) $query->where('d.channel', $filters['channel']);
-        if ($fromUtc !== null) $query->where('d.created_at', '>=', $fromUtc);
-        if ($toUtc !== null) $query->where('d.created_at', '<', $toUtc);
+        if (! empty($filters['status'])) {
+            $query->where('d.status', $filters['status']);
+        }
+        if (! empty($filters['locale'])) {
+            $query->where('d.recipient_locale', $filters['locale']);
+        }
+        if (! empty($filters['channel'])) {
+            $query->where('d.channel', $filters['channel']);
+        }
+        if ($fromUtc !== null) {
+            $query->where('d.created_at', '>=', $fromUtc);
+        }
+        if ($toUtc !== null) {
+            $query->where('d.created_at', '<', $toUtc);
+        }
 
         if (($filters['export'] ?? '') === 'csv') {
             $rows = (clone $query)->orderByDesc('d.created_at')->limit(10000)->get();
@@ -82,7 +90,7 @@ final class NotificationDeliveryController extends Controller
 
             return response()->streamDownload(function () use ($rows, $locale): void {
                 $out = fopen('php://output', 'w');
-                fwrite($out, "\\xEF\\xBB\\xBF");
+                fwrite($out, '\\xEF\\xBB\\xBF');
                 fputcsv($out, [
                     __('panel.deliveries.created'), __('panel.deliveries.event'),
                     __('panel.deliveries.template'), __('panel.deliveries.channel'),
@@ -132,16 +140,22 @@ final class NotificationDeliveryController extends Controller
 
     private function localDateBoundary(string $value, string $locale, bool $exclusiveEnd): ?string
     {
-        if ($value === '') return null;
+        if ($value === '') {
+            return null;
+        }
         $date = $this->localCalendarDate($value, $locale);
-        if ($exclusiveEnd) $date = $date->addDay();
+        if ($exclusiveEnd) {
+            $date = $date->addDay();
+        }
 
         return $date->setTimezone('UTC')->format('Y-m-d H:i:s');
     }
 
     private function localCalendarDate(string $value, string $locale): CarbonImmutable
     {
-        if (! preg_match('/^(\\d{4})-(\\d{2})-(\\d{2})$/', $value, $parts)) abort(422, __('panel.deliveries.invalid_date'));
+        if (! preg_match('/^(\\d{4})-(\\d{2})-(\\d{2})$/', $value, $parts)) {
+            abort(422, __('panel.deliveries.invalid_date'));
+        }
         $year = (int) $parts[1];
         $month = (int) $parts[2];
         $day = (int) $parts[3];
@@ -160,6 +174,7 @@ final class NotificationDeliveryController extends Controller
         $date = CarbonImmutable::parse($utc, 'UTC')->setTimezone(self::DISPLAY_TIMEZONE);
         if ($locale === 'fa') {
             [$year, $month, $day] = JalaliCalendar::fromGregorian((int) $date->format('Y'), (int) $date->format('m'), (int) $date->format('d'));
+
             return JalaliCalendar::toPersianDigits(sprintf('%04d/%02d/%02d %s', $year, $month, $day, $date->format('H:i')));
         }
 

@@ -135,6 +135,7 @@ final class OperationsCalendarController extends Controller
                 [$gy, $gm, $gd] = JalaliCalendar::toGregorian($jalaliYear, $jalaliMonth, $day);
                 $date = CarbonImmutable::create($gy, $gm, $gd, 0, 0, 0, $timezone);
                 $dateKey = JalaliCalendar::key($jalaliYear, $jalaliMonth, $day);
+
                 return [
                     'date' => $date,
                     'key' => $dateKey,
@@ -144,6 +145,7 @@ final class OperationsCalendarController extends Controller
                     'events' => $events->filter(function ($event) use ($timezone, $jalaliYear, $jalaliMonth, $day): bool {
                         $local = $event['at']->timezone($timezone);
                         [$jy, $jm, $jd] = JalaliCalendar::fromGregorian((int) $local->format('Y'), (int) $local->format('m'), (int) $local->format('d'));
+
                         return $jy === $jalaliYear && $jm === $jalaliMonth && $jd === $day;
                     })->values(),
                 ];
@@ -155,6 +157,7 @@ final class OperationsCalendarController extends Controller
             $todayKey = JalaliCalendar::key($todayYear, $todayMonth, $todayDay);
             $days = $days->map(function (array $day) use ($todayKey): array {
                 $day['today'] = $day['key'] === $todayKey;
+
                 return $day;
             });
             $weekdays = JalaliCalendar::WEEKDAYS;
@@ -162,6 +165,7 @@ final class OperationsCalendarController extends Controller
             $days = collect(range(1, $daysInMonth))->map(function (int $day) use ($month, $events): array {
                 $date = $month->setDay($day);
                 $dateKey = $date->format('Y-m-d');
+
                 return ['date' => $date, 'key' => $dateKey, 'day_number' => $date->day, 'weekday' => $date->locale('en')->isoFormat('ddd'), 'friday' => false, 'today' => $date->isToday(), 'events' => $events->filter(fn ($event) => $event['at']->timezone($date->timezone)->format('Y-m-d') === $dateKey)->values()];
             });
             $leading = $month->startOfMonth()->dayOfWeekIso - 1;

@@ -106,11 +106,12 @@
 <section class="card pad">
     <h2>{{ __('panel.launch.runtime_title') }}</h2>
     <div class="facts">
-        <div class="fact"><small>{{ __('panel.launch.queued_jobs') }}</small>{{ $queuedJobs }}</div>
-        <div class="fact"><small>{{ __('panel.launch.failed_jobs') }}</small>{{ $failedJobs }}</div>
+        <div class="fact"><small>{{ __('panel.launch.queued_jobs') }}</small>{{ $queuedJobs ?? '—' }}</div>
+        <div class="fact"><small>{{ __('panel.launch.failed_jobs') }}</small>{{ $failedJobs ?? '—' }}</div>
         <div class="fact"><small>{{ __('panel.launch.release') }}</small><bdi>{{ $release['commit'] ?? '—' }}</bdi></div>
         <div class="fact"><small>{{ __('panel.launch.built_at') }}</small><bdi>{{ $release['built_at'] ?? '—' }}</bdi></div>
     </div>
+    <p class="notice">{{ __('panel.launch.worker_unobservable') }}</p>
 </section>
 
 <section class="card pad">

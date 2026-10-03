@@ -115,15 +115,18 @@ final class DashboardService
         $assignedReviews = ReviewRevision::query()
             ->where('clinician_user_id', $user->id)
             ->whereDoesntHave('supersededBy')
+            ->where(function ($query): void {
+                $query->whereNull('signed_at')
+                    ->orWhereHas('publicationEvents', fn ($inner) => $inner->where('event', 'published'));
+            })
             ->when($isDemo, fn ($q) => $q->whereHas('case', fn ($case) => $this->demoCases($case)))
             ->with(['case:id,status,public_reference', 'publicationEvents'])
             ->latest()->limit(20)->get();
 
         $openDrafts = ReviewRevision::query()
             ->where('clinician_user_id', $user->id)
-            ->whereDoesntHave('supersededBy')
+            ->whereNull('signed_at')
             ->when($isDemo, fn ($q) => $q->whereHas('case', fn ($case) => $this->demoCases($case)))
-            ->whereDoesntHave('publicationEvents', fn ($q) => $q->where('event', 'published'))
             ->count();
 
         return [

@@ -97,6 +97,34 @@ final class DocumentStreamingHeadersTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_a_stranger_does_not_learn_a_rejected_or_failed_scan(): void
+    {
+        [$patient, $case, $document] = $this->seedApprovedDocument();
+        $stranger = User::factory()->create(['role' => 'patient']);
+        $clinician = User::factory()->create(['role' => 'clinician']);
+        $this->makeAssignedVerifiedClinician($clinician, $case);
+
+        $document->update(['status' => DocumentStatus::Rejected]);
+        $this->actingAs($stranger)
+            ->getJson("/api/v1/cases/{$case->id}/documents/{$document->id}/content")
+            ->assertNotFound();
+        $this->actingAs($clinician)
+            ->getJson("/api/v1/cases/{$case->id}/documents/{$document->id}/content")
+            ->assertForbidden()
+            ->assertJsonPath('error.code', 'document.rejected');
+
+        $document->update(['status' => DocumentStatus::ScanFailed]);
+        $this->actingAs($stranger)
+            ->getJson("/api/v1/cases/{$case->id}/documents/{$document->id}/content")
+            ->assertNotFound();
+        $this->actingAs($clinician)
+            ->getJson("/api/v1/cases/{$case->id}/documents/{$document->id}/content")
+            ->assertStatus(503)
+            ->assertJsonPath('error.code', 'document.scan_failed');
+
+        $this->assertDatabaseCount('document_access_events', 0);
+    }
+
     public function test_csp_header_restricts_inline_content(): void
     {
         [$patient, $case, $document] = $this->seedApprovedDocument();

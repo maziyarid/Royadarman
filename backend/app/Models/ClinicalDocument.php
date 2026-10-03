@@ -55,4 +55,9 @@ class ClinicalDocument extends Model
     {
         return $this->belongsTo(PatientCase::class, 'case_id');
     }
+
+    public function consentEvent(): BelongsTo
+    {
+        return $this->belongsTo(ConsentEvent::class);
+    }
 }

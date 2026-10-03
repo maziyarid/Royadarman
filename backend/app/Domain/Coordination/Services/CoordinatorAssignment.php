@@ -3,6 +3,7 @@
 namespace App\Domain\Coordination\Services;
 
 use App\Domain\Identity\Enums\UserRole;
+use App\Models\AuditEvent;
 use App\Models\PatientCase;
 use App\Support\DomainException;
 use Illuminate\Support\Facades\DB;
@@ -51,15 +52,14 @@ final class CoordinatorAssignment
         $case->current_coordinator_id = $coordinator->id;
         $case->save();
 
-        DB::table('audit_events')->insert([
-            'id' => (string) Str::ulid(),
+        AuditEvent::query()->create([
             'actor_user_id' => null,
             'action' => 'case.coordinator_auto_assigned',
             'resource_type' => PatientCase::class,
             'resource_id' => (string) $case->id,
             'result' => 'success',
             'reason' => 'least_loaded_active_coordinator',
-            'context' => json_encode(['coordinator_user_id' => (int) $coordinator->id], JSON_THROW_ON_ERROR),
+            'context' => ['coordinator_user_id' => (int) $coordinator->id],
             'correlation_id' => (string) Str::ulid(),
             'created_at' => now(),
         ]);

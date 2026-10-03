@@ -43,11 +43,14 @@ final class DocumentController extends Controller
     public function content(Request $request, PatientCase $case, ClinicalDocument $document): StreamedResponse|JsonResponse
     {
         abort_unless($document->case_id === $case->id, 404);
-        if ($document->status === DocumentStatus::Rejected) {
-            return response()->json(['error' => ['code' => 'document.rejected'], 'request_id' => $request->attributes->get('request_id')], 403);
-        }
-        if ($document->status === DocumentStatus::ScanFailed) {
-            return response()->json(['error' => ['code' => 'document.scan_failed'], 'request_id' => $request->attributes->get('request_id')], 503);
+        if ($document->status === DocumentStatus::Rejected || $document->status === DocumentStatus::ScanFailed) {
+            abort_unless($request->user()->can('learnStatus', $document), 404);
+            $failed = $document->status === DocumentStatus::ScanFailed;
+
+            return response()->json([
+                'error' => ['code' => $failed ? 'document.scan_failed' : 'document.rejected'],
+                'request_id' => $request->attributes->get('request_id'),
+            ], $failed ? 503 : 403);
         }
         abort_unless($request->user()->can('view', $document), 404);
 

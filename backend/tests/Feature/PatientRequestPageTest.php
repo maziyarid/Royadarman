@@ -44,12 +44,15 @@ class PatientRequestPageTest extends TestCase
             ->assertSee('/assets/patient-request.js', false)
             ->assertSee('guidance_referral', false)
             ->assertSee('data-patient-request', false)
+            ->assertSee('/assets/patient-request.css?v=20261003', false)
+            ->assertSee('<progress', false)
+            ->assertDontSee('style=', false)
             ->assertDontSee('<style>', false);
 
         $script = file_get_contents(public_path('assets/patient-request.js'));
         $this->assertIsString($script);
         $this->assertStringContainsString('/api/v1/policies/case_coordination', $script);
         $this->assertStringContainsString('Idempotency-Key', $script);
-        $this->assertStringContainsString('content_hash:policy.content_hash', $script);
+        $this->assertMatchesRegularExpression('/content_hash\s*:\s*policy\.content_hash/', $script);
     }
 }

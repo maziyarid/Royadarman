@@ -8,14 +8,17 @@ use InvalidArgumentException;
 final class JalaliCalendar
 {
     public const MONTHS = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+
     public const WEEKDAYS = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
+
     private const GREGORIAN_DAYS_BEFORE_MONTH = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+
     private const PERSIAN_DIGITS = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
 
     /** @return array{0:int,1:int,2:int} */
     public static function fromGregorian(int $gy, int $gm, int $gd): array
     {
-        if (!checkdate($gm, $gd, $gy)) {
+        if (! checkdate($gm, $gd, $gy)) {
             throw new InvalidArgumentException('Invalid Gregorian date.');
         }
         $jy = $gy <= 1600 ? 0 : 979;
@@ -34,13 +37,14 @@ final class JalaliCalendar
         if ($days < 186) {
             return [$jy, 1 + intdiv($days, 31), 1 + ($days % 31)];
         }
+
         return [$jy, 7 + intdiv($days - 186, 30), 1 + (($days - 186) % 30)];
     }
 
     /** @return array{0:int,1:int,2:int} */
     public static function toGregorian(int $jy, int $jm, int $jd): array
     {
-        if (!self::isValid($jy, $jm, $jd)) {
+        if (! self::isValid($jy, $jm, $jd)) {
             throw new InvalidArgumentException('Invalid Jalali date.');
         }
         $gy = $jy <= 979 ? 621 : 1600;
@@ -68,18 +72,35 @@ final class JalaliCalendar
         for ($gm = 1; $gm <= 12 && $gd > $monthLengths[$gm]; $gm++) {
             $gd -= $monthLengths[$gm];
         }
+
         return [$gy, $gm, $gd];
     }
+
+    private const LEAP_CYCLE_YEARS = [1, 5, 9, 13, 17, 22, 26, 30];
 
     public static function monthLength(int $jy, int $jm): int
     {
         if ($jm < 1 || $jm > 12 || $jy < 1) {
             throw new InvalidArgumentException('Invalid Jalali month.');
         }
-        if ($jm <= 6) return 31;
-        if ($jm <= 11) return 30;
-        $cycleYear = (($jy - ($jy > 0 ? 474 : 473)) % 2820 + 2820) % 2820 + 474 + 38;
-        return (($cycleYear * 682) % 2816) < 682 ? 30 : 29;
+        if ($jm <= 6) {
+            return 31;
+        }
+        if ($jm <= 11) {
+            return 30;
+        }
+
+        return self::isLeap($jy) ? 30 : 29;
+    }
+
+    /** Same 33-year leap cycle that fromGregorian/toGregorian embed, so validity, month grids and conversions cannot disagree. */
+    public static function isLeap(int $jy): bool
+    {
+        if ($jy < 1) {
+            throw new InvalidArgumentException('Invalid Jalali year.');
+        }
+
+        return in_array($jy % 33, self::LEAP_CYCLE_YEARS, true);
     }
 
     public static function isValid(int $jy, int $jm, int $jd): bool
@@ -99,7 +120,10 @@ final class JalaliCalendar
 
     public static function monthLabel(int $jy, int $jm): string
     {
-        if ($jm < 1 || $jm > 12) throw new InvalidArgumentException('Invalid Jalali month.');
+        if ($jm < 1 || $jm > 12) {
+            throw new InvalidArgumentException('Invalid Jalali month.');
+        }
+
         return self::toPersianDigits(self::MONTHS[$jm - 1].' '.$jy);
     }
 
