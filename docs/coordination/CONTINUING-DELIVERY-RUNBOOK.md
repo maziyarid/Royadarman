@@ -4,15 +4,21 @@
 
 Read this section before the historical September baseline below. The queue and
 ownership rules still apply; dated access/source blockers do not override fresh
-observations. Current released main and canonical cPanel repo are
-`a5d7df5fb348d1b6c22939aa0e6adfd24b524626` (PR51). PR49 reconciled live source
+observations. The source baseline verified before this analytics release is
+`4a87ceb70b08f298fe7144ec229130d156392018` (PR52). PR49 reconciled live source
 and security fixes; PR50 added shared persisted month windows, accepted-referral
 notification correlation, clinic dashboard isolation and real personal profiles;
 PR51 secured all four existing privileged administrator mutations using current
-browser-session assurance and improved their real forms. See the three dated
+browser-session assurance and improved their real forms. PR52 added scheduler
+and per-queue execution evidence, strict probe retirement/recovery, and a bound
+readiness interface. Actual live post-activation ticks were observed at15:03:48Z:
+all five components recent, age45s, and independent backlog stateok. This is
+recent execution, not a current-process/provider/capacity guarantee. All453
+captured source hashes match. The earlier checkpoint in this file was stale;
+latest Agiflow/GitHub checkpoints remained authoritative. See the four dated
 release records and latest GitHub issues13/14/15 and RPH49/57/85 comments.
 
-Full isolated VPS PHP8.3.33 suite610 tests/33,823 assertions passes. MariaDB
+Full isolated VPS PHP8.3.33 suite656 tests/34,317 assertions passes. MariaDB
 checks use a separate physical datadir/socket, synthetic records and disabled
 networking. These are not tests against the production database or authenticated
 production browser demonstrations. The queue service and minute cron were
@@ -31,8 +37,16 @@ G2 live membership publication and assignment regressions are integrated; retain
 own-clinic isolation and build scoped workspace/branch persistence on fresh main.
 PX1 session assurance and PX4 corruption handling are integrated; PX2 staff MFA
 enrolment/recovery activation still awaits explicit policy. Codex claim on issue15
-adds harmless per-queue/scheduler runtime probes and bound readiness UI; leave
-those exact paths to this slice. Native Android and iOS remain required and
+completed harmless per-queue/scheduler runtime probes and bound readiness UI.
+Their explicit activation/retirement lifecycle must be preserved; read the
+runtime release document before removing job code. The next bounded analytics release delivers real owner count/window corrections,
+recorded referral lifecycle projection, Tehran Saturday series and CSP-safe charts.
+See docs/operations/2026-10-03-analytics-release.md and the final issue15 checkpoint
+for its executed tests, merge/deployment SHA and private backup identity. No
+accountant/supervisor access follows from the owner's projection. The next
+backend lanes remain G1 week/capacity and G2 scoped workspace/branch persistence;
+clinical/finance/mobile activation gates and assigned decisions remain explicit.
+Native Android and iOS remain required and
 unimplemented; proposals, Studio screens and responsive web do not satisfy them.
 
 Draft PR28/45/46/47 are not wholesale integration approvals. In particular,
@@ -58,7 +72,11 @@ coordination source when a worker cannot access that Agiflow account. Codex
 mirrors accepted GitHub evidence back to Agiflow. A failed connector lookup is
 not evidence that a task does not exist or that work is prohibited.
 
-| Item | Latest evidenced state | Important limit |
+The following table preserves the historical30September checkpoint. The verified
+3October section above and latest release records supersede its source/host/
+restore blockers; do not repeat them as current facts.
+
+| Item | Historical evidenced state | Important limit |
 | --- | --- | --- |
 | Main baseline | PR #11 merged, f99210e05c1fef2e186d76e625164cc4ea101d8a | Fetch current main; this is a dated baseline, not a permanent pin |
 | Frontend | PR #12, frontend/20260930, ac7bd87224a37c90c6ef87eb50f222eae7bef0b7; 17 presentation files deployed | PR was open at checkpoint; browser and authenticated walkthrough still unverified |
