@@ -4,8 +4,8 @@
 
 Read this section before the historical September baseline below. The queue and
 ownership rules still apply; dated access/source blockers do not override fresh
-observations. The source baseline verified before the patient-report release is
-`a00407c5856d94cedd9ea94ca16705cd6c7a1c19` (PR53),459 matching source hashes. PR49 reconciled live source
+observations. The source baseline verified before the clinician-preview release is
+`2b6dee2c9d4041ebacd2ac1de74509a4c0c495c9` (PR54), 464 matching source hashes. PR49 reconciled live source
 and security fixes; PR50 added shared persisted month windows, accepted-referral
 notification correlation, clinic dashboard isolation and real personal profiles;
 PR51 secured all four existing privileged administrator mutations using current
@@ -50,9 +50,12 @@ The bounded patient release improves already-existing signed/published/current
 case narratives, original language and actual dates, document progress and withdrawn
 referral controls; case responses prevent storage. See its dated release record
 and final issue15/RPH108 checkpoints for tests and later merge/live identity.
-Next safe Codex work is own unsigned clinician draft preview only while its
-existing approved/consented source remains readable; exact method ownership must
-be claimed first. Clinical release notifications remain a separate source-verified
+The bounded clinician slice provides own unsigned saved-draft previews only while
+the approved, non-deleted, consented source remains readable. Separate ownership
+addenda claim narrow source guards in createReview/publishReview and document
+status/content. Actual synthetic endpoint regressions, not policy speculation,
+justify the guards. Read the dated clinician release and final issue15/RPH107
+checkpoint before choosing further work; no new signer or retention policy follows. Clinical release notifications remain a separate source-verified
 gap F-2026-10-03-07. No new signing/dental taxonomy or publication policy is enabled.
 Native Android and iOS remain required and
 unimplemented; proposals, Studio screens and responsive web do not satisfy them.

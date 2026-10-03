@@ -35,6 +35,7 @@ final class DocumentController extends Controller
     public function status(Request $request, PatientCase $case, ClinicalDocument $document): JsonResponse
     {
         abort_unless($document->case_id === $case->id, 404);
+        abort_unless($document->deleted_at === null, 404);
         abort_unless($request->user()->can('view', $document), 404);
 
         return response()->json(['data' => ['id' => $document->id, 'status' => $document->status->value, 'mime' => $document->detected_mime, 'bytes' => $document->byte_size]])->header('Cache-Control', 'private, no-store');
@@ -43,6 +44,7 @@ final class DocumentController extends Controller
     public function content(Request $request, PatientCase $case, ClinicalDocument $document): StreamedResponse|JsonResponse
     {
         abort_unless($document->case_id === $case->id, 404);
+        abort_unless($document->deleted_at === null, 404);
         if ($document->status === DocumentStatus::Rejected || $document->status === DocumentStatus::ScanFailed) {
             abort_unless($request->user()->can('learnStatus', $document), 404);
             $failed = $document->status === DocumentStatus::ScanFailed;

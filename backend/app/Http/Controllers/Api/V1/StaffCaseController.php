@@ -209,6 +209,7 @@ final class StaffCaseController extends Controller
                 ->where('id', $data['clinical_document_id'])
                 ->where('case_id', $case->id)
                 ->where('status', DocumentStatus::Approved)
+                ->whereNull('deleted_at')
                 ->lockForUpdate()
                 ->first();
             if ($doc === null) {
@@ -267,6 +268,7 @@ final class StaffCaseController extends Controller
                 ->where('id', $locked->clinical_document_id)
                 ->where('case_id', $case->id)
                 ->where('status', DocumentStatus::Approved)
+                ->whereNull('deleted_at')
                 ->lockForUpdate()
                 ->first();
             if ($document === null) {
