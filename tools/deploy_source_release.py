@@ -15,7 +15,7 @@ import tempfile
 APP = pathlib.Path('/home/royadarman/apps/royadarman-backend')
 WEB = pathlib.Path('/home/royadarman/public_html')
 PHP = '/opt/cpanel/ea-php83/root/usr/bin/php'
-PREFIXES = ('backend/app/', 'backend/lang/', 'backend/resources/views/',
+PREFIXES = ('backend/app/', 'backend/lang/', 'backend/resources/views/', 'backend/routes/',
             'backend/public/assets/', 'deployment/webroot/assets/')
 
 
@@ -93,6 +93,16 @@ def main():
         if not args.apply:
             print(json.dumps({'commit': commit, 'dry_run': True, 'changed_files': changes}))
             return 0
+        blocked = []
+        for name in changes:
+            parent = target(name).parent
+            while not parent.exists():
+                parent = parent.parent
+            if not os.access(parent, os.W_OK | os.X_OK):
+                blocked.append(str(parent))
+        if blocked:
+            print(json.dumps({'error': 'source_parent_not_writable', 'paths': sorted(set(blocked))}))
+            return 1
         stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
         # Older root-owned archives retain their existing private permissions.
         backup_root = pathlib.Path('/home/royadarman/royadarman-source-backups')
