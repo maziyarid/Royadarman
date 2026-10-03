@@ -49,6 +49,9 @@ return [
         'nav_snapp' => 'Copy destination + open Snapp',
         'nav_tapsi' => 'Copy destination + open Tapsi',
         'destination_copied' => 'Destination coordinates were copied. Paste them into the ride app.',
+        'destination_copy_failed' => 'Automatic copying failed. You can manually copy the public clinic destination below.',
+        'destination_manual_copy_label' => 'Public clinic destination coordinates',
+        'destination_manual_copy_help' => 'Select these coordinates and copy them to your navigation or transport app. This does not book a trip or an appointment.',
         'map_attribution_note' => 'The embedded map uses OpenStreetMap data. Choosing a navigation provider takes you to that provider.',
     ],
     'photos' => [

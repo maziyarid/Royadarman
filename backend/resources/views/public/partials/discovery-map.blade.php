@@ -37,6 +37,14 @@
             <p class="discovery-boundary">{{ $copy['not_available_claim'] }}</p>
             <p class="discovery-privacy">{{ $copy['location_ephemeral'] }}</p>
             <p class="discovery-status" data-discovery-status role="status" aria-live="polite"></p>
+            @if($enhancementReady)
+                <link rel="stylesheet" href="/assets/discovery-copy.css?v=20261003">
+                <div class="discovery-copy-fallback" data-discovery-copy-fallback hidden>
+                    <label for="discovery-copy-value">{{ $copy['destination_manual_copy_label'] }}</label>
+                    <textarea id="discovery-copy-value" data-discovery-copy-value readonly dir="ltr" rows="2" spellcheck="false" autocomplete="off" aria-describedby="discovery-copy-help"></textarea>
+                    <p id="discovery-copy-help">{{ $copy['destination_manual_copy_help'] }}</p>
+                </div>
+            @endif
 
             <div class="discovery-layout">
                 <div>

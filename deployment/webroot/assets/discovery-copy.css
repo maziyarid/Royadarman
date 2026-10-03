@@ -1,0 +1,7 @@
+[data-discovery-root] .discovery-copy-fallback{display:grid;gap:.65rem;max-width:760px;margin-block:1rem 1.4rem;padding:1rem 1.2rem;border:1px solid #cedee7;border-inline-start:4px solid #58978a;border-radius:.85rem;background:#f3f8f7;color:#29465b;min-width:0;box-sizing:border-box}
+[data-discovery-root] .discovery-copy-fallback[hidden]{display:none!important}
+[data-discovery-root] .discovery-copy-fallback label{font-size:.9rem;font-weight:700;line-height:1.8}
+[data-discovery-root] .discovery-copy-fallback textarea{display:block;width:100%;min-width:0;min-height:3.5rem;padding:.65rem .8rem;box-sizing:border-box;border:1px solid #b8cad5;border-radius:.55rem;background:#fff;color:#233e56;font-family:inherit;font-size:1rem;line-height:1.6;resize:vertical;text-align:start;direction:ltr;font-variant-numeric:tabular-nums}
+[data-discovery-root] .discovery-copy-fallback textarea:focus-visible{outline:3px solid #147d72;outline-offset:3px}
+[data-discovery-root] .discovery-copy-fallback p{margin:0;color:#50697a;font-size:.83rem;line-height:1.9;overflow-wrap:anywhere}
+@media(max-width:700px){[data-discovery-root] .discovery-copy-fallback{padding:1rem}[data-discovery-root] .discovery-copy-fallback textarea{font-size:.95rem}}

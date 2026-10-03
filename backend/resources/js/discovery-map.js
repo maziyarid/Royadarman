@@ -4,6 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 const GPS_KEYS = ["latitude", "longitude", "lat", "lng", "gps", "origin_lat", "origin_lng"];
 const SNAPP_URL = "https://snapp.ir/";
 const TAPSI_URL = "https://tapsi.ir/";
+const copyAttempts = new WeakMap();
 
 function text(copy, key) {
   return copy && typeof copy[key] === "string" ? copy[key] : "";
@@ -170,21 +171,46 @@ function applyOriginToLinks(root, origin) {
 }
 
 async function copyDestination(root, value, copy) {
+  const attempt = {};
+  copyAttempts.set(root, attempt);
+  const isCurrent = () => copyAttempts.get(root) === attempt;
+  let copied = false;
   try {
     await navigator.clipboard.writeText(value);
-    setStatus(root, text(copy, "destination_copied"));
+    copied = true;
   } catch {
-    const fallback = document.createElement("textarea");
-    fallback.value = value;
-    fallback.setAttribute("readonly", "");
-    fallback.style.position = "fixed";
-    fallback.style.opacity = "0";
-    document.body.append(fallback);
-    fallback.select();
-    document.execCommand("copy");
-    fallback.remove();
-    setStatus(root, text(copy, "destination_copied"));
+    if (!isCurrent()) return false;
+    const previousFocus = document.activeElement;
+    let buffer = null;
+    try {
+      buffer = document.createElement("textarea");
+      buffer.value = value;
+      buffer.className = "visually-hidden";
+      buffer.setAttribute("readonly", "");
+      document.body.append(buffer);
+      buffer.focus();
+      if (!isCurrent()) return false;
+      buffer.select();
+      copied = typeof document.execCommand === "function" && document.execCommand("copy") === true;
+    } catch {
+      copied = false;
+    } finally {
+      buffer?.remove();
+      if (isCurrent()) previousFocus?.focus?.();
+    }
   }
+
+  if (!isCurrent()) return copied;
+  const manual = root.querySelector("[data-discovery-copy-value]");
+  const fallback = root.querySelector("[data-discovery-copy-fallback]");
+  if (manual) manual.value = copied ? "" : value;
+  if (fallback) fallback.hidden = copied;
+  setStatus(root, text(copy, copied ? "destination_copied" : "destination_copy_failed"));
+  if (!copied && manual) {
+    manual.focus();
+    if (isCurrent()) manual.select();
+  }
+  return copied;
 }
 
 async function loadMatches(endpoint, neighborhoodId, serviceType) {

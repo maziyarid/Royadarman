@@ -2,6 +2,17 @@
 
 ## Verified continuation checkpoint — 3 October 2026
 
+PR57 is deployed at `d99eae3`:492 source hashes matched, full VPS764/35,520,
+private MariaDB63/567, Node map7/7 and release-helper16/16 checks passed.
+The real guest browser showed the translated map fallback and functioning
+Tajrish filter; real GL/tiles/markers remain unverified. The next bounded
+clipboard slice fixes false success and stale asynchronous feedback with an
+accessible manual destination field. Read its dated release document and final
+issue15 checkpoint for exact merge/live/backup and executed VPS evidence.
+F09 GPS/header, F07 clinical notifications and all wider role/clinical/finance/
+Android/iOS requirements remain open; no broad acceptance checkbox changes.
+
+
 Read this section before the historical September baseline below. The queue and
 ownership rules still apply; dated access/source blockers do not override fresh
 observations. The source baseline verified before the public-home release is
