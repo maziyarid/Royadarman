@@ -5,15 +5,16 @@ namespace App\Http\Controllers\Web;
 use App\Domain\Identity\Enums\UserRole;
 use App\Domain\Operations\Services\IntegrationSettings;
 use App\Domain\Operations\Services\OperationalHealth;
+use App\Domain\Operations\Services\OperationalHeartbeats;
 use App\Http\Controllers\Controller;
 use App\Models\AuditEvent;
 use App\Models\IntegrationSetting;
 use App\Models\PolicyVersion;
 use App\Models\User;
 use App\Support\WorkspaceView;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -35,7 +36,7 @@ final class LaunchReadinessController extends Controller
         'referral_sharing',
     ];
 
-    public function index(Request $request, string $locale): View
+    public function index(Request $request, string $locale): Response
     {
         $this->authorizeViewer($request);
 
@@ -98,6 +99,7 @@ final class LaunchReadinessController extends Controller
 
         // Observed evidence, separate from the configuration checks above.
         $health = app(OperationalHealth::class)->snapshot();
+        $runtimeHeartbeat = app(OperationalHeartbeats::class)->snapshot();
         $integration = app(IntegrationSettings::class)->diagnostics();
 
         $allPoliciesPublished = collect($policyCoverage)
@@ -141,18 +143,17 @@ final class LaunchReadinessController extends Controller
                 'ok' => $integration['problem_count'] === 0,
                 'detail' => $integration['problem_count'] === 0 ? null : (string) $integration['problem_count'],
             ],
+            'runtime_heartbeat' => [
+                'ok' => $runtimeHeartbeat['state'] === 'ok',
+                'detail' => __('runtime.states.'.$runtimeHeartbeat['state']),
+            ],
         ];
 
         $ready = collect($gates)->every(fn (array $gate) => $gate['ok']);
 
-        $release = null;
-        $releasePath = storage_path('app/release-identity.json');
-        if (is_file($releasePath)) {
-            $decoded = json_decode((string) file_get_contents($releasePath), true);
-            $release = is_array($decoded) ? $decoded : null;
-        }
+        $release = $this->releaseIdentity();
 
-        return view('panel.launch-readiness.index', [
+        return response()->view('panel.launch-readiness.index', [
             ...WorkspaceView::data($request, 'launch_readiness'),
             'gates' => $gates,
             'manual' => $manual,
@@ -163,7 +164,9 @@ final class LaunchReadinessController extends Controller
             'failedJobs' => $health['signals']['failed_jobs'] ?? null,
             'queuedJobs' => $health['signals']['queued_jobs'] ?? null,
             'operationalHealth' => $health,
-        ])->with('locale', $locale);
+            'runtimeHeartbeat' => $runtimeHeartbeat,
+            'locale' => $locale,
+        ])->header('Cache-Control', 'private, no-store');
     }
 
     public function acknowledge(Request $request, string $locale): RedirectResponse
@@ -231,5 +234,32 @@ final class LaunchReadinessController extends Controller
     private function ackKey(string $gate): string
     {
         return 'launch_ack_'.$gate;
+    }
+
+    private function releaseIdentity(): ?array
+    {
+        $path = storage_path('app/release-identity.json');
+        if (is_link($path) || ! is_file($path)) {
+            return null;
+        }
+        try {
+            $json = @file_get_contents($path, false, null, 0, 4097);
+            if (! is_string($json) || strlen($json) > 4096) {
+                return null;
+            }
+            $record = json_decode($json, true, 8, JSON_THROW_ON_ERROR);
+            $commit = $record['commit'] ?? null;
+            $builtAt = $record['built_at'] ?? null;
+            if (! is_string($commit) || preg_match('/^[A-Za-z0-9._-]{1,80}$/D', $commit) !== 1
+                || ! is_string($builtAt) || strlen($builtAt) > 40
+                || ! \DateTimeImmutable::createFromFormat(\DateTimeInterface::ATOM, $builtAt)
+                || \DateTimeImmutable::getLastErrors() !== false) {
+                return null;
+            }
+
+            return ['commit' => $commit, 'built_at' => $builtAt];
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }
