@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Domain\Identity\Services\ProfilePreferences;
+use App\Domain\Identity\Services\SelfProfileProjection;
 use App\Domain\Identity\Services\SessionInventoryService;
 use App\Domain\Identity\Services\StaffMfaService;
 use App\Http\Controllers\Controller;
 use App\Support\WorkspaceView;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Illuminate\View\View;
 
 final class ProfileWorkspaceController extends Controller
 {
@@ -21,16 +23,17 @@ final class ProfileWorkspaceController extends Controller
         private readonly StaffMfaService $mfa,
     ) {}
 
-    public function show(Request $request): View
+    public function show(Request $request): Response
     {
         $currentId = $request->hasSession() ? (string) $request->session()->getId() : null;
         $sessionRows = $this->sessions->listForUser($request->user(), $currentId);
 
         $pendingTotpSecret = (string) $request->session()->get('pending_totp_secret', '');
 
-        return view('panel.profile', [
+        return response()->view('panel.profile', [
             ...WorkspaceView::data($request, 'profile'),
             'profileUser' => $request->user(),
+            'selfProfile' => app(SelfProfileProjection::class)->forUser($request->user()),
             'credentialsConfigured' => filled($request->user()->username) && filled($request->user()->password),
             'sessions' => $sessionRows,
             'mfaConfigured' => $this->mfa->isConfigured($request->user()),
@@ -42,7 +45,7 @@ final class ProfileWorkspaceController extends Controller
             'passkeys' => $request->user()->passkeys()
                 ->latest('created_at')
                 ->get(['id', 'name', 'last_used_at', 'created_at']),
-        ]);
+        ])->header('Cache-Control', 'private, no-store')->header('Pragma', 'no-cache');
     }
 
     public function update(Request $request): RedirectResponse
@@ -52,7 +55,7 @@ final class ProfileWorkspaceController extends Controller
             'name' => ['nullable', 'string', 'max:80'],
         ]);
 
-        $request->user()->update($data);
+        app(ProfilePreferences::class)->update($request->user(), $data, $request->attributes->get('request_id'));
 
         return redirect()
             ->route('panel.profile', ['locale' => $data['locale']])

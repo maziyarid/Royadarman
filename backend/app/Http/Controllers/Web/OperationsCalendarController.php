@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domain\Identity\Enums\UserRole;
+use App\Domain\Scheduling\OperationsMonthWindow;
 use App\Http\Controllers\Controller;
 use App\Models\CoordinationTask;
 use App\Models\HomeServiceRequest;
@@ -42,13 +43,12 @@ final class OperationsCalendarController extends Controller
             [$jalaliYear, $jalaliMonth] = array_map('intval', explode('-', $monthInput));
             abort_unless($jalaliYear >= 1200 && $jalaliYear <= 1600 && $jalaliMonth >= 1 && $jalaliMonth <= 12, 422);
             $monthInput = JalaliCalendar::monthKey($jalaliYear, $jalaliMonth);
-            [$startYear, $startMonth, $startDay] = JalaliCalendar::toGregorian($jalaliYear, $jalaliMonth, 1);
-            $nextJalaliYear = $jalaliMonth === 12 ? $jalaliYear + 1 : $jalaliYear;
-            $nextJalaliMonth = $jalaliMonth === 12 ? 1 : $jalaliMonth + 1;
-            [$endYear, $endMonth, $endDay] = JalaliCalendar::toGregorian($nextJalaliYear, $nextJalaliMonth, 1);
-            $start = CarbonImmutable::create($startYear, $startMonth, $startDay, 0, 0, 0, $timezone);
-            $endExclusive = CarbonImmutable::create($endYear, $endMonth, $endDay, 0, 0, 0, $timezone);
-            $daysInMonth = JalaliCalendar::monthLength($jalaliYear, $jalaliMonth);
+            $window = OperationsMonthWindow::jalali($jalaliYear, $jalaliMonth, (string) $timezone);
+            $start = CarbonImmutable::parse($window['start_utc'], 'UTC')->timezone($timezone);
+            $endExclusive = CarbonImmutable::parse($window['end_utc'], 'UTC')->timezone($timezone);
+            $daysInMonth = $window['day_count'];
+            $nextJalaliYear = $window['next_year'];
+            $nextJalaliMonth = $window['next_month'];
             $monthLabel = JalaliCalendar::monthLabel($jalaliYear, $jalaliMonth);
             $previousMonth = $jalaliMonth === 1
                 ? JalaliCalendar::monthKey($jalaliYear - 1, 12)
@@ -73,6 +73,13 @@ final class OperationsCalendarController extends Controller
 
         $startUtc = $start->utc();
         $endExclusiveUtc = $endExclusive->utc();
+        $serverWindow = [
+            'start_utc' => $startUtc->format('Y-m-d H:i:s'),
+            'end_utc' => $endExclusiveUtc->format('Y-m-d H:i:s'),
+            'day_count' => $daysInMonth,
+            'half_open' => true,
+            'client_must_not_recompute_bounds' => true,
+        ];
 
         $taskEvents = CoordinationTask::query()
             ->with('case:id,public_reference,current_coordinator_id')
@@ -192,6 +199,7 @@ final class OperationsCalendarController extends Controller
             'days' => $days,
             'events' => $events,
             'summary' => $summary,
+            'serverWindow' => $serverWindow,
         ])->with('locale', $locale);
     }
 }

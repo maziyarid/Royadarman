@@ -1,0 +1,28 @@
+/* Account UI only. No clinical data, permissions or offline storage. */
+.profile-workspace{display:grid;gap:20px;max-width:1080px;margin-inline:auto}
+.profile-workspace [hidden]{display:none!important}
+.profile-workspace .profile-hero{padding:clamp(20px,3vw,30px);background:linear-gradient(125deg,#fff,#edf3ff);border-color:#d6e2f5}
+.profile-heading{display:flex;gap:18px;align-items:center;margin-block-end:24px;min-width:0}
+.profile-heading>div{min-width:0}.profile-heading h2{margin:0;font-size:clamp(1.3rem,2.3vw,1.8rem);overflow-wrap:anywhere;line-height:1.6}
+.profile-heading p{margin:6px 0 0;color:var(--muted);line-height:1.9}
+.profile-avatar{display:grid;place-items:center;width:64px;height:64px;flex:0 0 64px;background:#244baf;color:#fff;border:4px solid #fff;border-radius:20px;box-shadow:0 3px 12px #244baf26;font-size:1.65rem;font-weight:800}
+.profile-section-nav{display:flex;flex-wrap:wrap;gap:8px}.profile-section-nav a{display:inline-flex;align-items:center;min-height:44px;padding:10px 15px;border:1px solid #d1ddef;border-radius:12px;background:#fff;color:#244478;text-decoration:none;font-weight:700;font-size:.88rem;line-height:1.65}
+.profile-section-nav a:hover{background:#eaf1fc;border-color:#9db5df}
+.profile-section{scroll-margin-block-start:24px;min-width:0}.profile-section h2{margin-block-start:0;font-size:1.18rem;line-height:1.7}.profile-section h3{font-size:1rem;line-height:1.7}
+.profile-workspace .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.profile-workspace .field{min-width:0}.profile-workspace :is(input,select){min-height:44px}.profile-workspace input[readonly]{background:#f5f8fc}
+.profile-workspace input[aria-invalid=true],.profile-workspace select[aria-invalid=true]{border-color:#b22430}
+.profile-field-error{margin:0;color:#a31d2b;font-size:.86rem;line-height:1.8}
+.profile-errors{border:1px solid #e2b7bd;background:#fff2f3;color:#872633}.profile-errors h2{margin:0;font-size:1.08rem}.profile-errors p{margin:8px 0}.profile-errors ul{margin:10px 0;padding-inline-start:24px}.profile-errors a{color:inherit;text-underline-offset:3px}
+.profile-actions{display:flex;flex-wrap:wrap;gap:10px}.profile-spaced{margin-block-start:12px}.profile-intro{margin-block-start:0}
+.profile-workspace .profile-records{padding:0;margin-block-start:14px;gap:10px}.profile-workspace .task-card{min-width:0}.profile-workspace .task-card-main{min-width:0}.profile-workspace .task-card-main strong,.profile-workspace .task-meta{overflow-wrap:anywhere}
+.profile-divider{margin:26px 0;border:0;border-block-start:1px solid var(--line)}
+.profile-recovery-codes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;font-family:monospace}.profile-recovery-codes code{padding:9px 12px;border-radius:8px;background:#fff;border:1px solid var(--line);overflow-wrap:anywhere}
+.profile-copy{align-self:flex-start}.profile-affiliation{padding:16px;border:1px solid var(--line);border-radius:12px;background:#fbfcff;margin-block-start:12px}.profile-affiliation h3{margin:0 0 8px;overflow-wrap:anywhere}
+.profile-dates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0 0}.profile-dates div{min-width:0}.profile-dates dt{font-size:.82rem;color:var(--muted);line-height:1.8}.profile-dates dd{margin:4px 0 0;font-size:.9rem;overflow-wrap:anywhere}.profile-dates .badge{display:inline-block;margin-inline-start:6px}
+.profile-credential{padding-block-start:16px;margin-block-start:16px;border-block-start:1px solid var(--line)}.profile-empty{padding:14px 16px;border-radius:11px;background:#f4f7fc;color:var(--muted);line-height:1.9}
+.profile-workspace details>summary:focus-visible{outline:3px solid #4579c8;outline-offset:3px;border-radius:8px}
+.profile-workspace details>summary{cursor:pointer;min-height:44px;padding-block:12px;color:#a31d2b;font-weight:700}
+.profile-workspace form[aria-busy=true]{opacity:.75}.profile-workspace .btn{white-space:normal}
+@media(max-width:600px){.profile-workspace{gap:16px}.profile-heading{align-items:flex-start;gap:12px}.profile-avatar{width:52px;height:52px;flex-basis:52px;border-radius:16px}.profile-workspace .form-grid,.profile-dates{grid-template-columns:1fr;gap:10px}.profile-section-nav a{flex:1 1 145px;justify-content:center;text-align:center}.profile-workspace .task-card{flex-wrap:wrap;gap:14px}.profile-actions{flex-direction:column}.profile-actions form,.profile-actions .btn{width:100%}.profile-workspace .profile-section{padding:18px}.profile-workspace .profile-recovery-codes{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.profile-workspace{scroll-behavior:auto}}
