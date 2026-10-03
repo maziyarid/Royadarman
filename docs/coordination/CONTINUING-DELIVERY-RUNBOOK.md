@@ -5,7 +5,9 @@
 Read this section before the historical September baseline below. The queue and
 ownership rules still apply; dated access/source blockers do not override fresh
 observations. The source baseline verified before the public-home release is
-`c9749fddcae1ffab8b885cfbced4201efbfb3970` (PR55), 469 matching source hashes. PR49 reconciled live source
+`af24b5e62469d3c19d4fdc4baa3c741416ba09f0` (PR56), with the subsequent map-release
+capture verifying490 matching source hashes (prior474 plus exact map source,
+served .htaccess and all14 served build files). PR49 reconciled live source
 and security fixes; PR50 added shared persisted month windows, accepted-referral
 notification correlation, clinic dashboard isolation and real personal profiles;
 PR51 secured all four existing privileged administrator mutations using current
@@ -66,6 +68,14 @@ Verified social targets, remaining placeholder captions and unavailable referenc
 images stay tracked; source-based UI work continues after design CLI telemetry
 was rejected, without claiming canvas generation. Clinical release notifications remain a separate source-verified
 gap F-2026-10-03-07. No new signing/dental taxonomy or publication policy is enabled.
+PR56 is deployed, with757 VPS tests /35,457 assertions and private MariaDB56 /504
+passing. The real guest browser verified the homepage and neighborhood filter,
+but found a blank map. A separately claimed map runtime repair and exact pinned
+bundle/CSP/deployer release closes reproduced constructor/marker/fallback defects;
+read its dated release record and final issue15/RPH57 checkpoint before copying
+any built asset. Synthetic Node/fault-injected deployment checks do not establish
+real GPU/tile/provider/device behavior. Adjacent GPS-header/clipboard-feedback gaps
+F-2026-10-03-09/-10 remain separately tracked. Root retains serial deployment.
 Native Android and iOS remain required and
 unimplemented; proposals, Studio screens and responsive web do not satisfy them.
 

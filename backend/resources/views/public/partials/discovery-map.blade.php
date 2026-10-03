@@ -82,6 +82,7 @@
                 <div>
                     @if($enhancementReady)
                         <div id="discovery-map" class="discovery-map" data-discovery-map role="region" aria-label="{{ $copy['title'] }}"></div>
+                        <p class="discovery-map-fallback" data-discovery-map-fallback hidden role="status">{{ $copy['map_unavailable'] }}</p>
                         <p class="discovery-map-credit">
                             {{ $copy['map_attribution_note'] }}
                             <a href="{{ $discovery['map_attribution_url'] ?? 'https://www.openstreetmap.org/copyright' }}" rel="noopener noreferrer" target="_blank">{{ $discovery['map_attribution'] ?? '© OpenStreetMap contributors' }}</a>

@@ -1,0 +1,14 @@
+{
+  "node": "v22.23.2",
+  "lock_sha256": "e247db9af12418dc018cc94a91db40859da9f785b1ae6ca5b3f7ffc81ebf1539",
+  "source_sha256": "670b4318a54239730cc0f28328a9add5acfb2a304d0ef10520e08fc98bc63928",
+  "builder_sha256": "7982ca628a0841a5a4d527df99cadc905a69c866a549831d7f461e8af30f6566",
+  "vite": "8.3.0",
+  "maplibre": "6.10.0",
+  "manifest_sha256": "34844e8cbdfee072a31611ec0322e86c69cb3052bae2a37bc1d545d21dcb6f73",
+  "artifacts": {
+    "assets/discovery-map-DHxMAkVx.js": "9911b0b15ca67438b0b309bb974debd8b6929ab9ac42a377383d17a1f1fa19ba",
+    "assets/discovery-map-CKRTiAqP.css": "a44e9c8519685a73587bcb465401eade1c3491d382c22243373c1c42b766f186"
+  },
+  "scope": "discovery only; no app/passkeys/fonts/plugin/environment loading; no WebGL/provider proof"
+}
