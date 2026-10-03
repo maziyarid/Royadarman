@@ -343,6 +343,22 @@ function updateEphemeralUserMarker(state, origin) {
     .addTo(state.map);
 }
 
+function geolocationPolicyState() {
+  // Policy inspection is an enhancement, not proof of the user's permission.
+  // Unknown browsers retain the existing explicit click-and-denial path.
+  for (const key of ["permissionsPolicy", "featurePolicy"]) {
+    try {
+      const policy = document[key];
+      if (typeof policy?.allowsFeature !== "function") continue;
+      const allowed = policy.allowsFeature("geolocation");
+      return allowed === true ? "allowed" : allowed === false ? "denied" : "unknown";
+    } catch {
+      return "unknown";
+    }
+  }
+  return "unknown";
+}
+
 function initRoot(root) {
   const copy = parseCopy(root);
   const endpoint = root.getAttribute("data-endpoint") || "";
@@ -361,6 +377,7 @@ function initRoot(root) {
   let selectedId = null;
   let activeNeighborhoodId = root.getAttribute("data-neighborhood-id") || select?.value || "";
   let requestSerial = 0;
+  let geoRequestSerial = 0;
   let mapState = null;
 
   function currentOrigin() {
@@ -449,38 +466,59 @@ function initRoot(root) {
     select.addEventListener("change", () => form.requestSubmit());
   }
 
-  if (geoBtn && navigator.geolocation) {
+  function discardEphemeralOrigin(message = "") {
+    ephemeralOrigin = null;
+    applyOriginToLinks(root, neighborhoodOrigin);
+    updateEphemeralUserMarker(mapState, null);
+    if (geoClear) geoClear.hidden = true;
+    setStatus(root, message);
+  }
+
+  const geolocation = navigator.geolocation;
+  if (geoBtn && typeof geolocation?.getCurrentPosition === "function" && geolocationPolicyState() !== "denied") {
     geoBtn.hidden = false;
     geoBtn.addEventListener("click", () => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          ephemeralOrigin = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          applyOriginToLinks(root, currentOrigin());
-          updateEphemeralUserMarker(mapState, ephemeralOrigin);
-          if (geoClear) geoClear.hidden = false;
-          setStatus(root, text(copy, "location_ephemeral"));
-        },
-        () => {
-          ephemeralOrigin = null;
-          applyOriginToLinks(root, neighborhoodOrigin);
-          updateEphemeralUserMarker(mapState, null);
-          setStatus(root, text(copy, "location_denied"));
-        },
-        { enableHighAccuracy: false, timeout: 8000, maximumAge: 0 },
-      );
+      const serial = ++geoRequestSerial;
+      const deny = () => {
+        if (serial !== geoRequestSerial) return;
+        if (geolocationPolicyState() === "denied") geoBtn.hidden = true;
+        discardEphemeralOrigin(text(copy, "location_denied"));
+      };
+      if (geolocationPolicyState() === "denied") {
+        deny();
+        return;
+      }
+
+      try {
+        geolocation.getCurrentPosition(
+          (position) => {
+            if (serial !== geoRequestSerial) return;
+            if (geolocationPolicyState() === "denied") {
+              deny();
+              return;
+            }
+            ephemeralOrigin = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            applyOriginToLinks(root, currentOrigin());
+            updateEphemeralUserMarker(mapState, ephemeralOrigin);
+            if (geoClear) geoClear.hidden = false;
+            setStatus(root, text(copy, "location_ephemeral"));
+          },
+          deny,
+          { enableHighAccuracy: false, timeout: 8000, maximumAge: 0 },
+        );
+      } catch {
+        deny();
+      }
     });
   }
 
   if (geoClear) {
     geoClear.addEventListener("click", () => {
-      ephemeralOrigin = null;
-      applyOriginToLinks(root, neighborhoodOrigin);
-      updateEphemeralUserMarker(mapState, null);
-      geoClear.hidden = true;
-      setStatus(root, "");
+      ++geoRequestSerial;
+      discardEphemeralOrigin();
     });
   }
 

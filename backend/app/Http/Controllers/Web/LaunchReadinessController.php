@@ -11,6 +11,7 @@ use App\Models\AuditEvent;
 use App\Models\IntegrationSetting;
 use App\Models\PolicyVersion;
 use App\Models\User;
+use App\Support\PanelDemoRegistry;
 use App\Support\WorkspaceView;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -71,12 +72,16 @@ final class LaunchReadinessController extends Controller
         $activeCoordinators = User::query()
             ->where('role', UserRole::Coordinator->value)
             ->where('is_active', true)
+            ->where(fn ($query) => $query->whereNull('email')
+                ->orWhereNotIn('email', array_column(PanelDemoRegistry::identities(), 'email')))
             ->count();
 
         $verifiedClinicians = User::query()
             ->join('practitioners', 'practitioners.user_id', '=', 'users.id')
             ->where('users.role', UserRole::Clinician->value)
             ->where('users.is_active', true)
+            ->where(fn ($query) => $query->whereNull('users.email')
+                ->orWhereNotIn('users.email', array_column(PanelDemoRegistry::identities(), 'email')))
             ->where('practitioners.credential_status', 'verified')
             ->where(fn ($q) => $q->whereNull('practitioners.expires_at')->orWhere('practitioners.expires_at', '>', now()))
             ->count();
