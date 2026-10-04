@@ -211,7 +211,7 @@ Route::get('/{locale}/blog/{slug}/preview', [BlogController::class, 'preview'])
     ->middleware(['signed', 'auth', SetLocale::class])
     ->name('public.blog.preview');
 
-Route::middleware(['staff'])->prefix('/admin/cms')->name('admin.cms.')->group(function (): void {
+Route::middleware(['staff', SetLocale::class])->prefix('/admin/cms')->name('admin.cms.')->group(function (): void {
     Route::get('/', [AdminCmsController::class, 'dashboard'])->name('dashboard');
     Route::get('/posts', [AdminCmsController::class, 'index'])->name('posts.index');
     Route::get('/posts/create', [AdminCmsController::class, 'create'])->name('posts.create');
@@ -266,6 +266,8 @@ Route::get('/{locale}/dashboard', [DashboardController::class, 'show'])
     ->middleware(['web', SetLocale::class, 'auth', EnsureActiveUser::class])
     ->name('dashboard');
 Route::get('/admin', fn () => redirect()->route('admin.cms.dashboard'))->middleware(['staff']);
+
+require __DIR__.'/patient-portal.php';
 
 Route::get('/fa/{path?}', [PublicPageController::class, 'redirectPersianPrefix'])->where('path', '.*')->name('public.fa-redirect');
 

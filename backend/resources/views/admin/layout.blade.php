@@ -1,5 +1,5 @@
 @php
-    $locale = in_array(auth()->user()?->locale, ['fa', 'ar', 'en'], true) ? auth()->user()->locale : (in_array(app()->getLocale(), ['fa', 'ar', 'en'], true) ? app()->getLocale() : 'fa');
+    $locale = in_array(app()->getLocale(), ['fa', 'ar', 'en'], true) ? app()->getLocale() : 'fa';
     $rtl = in_array($locale, ['fa', 'ar'], true);
     $home = $locale === 'fa' ? url('/') : url('/'.$locale);
     $role = auth()->user()?->role;
@@ -14,16 +14,17 @@
     <meta name="robots" content="noindex,nofollow">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('ui.admin.title') }} · Royadarman</title>
-    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/assets/royadarman-symbol-20261004.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/assets/workspace.css?v=20260915">
     <script src="/assets/workspace.js?v=20260915" defer></script>
+@include('public.partials.brand-assets')
 </head>
-<body class="workspace-body" data-dialog-ok="{{ __('panel.dialog.ok') }}" data-dialog-cancel="{{ __('panel.dialog.cancel') }}" data-dialog-url="{{ __('panel.dialog.url') }}">
+<body data-brand="royadarman" class="workspace-body" data-dialog-ok="{{ __('panel.dialog.ok') }}" data-dialog-cancel="{{ __('panel.dialog.cancel') }}" data-dialog-url="{{ __('panel.dialog.url') }}">
 <a class="skip-link" href="#main">{{ __('ui.skip') }}</a>
 <div class="app-shell" data-workspace>
-    <aside class="app-sidebar">
+    <aside class="app-sidebar" id="workspace-navigation">
         <div class="app-brand">
-            <img src="/assets/brand-mark.svg" width="38" height="38" alt="">
+            <img src="/assets/royadarman-symbol-20261004.svg" width="38" height="38" alt="">
             <div>
                 <strong>{{ __('panel.brand') }}</strong>
                 <span class="app-role">{{ __('ui.admin.title') }}</span>
@@ -55,9 +56,10 @@
             <button class="btn" type="button" data-logout data-locale="{{ $locale }}" data-home="{{ $home }}">{{ __('ui.admin.logout') }}</button>
         </div>
     </aside>
+<button class="nav-backdrop" type="button" data-nav-dismiss tabindex="-1" aria-label="{{ __('panel.dialog.cancel') }}"></button>
     <div class="app-main">
         <header class="app-topbar">
-            <button class="btn mobile-nav" type="button" data-mobile-nav aria-label="{{ __('site.menu') }}">☰</button>
+            <button class="btn mobile-nav" type="button" data-mobile-nav aria-controls="workspace-navigation" aria-expanded="false" aria-label="{{ __('site.menu') }}">☰</button>
             <h1>{{ __('ui.admin.title') }}</h1>
             <div class="app-top-actions"><a class="btn" href="{{ route('panel', ['locale' => $locale]) }}">{{ __('panel.brand') }}</a></div>
         </header>

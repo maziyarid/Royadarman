@@ -7,6 +7,9 @@
 @section('title', __('panel.nav.profile'))
 @section('heading', __('panel.nav.profile'))
 @section('content')
+@if($profileUser->role->value === 'patient' && !$isDemo)
+<section class="card pad"><h2>{{ __('patient_portal.profile_title') }}</h2><p>{{ __('patient_portal.profile_intro') }}</p><a class="btn primary" href="{{ route('patient.profile', ['locale' => $locale]) }}">{{ __('patient_portal.edit_profile') }}</a></section>
+@endif
 @php
     $selfProfile = $selfProfile ?? ['clinic_affiliations' => [], 'practitioner_credential' => null];
     $profileFieldIds = [

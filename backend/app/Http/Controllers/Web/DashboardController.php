@@ -12,9 +12,12 @@ final class DashboardController extends Controller
 {
     public function __construct(private readonly DashboardService $dashboard) {}
 
-    public function show(Request $request): View
+    public function show(Request $request): View|\Illuminate\Http\Response
     {
         $user = $request->user();
+        if ($user->role === \App\Domain\Identity\Enums\UserRole::Patient && ! $request->session()->get('panel_demo', false)) {
+            return app(PatientPortalController::class)->home($request);
+        }
         $payload = $this->dashboard->build($user, (bool) $request->session()->get('panel_demo', false));
         $role = $payload['role'];
 

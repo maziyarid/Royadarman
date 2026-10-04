@@ -16,6 +16,8 @@ final class PatientRequestController extends Controller
         return view('panel.patient-new-request', [
             ...WorkspaceView::data($request, 'request'),
             'locale' => $locale,
+            'provinces' => app(\App\Domain\Patients\IranLocations::class)->provinces(),
+            'patientProfile' => \App\Models\PatientContactProfile::query()->find($request->user()->id),
             'intakeEnabled' => (bool) config('royadarman.intake_enabled'),
             'tehranAreas' => config('royadarman.tehran_areas', []),
             'tehranNeighborhoods' => config('royadarman.tehran_neighborhoods', []),

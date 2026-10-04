@@ -40,6 +40,7 @@ final class PanelCaseController extends Controller
             'roleKey' => $role->value,
             'locale' => $locale,
             'isDemo' => $isDemo,
+            'caseLocation' => in_array($role, [UserRole::Patient, UserRole::Coordinator], true) ? \App\Models\CaseLocation::query()->find($case->id) : null,
             'allowedStatuses' => $role === UserRole::Coordinator ? $case->status->allowedTargets() : [],
             ...$data,
         ])->header('Cache-Control', 'private, no-store');
@@ -89,7 +90,7 @@ final class PanelCaseController extends Controller
     {
         return [
             'documents' => collect(), 'reviews' => collect(), 'referrals' => collect(), 'draftReviews' => collect(),
-            'clinics' => DB::table('clinics')->where('is_active', true)->orderBy('name')->get(['id', 'name', 'city', 'area_code']),
+            'clinics' => app(\App\Domain\Patients\ClinicLocationRanking::class)->forCase($case),
             'eligibleClinicians' => DB::table('users')->join('practitioners', 'practitioners.user_id', '=', 'users.id')
                 ->where('users.role', UserRole::Clinician->value)->where('users.is_active', true)
                 ->where('practitioners.credential_status', 'verified')
