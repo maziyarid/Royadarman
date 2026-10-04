@@ -1,0 +1,23 @@
+# Exact owner Grok build + approved Royadarman identity
+
+## Source and boundary
+Owner supplied `royadarman-source-2026-10-03e.zip` on 4 October 2026. SHA256 `2fb83b17e1cc076d91bc8b9e50ba3f7b4e4550648ffb704ec428af6c92dccabb`, 563608 bytes, 166 files. This is TanStack React Start / Vite with React and PostgreSQL/PGlite preview persistence, NOT the older PR48 Next.js reference. The original archive is preserved in the owner Project/Library; no claim that its ZIP was uploaded to this repository or Agiflow.
+
+SVG text is from the owner's `royadarman-symbol.svg`, Files ID `file_000000008d3c81f59fa951a0283655a0`. CSS text is from `royadarman-tokens.css`, Files ID `file_0000000008dc81f5bceb8e25e4a54ff8`. Complete retrieved text is retained in `brand/`, without redrawing, fonts or embedded raster. Raw materialization of the historical kit was unavailable; do not claim an original binary-archive checksum. RPH130 records its screenshot-reconstruction provenance. The latest explicit owner selection supersedes the older droplet/tooth mark. Smart Teb attribution remains unchanged.
+
+## Implemented source adaptation
+The attached patch modifies only three existing Grok files: `src/components/brand-mark.tsx`, `src/routes/__root.tsx`, `src/styles.css`. It replaces the old droplet with the approved static SVG, adds the application's `data-brand` opt-in, uses the approved favicon/theme colour, and maps the existing utility colour variables to the supplied tokens. The actual `.dark` toggle is preserved and mapped to the supplied dark tokens. Semantic success/warning/error remain distinct. It does not replace layouts or alter auth, server functions, DB/schema, preview seeding, booking, payments or clinical logic.
+
+Apply to a clean extraction of the exact archive only after comparing the three `source_preconditions` hashes in `validation.json`. Place `brand/royadarman-symbol.svg` at `public/brand/royadarman-symbol.svg`, and `brand/royadarman-tokens.css` at `src/styles/royadarman-tokens.css`; then run `git apply --check grok-brand-integration.patch` followed by `git apply grok-brand-integration.patch` at that extraction root. Both the adjacent-file installation and patch were locally replayed and the five resulting files matched the checked candidate exactly. These are preparation steps for W07, not an instruction to overwrite the live root.
+
+## Reuse into the real dashboard
+Retain the supplied `shell.tsx`, `dashboard-desk.tsx`, `pages/desks.tsx`, messages/tasks/case-coordination routes and their interaction patterns as the owner's design/workflow basis. Bind them to existing Laravel record/actions and active role/clinic checks. TSMS local `SEED`/`useState` changes, sample balances, `CLINIC_ID`, `previewRole`/sessionStorage identities and PostgreSQL preview schema are NOT production integrations. Preserve useful source; do not import fake authority/data to make a screen appear complete.
+
+Current canonical source hooks located on base `9a16918997dfa064364fda47c57b18b4f5e40618`: `backend/resources/views/panel/layout.blade.php` (logo line46, CSS line36), `dashboard/layout.blade.php`, `admin/layout.blade.php`, `auth/login.blade.php`, public partial header/footer and public home. Their current logo reference is `/assets/brand-mark.svg`; `workspace.css` and `site.css` are separate existing stylesheets. W07 owns the exact template/token integration and must compare the separately served `deployment/webroot/assets` before changing assets. This patch targets the owner Grok input, not those shared canonical files.
+
+W07 also retains manifest/PWA icon integration: the source still contains Grok generated manifest/Apple-icon references. Neither those resources nor native/installed icons are claimed updated by this slice. Do not move the Grok hosting/runtime or bypass the existing CSP/auth stack.
+
+## Evidence and release
+Ten source/asset checks pass, two TSX files pass transpilation syntax checks, SVG XML/active-content checks and local raster rendering pass. Five supplied light/dark text/background contrast pairs are recorded. The original brand-helper suite is 26/29 both before and after; the same three checks require an omitted `.grok/skills/og/SKILL.md`. Browser fixture navigation was blocked by browser policy; no full rendered UI, framework build, backend flow or live deployment is claimed.
+
+W08 prepared these non-conflicting input files. W07 integrates shared presentation; W04 independently reviews security changes and W01 alone integrates/releases under the current source/backup/lock controls. Notification fixes are independently published as PR66 and are not mixed into this brand patch. Deliver small working live increments; source readiness is not deployment or owner acceptance.

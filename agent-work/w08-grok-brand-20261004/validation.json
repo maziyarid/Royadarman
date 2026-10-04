@@ -1,0 +1,74 @@
+{
+  "input_archive": {
+    "name": "royadarman-source-2026-10-03e.zip",
+    "sha256": "2fb83b17e1cc076d91bc8b9e50ba3f7b4e4550648ffb704ec428af6c92dccabb",
+    "files": 166
+  },
+  "asset_provenance": "Complete Files-retrieved SVG/CSS text; original raw-byte materialization unavailable. No logo redrawing, raster embedding or font distribution.",
+  "assets": {
+    "royadarman-tokens.css": {
+      "bytes": 1528,
+      "sha256": "f7c204471f4caa6441e1fea9554d0c5727585f10fc585cc00b1087223bff0ad9"
+    },
+    "royadarman-symbol.svg": {
+      "bytes": 6105,
+      "sha256": "85606dbda3168c8081b1cd5bead4455c16ca69aba5114699e967b73e64b98f52"
+    }
+  },
+  "source_preconditions": {
+    "src/components/brand-mark.tsx": "c9f2c1ef645bc12477bacb9305d4a552d8d3a66f855f4fa650a1e5c25e19c759",
+    "src/routes/__root.tsx": "100d995cd397218c5684ed2a60bfd6d482d9c190e5aa7e41f30cf5d25d211dde",
+    "src/styles.css": "3be2b87a7534e4f5f522d6b8d81b394a263215f358f8f2161f6c0757df29ae13"
+  },
+  "source_after": {
+    "src/components/brand-mark.tsx": "8893d4659f989fd4aa63b15b8157f8c8a962efe7d6eacc8d6be4e3ebd6a3f0c5",
+    "src/routes/__root.tsx": "d53999ca62b2eadf3130cb3d4e841125fa835a5c3345147a0f2728e7ba204de3",
+    "src/styles.css": "0182c3e31bb347a4df924f9a9238191ce4dfd1d58b5f00fdb59d0a0a11340d50"
+  },
+  "changed_existing_files": 3,
+  "added_asset_files": 2,
+  "other_original_files_unchanged": 163,
+  "checks": {
+    "source_red": {
+      "tests": 10,
+      "failures": 6,
+      "missing_asset_errors": 2,
+      "exit": 1
+    },
+    "source_green": {
+      "tests": 10,
+      "exit": 0
+    },
+    "patch_apply_and_file_equivalence": "PASS",
+    "tsx_transpile_syntax": {
+      "files": 2,
+      "errors": 0,
+      "full_typecheck": "NOT_RUN"
+    },
+    "svg_xml_and_no_active_content": "PASS",
+    "svg_local_raster_render": "PASS",
+    "upstream_brand_helpers_before_and_after": {
+      "tests": 29,
+      "passed": 26,
+      "failed": 3,
+      "reason": "Missing .grok/skills/og/SKILL.md in supplied export; identical failures in unmodified input"
+    },
+    "browser_asset_fixture": "NOT_VERIFIED: synthetic fixture navigation returned net::ERR_BLOCKED_BY_ADMINISTRATOR; not retried through another navigation route"
+  },
+  "contrast": {
+    "white_on_primary": 7.2181,
+    "text_on_canvas": 12.6386,
+    "muted_on_surface": 6.1536,
+    "dark_text_on_surface": 13.8012,
+    "dark_primary_pair": 8.0264
+  },
+  "not_run": [
+    "Full TanStack/Vite build and dependency typecheck",
+    "Authenticated browser flows",
+    "Canonical Laravel branding integration",
+    "PWA generated/installed icons",
+    "Production deployment"
+  ],
+  "status": "SOURCE_ADAPTED_AND_CHECKED_NOT_DEPLOYED",
+  "patch_sha256": "ecc539d68ec22d13de80f368090af6040930f2f44b334d9bea9fc25dcd4d3c92"
+}
