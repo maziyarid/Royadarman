@@ -43,7 +43,9 @@ final class ProcessOutboxEvent implements ShouldQueue
         }
 
         $delivery = DB::table('notification_deliveries')->where('outbox_event_id', $event->id)->where('channel', 'sms')->first();
-        if (in_array($delivery?->status, ['sent', 'delivered'], true)) {
+        // Final delivery outcomes must not trigger another automatic provider call.
+        // Keep a failed receipt visible for explicit operational reconciliation.
+        if (in_array($delivery?->status, ['sent', 'delivered', 'failed'], true)) {
             $event->update(['processed_at' => now()]);
 
             return;
