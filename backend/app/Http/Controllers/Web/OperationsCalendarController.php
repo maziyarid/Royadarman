@@ -38,7 +38,8 @@ final class OperationsCalendarController extends Controller
                 (int) CarbonImmutable::now($timezone)->format('m'),
                 (int) CarbonImmutable::now($timezone)->format('d'),
             );
-            $monthInput = (string) $request->query('jmonth', JalaliCalendar::monthKey($currentJalaliYear, $currentJalaliMonth));
+            $monthInput = $request->query('jmonth', JalaliCalendar::monthKey($currentJalaliYear, $currentJalaliMonth));
+            abort_unless(is_string($monthInput), 422);
             abort_unless((bool) preg_match('/^\d{4}-\d{2}$/', $monthInput), 422);
             [$jalaliYear, $jalaliMonth] = array_map('intval', explode('-', $monthInput));
             abort_unless($jalaliYear >= 1200 && $jalaliYear <= 1600 && $jalaliMonth >= 1 && $jalaliMonth <= 12, 422);
@@ -55,7 +56,8 @@ final class OperationsCalendarController extends Controller
                 : JalaliCalendar::monthKey($jalaliYear, $jalaliMonth - 1);
             $nextMonth = JalaliCalendar::monthKey($nextJalaliYear, $nextJalaliMonth);
         } else {
-            $monthInput = (string) $request->query('month', CarbonImmutable::now($timezone)->format('Y-m'));
+            $monthInput = $request->query('month', CarbonImmutable::now($timezone)->format('Y-m'));
+            abort_unless(is_string($monthInput), 422);
             abort_unless((bool) preg_match('/^\d{4}-\d{2}$/', $monthInput), 422);
             try {
                 $month = CarbonImmutable::createFromFormat('!Y-m', $monthInput, $timezone);
