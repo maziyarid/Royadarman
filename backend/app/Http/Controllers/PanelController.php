@@ -12,11 +12,15 @@ use Illuminate\Support\Facades\DB;
 
 final class PanelController extends Controller
 {
-    public function __invoke(Request $request, string $locale): View
+    public function __invoke(Request $request, string $locale): View|\Illuminate\Http\Response
     {
         $user = $request->user();
         abort_unless($user?->is_active, 403);
         $isDemo = (bool) $request->session()->get('panel_demo', false);
+
+        if ($user->role === UserRole::Patient && ! $isDemo) {
+            return app(\App\Http\Controllers\Web\PatientPortalController::class)->home($request);
+        }
 
         [$metrics, $cases, $panelKey] = match ($user->role) {
             UserRole::Patient => $this->patientPanel((int) $user->id, $isDemo),
