@@ -1,0 +1,2916 @@
+[
+    {
+      "province-en": "alborz",
+      "province-fa": "البرز",
+      "cities": [
+        {
+          "city-en": "karaj",
+          "city-fa": "کرج"
+        },
+        {
+          "city-en": "fardis",
+          "city-fa": "فردیس"
+        },
+        {
+          "city-en": "kamal-shahr",
+          "city-fa": "کمال شهر"
+        },
+        {
+          "city-en": "nazarabad",
+          "city-fa": "نظرآباد"
+        },
+        {
+          "city-en": "mohammadshahr",
+          "city-fa": "محمدشهر"
+        },
+        {
+          "city-en": "hashtgerd",
+          "city-fa": "هشتگرد"
+        },
+        {
+          "city-en": "mahdasht",
+          "city-fa": "ماهدشت"
+        },
+        {
+          "city-en": "meshkin-dasht",
+          "city-fa": "مشکین دشت"
+        },
+        {
+          "city-en": "chaharbagh",
+          "city-fa": "چهارباغ"
+        },
+        {
+          "city-en": "shahr-e-jadid-e-hashtgerd",
+          "city-fa": "شهر جدید هشتگرد"
+        },
+        {
+          "city-en": "eshtehard",
+          "city-fa": "اشتهارد"
+        },
+        {
+          "city-en": "garmdarreh",
+          "city-fa": "گرمدره"
+        },
+        {
+          "city-en": "golsar",
+          "city-fa": "گلسار"
+        },
+        {
+          "city-en": "kuhsar",
+          "city-fa": "کوهسار"
+        },
+        {
+          "city-en": "taleqan",
+          "city-fa": "طالقان"
+        },
+        {
+          "city-en": "asara",
+          "city-fa": "آسارا"
+        },
+        {
+          "city-en": "tankaman",
+          "city-fa": "تانکمان"
+        }
+      ]
+    },
+    {
+      "province-en": "ardabil",
+      "province-fa": "اردبیل",
+      "cities": [
+        {
+          "city-en": "ardabil",
+          "city-fa": "اردبیل"
+        },
+        {
+          "city-en": "parsabad",
+          "city-fa": "پارس آباد"
+        },
+        {
+          "city-en": "meshginshahr",
+          "city-fa": "مشگین شهر"
+        },
+        {
+          "city-en": "khalkhal",
+          "city-fa": "خلخال"
+        },
+        {
+          "city-en": "germi",
+          "city-fa": "گرمی"
+        },
+        {
+          "city-en": "bileh-savar",
+          "city-fa": "بیله سوار"
+        },
+        {
+          "city-en": "namin",
+          "city-fa": "نمین"
+        },
+        {
+          "city-en": "jafarabad",
+          "city-fa": "جعفرآباد"
+        },
+        {
+          "city-en": "kivi",
+          "city-fa": "کیوی"
+        },
+        {
+          "city-en": "anbaran",
+          "city-fa": "عنبران"
+        },
+        {
+          "city-en": "abi-beyglu",
+          "city-fa": "ابی بیگلو"
+        },
+        {
+          "city-en": "nir",
+          "city-fa": "نیر"
+        },
+        {
+          "city-en": "hashatjin",
+          "city-fa": "هشاتجین"
+        },
+        {
+          "city-en": "sareyn",
+          "city-fa": "سرعین"
+        },
+        {
+          "city-en": "aslan-duz",
+          "city-fa": "اصلان دوز"
+        },
+        {
+          "city-en": "eslamabad-e-qadim",
+          "city-fa": "اسلام آباد قدیم"
+        },
+        {
+          "city-en": "tazeh-kand-e-qadim",
+          "city-fa": "تازه کند قدیم"
+        },
+        {
+          "city-en": "qasabeh",
+          "city-fa": "قصابه"
+        },
+        {
+          "city-en": "lahrud",
+          "city-fa": "لاهرود"
+        },
+        {
+          "city-en": "hir",
+          "city-fa": "هیر"
+        },
+        {
+          "city-en": "kolowr",
+          "city-fa": "کولوور"
+        },
+        {
+          "city-en": "razey",
+          "city-fa": "رازی"
+        },
+        {
+          "city-en": "tazeh-kand-e-angut",
+          "city-fa": "تازه کند انگوت"
+        },
+        {
+          "city-en": "fakhrabad",
+          "city-fa": "فخرآباد"
+        },
+        {
+          "city-en": "kuraim",
+          "city-fa": "کوریم"
+        },
+        {
+          "city-en": "moradlu",
+          "city-fa": "مرادلو"
+        }
+      ]
+    },
+    {
+      "province-en": "bushehr",
+      "province-fa": "بوشهر",
+      "cities": [
+        {
+          "city-en": "bushehr",
+          "city-fa": "بوشهر"
+        },
+        {
+          "city-en": "borazjan",
+          "city-fa": "برازجان"
+        },
+        {
+          "city-en": "bandar-ganaveh",
+          "city-fa": "بندر گناوه"
+        },
+        {
+          "city-en": "khormoj",
+          "city-fa": "خورموج"
+        },
+        {
+          "city-en": "bandar-kangan",
+          "city-fa": "بندر کنگان"
+        },
+        {
+          "city-en": "jam",
+          "city-fa": "جم"
+        },
+        {
+          "city-en": "bandar-deylam",
+          "city-fa": "بندر دیلم"
+        },
+        {
+          "city-en": "bandar-e-deyr",
+          "city-fa": "بندر دیر"
+        },
+        {
+          "city-en": "ali-shahr",
+          "city-fa": "علی شهر"
+        },
+        {
+          "city-en": "choghadak",
+          "city-fa": "چغادک"
+        },
+        {
+          "city-en": "ab-pakhsh",
+          "city-fa": "آب پخش"
+        },
+        {
+          "city-en": "ahram",
+          "city-fa": "اهرم"
+        },
+        {
+          "city-en": "vahdatiyeh",
+          "city-fa": "وحدتیه"
+        },
+        {
+          "city-en": "kaki",
+          "city-fa": "کاکی"
+        },
+        {
+          "city-en": "bank",
+          "city-fa": "بانک"
+        },
+        {
+          "city-en": "nakhl-taqi",
+          "city-fa": "نخل تقی"
+        },
+        {
+          "city-en": "asaluyeh",
+          "city-fa": "عسلویه"
+        },
+        {
+          "city-en": "kharg",
+          "city-fa": "خارک"
+        },
+        {
+          "city-en": "dalaki",
+          "city-fa": "دالکی"
+        },
+        {
+          "city-en": "sadabad",
+          "city-fa": "سعدآباد"
+        },
+        {
+          "city-en": "shabankareh",
+          "city-fa": "شبانکاره"
+        },
+        {
+          "city-en": "abdan",
+          "city-fa": "آبدان"
+        },
+        {
+          "city-en": "bandar-rig",
+          "city-fa": "بندر ریگ"
+        },
+        {
+          "city-en": "bardestan",
+          "city-fa": "بردستان"
+        },
+        {
+          "city-en": "bord-khun",
+          "city-fa": "بورد خون"
+        },
+        {
+          "city-en": "delvar",
+          "city-fa": "دلوار"
+        },
+        {
+          "city-en": "bandar-siraf",
+          "city-fa": "بندر سیراف"
+        },
+        {
+          "city-en": "dowrahak",
+          "city-fa": "دوراهک"
+        },
+        {
+          "city-en": "baduleh",
+          "city-fa": "بادوله"
+        },
+        {
+          "city-en": "tang-e-eram",
+          "city-fa": "تنگ ارم"
+        },
+        {
+          "city-en": "abad",
+          "city-fa": "آباد"
+        },
+        {
+          "city-en": "anarestan",
+          "city-fa": "انارستان"
+        },
+        {
+          "city-en": "shonbeh",
+          "city-fa": "شونبه"
+        },
+        {
+          "city-en": "imam-hassan",
+          "city-fa": "امام حسن"
+        },
+        {
+          "city-en": "kalameh",
+          "city-fa": "کلامه"
+        },
+        {
+          "city-en": "riz",
+          "city-fa": "ریز"
+        },
+        {
+          "city-en": "bushkan",
+          "city-fa": "بوشکان"
+        }
+      ]
+    },
+    {
+      "province-en": "chaharmahal-and-bakhtiari",
+      "province-fa": "چهارمحال و بختیاری",
+      "cities": [
+        {
+          "city-en": "shahr-e-kord",
+          "city-fa": "شهرکرد"
+        },
+        {
+          "city-en": "borujen",
+          "city-fa": "بروجن"
+        },
+        {
+          "city-en": "farsan",
+          "city-fa": "فارسان"
+        },
+        {
+          "city-en": "farrokh-shahr",
+          "city-fa": "فرخ شهر"
+        },
+        {
+          "city-en": "lordegan",
+          "city-fa": "لردگان"
+        },
+        {
+          "city-en": "hafshejan",
+          "city-fa": "هفشجان"
+        },
+        {
+          "city-en": "saman",
+          "city-fa": "سامان"
+        },
+        {
+          "city-en": "junqan",
+          "city-fa": "جونقان"
+        },
+        {
+          "city-en": "kian",
+          "city-fa": "کیان"
+        },
+        {
+          "city-en": "faradonbeh",
+          "city-fa": "فرادنبه"
+        },
+        {
+          "city-en": "ben",
+          "city-fa": "بن"
+        },
+        {
+          "city-en": "sureshjan",
+          "city-fa": "سورشجان"
+        },
+        {
+          "city-en": "babaheydar",
+          "city-fa": "باباحیدر"
+        },
+        {
+          "city-en": "boldaji",
+          "city-fa": "بولداجی"
+        },
+        {
+          "city-en": "ardal",
+          "city-fa": "اردل"
+        },
+        {
+          "city-en": "naqneh",
+          "city-fa": "نقنه"
+        },
+        {
+          "city-en": "pardanjan",
+          "city-fa": "پردنجان"
+        },
+        {
+          "city-en": "shalamzar",
+          "city-fa": "شلمزار"
+        },
+        {
+          "city-en": "gahru",
+          "city-fa": "گهرو"
+        },
+        {
+          "city-en": "gujan",
+          "city-fa": "گوجان"
+        },
+        {
+          "city-en": "sefiddasht",
+          "city-fa": "سفیددشت"
+        },
+        {
+          "city-en": "gandoman",
+          "city-fa": "گندمان"
+        },
+        {
+          "city-en": "taqanak",
+          "city-fa": "طاقانک"
+        },
+        {
+          "city-en": "sardasht",
+          "city-fa": "سردشت"
+        },
+        {
+          "city-en": "sudjan",
+          "city-fa": "سودجان"
+        },
+        {
+          "city-en": "naghan",
+          "city-fa": "ناغان"
+        },
+        {
+          "city-en": "dastana",
+          "city-fa": "دستانا"
+        },
+        {
+          "city-en": "cholicheh",
+          "city-fa": "چلیچه"
+        },
+        {
+          "city-en": "vardanjan",
+          "city-fa": "وردنجان"
+        },
+        {
+          "city-en": "kaj",
+          "city-fa": "کاج"
+        },
+        {
+          "city-en": "dashtak",
+          "city-fa": "دشتک"
+        },
+        {
+          "city-en": "nafech",
+          "city-fa": "نافچ"
+        },
+        {
+          "city-en": "mal-e-khalifeh",
+          "city-fa": "مال خلیفه"
+        },
+        {
+          "city-en": "chelgard",
+          "city-fa": "چلگارد"
+        },
+        {
+          "city-en": "aluni",
+          "city-fa": "آلونی"
+        },
+        {
+          "city-en": "haruni",
+          "city-fa": "هارونی"
+        },
+        {
+          "city-en": "sar-khun",
+          "city-fa": "سر خون"
+        },
+        {
+          "city-en": "bazoft",
+          "city-fa": "بازفت"
+        },
+        {
+          "city-en": "manj-e-nesa",
+          "city-fa": "منج نسا"
+        },
+        {
+          "city-en": "samsami",
+          "city-fa": "صمصامی"
+        }
+      ]
+    },
+    {
+      "province-en": "east-azerbaijan",
+      "province-fa": "آذربایجان شرقی",
+      "cities": [
+        {
+          "city-en": "tabriz",
+          "city-fa": "تبریز"
+        },
+        {
+          "city-en": "maragheh",
+          "city-fa": "مراغه"
+        },
+        {
+          "city-en": "marand",
+          "city-fa": "مرند"
+        },
+        {
+          "city-en": "ahar",
+          "city-fa": "اهر"
+        },
+        {
+          "city-en": "mianeh",
+          "city-fa": "میانه"
+        },
+        {
+          "city-en": "bonab",
+          "city-fa": "بناب"
+        },
+        {
+          "city-en": "sahand",
+          "city-fa": "سهند"
+        },
+        {
+          "city-en": "sarab",
+          "city-fa": "سراب"
+        },
+        {
+          "city-en": "azarshahr",
+          "city-fa": "آذرشهر"
+        },
+        {
+          "city-en": "hadishahr",
+          "city-fa": "هادیشهر"
+        },
+        {
+          "city-en": "ajab-shir",
+          "city-fa": "عجب شیر"
+        },
+        {
+          "city-en": "sardrud",
+          "city-fa": "سردرود"
+        },
+        {
+          "city-en": "malekan",
+          "city-fa": "ملکان"
+        },
+        {
+          "city-en": "shabestar",
+          "city-fa": "شبستر"
+        },
+        {
+          "city-en": "bostanabad",
+          "city-fa": "بستان آباد"
+        },
+        {
+          "city-en": "hashtrud",
+          "city-fa": "هشترود"
+        },
+        {
+          "city-en": "osku",
+          "city-fa": "اسکو"
+        },
+        {
+          "city-en": "ilkhchi",
+          "city-fa": "ایلخچی"
+        },
+        {
+          "city-en": "mamqan",
+          "city-fa": "ممقان"
+        },
+        {
+          "city-en": "khosrowshah",
+          "city-fa": "خسروشاه"
+        },
+        {
+          "city-en": "basmenj",
+          "city-fa": "باسمنج"
+        },
+        {
+          "city-en": "gugan",
+          "city-fa": "گوگان"
+        },
+        {
+          "city-en": "heris",
+          "city-fa": "هریس"
+        },
+        {
+          "city-en": "yamchi",
+          "city-fa": "یامچی"
+        },
+        {
+          "city-en": "kaleybar",
+          "city-fa": "كليبر"
+        },
+        {
+          "city-en": "shendabad",
+          "city-fa": "شندآباد"
+        },
+        {
+          "city-en": "sufian",
+          "city-fa": "صوفيان"
+        },
+        {
+          "city-en": "jolfa",
+          "city-fa": "جلفا"
+        },
+        {
+          "city-en": "koshksaray",
+          "city-fa": "کوشک سرای"
+        },
+        {
+          "city-en": "tasuj",
+          "city-fa": "تسوج"
+        },
+        {
+          "city-en": "torkamanchay",
+          "city-fa": "ترکمانچای"
+        },
+        {
+          "city-en": "kolvanaq",
+          "city-fa": "كلوانق"
+        },
+        {
+          "city-en": "leylan",
+          "city-fa": "لیلان"
+        },
+        {
+          "city-en": "sis",
+          "city-fa": "سیس"
+        },
+        {
+          "city-en": "bakhshayesh",
+          "city-fa": "بخشایش"
+        },
+        {
+          "city-en": "qarah-aghaj",
+          "city-fa": "قره آغاج"
+        },
+        {
+          "city-en": "mehraban",
+          "city-fa": "مهربان"
+        },
+        {
+          "city-en": "teymurlu",
+          "city-fa": "تیمورلو"
+        },
+        {
+          "city-en": "varzaqan",
+          "city-fa": "ورزقان"
+        },
+        {
+          "city-en": "zarnaq",
+          "city-fa": "زرنق"
+        },
+        {
+          "city-en": "hurand",
+          "city-fa": "هوراند"
+        },
+        {
+          "city-en": "khajeh",
+          "city-fa": "خواجه"
+        },
+        {
+          "city-en": "benab-e-marand",
+          "city-fa": "بناب مرند"
+        },
+        {
+          "city-en": "sharabian",
+          "city-fa": "شرابیان"
+        },
+        {
+          "city-en": "vayqan",
+          "city-fa": "وایقان"
+        },
+        {
+          "city-en": "mobarak-shahr",
+          "city-fa": "مبارک شهر"
+        },
+        {
+          "city-en": "sharafkhaneh",
+          "city-fa": "شرفخانه"
+        },
+        {
+          "city-en": "kuzeh-kanan",
+          "city-fa": "کوزه کنان"
+        },
+        {
+          "city-en": "achachi",
+          "city-fa": "آچاچی"
+        },
+        {
+          "city-en": "duzduzan",
+          "city-fa": "دوزدوزان"
+        },
+        {
+          "city-en": "kharvana",
+          "city-fa": "خاروانا"
+        },
+        {
+          "city-en": "khamaneh",
+          "city-fa": "خامنه"
+        },
+        {
+          "city-en": "tekmeh-dash",
+          "city-fa": "تکمه داش"
+        },
+        {
+          "city-en": "aqkand",
+          "city-fa": "آقکند"
+        },
+        {
+          "city-en": "abish-ahmad",
+          "city-fa": "ابیش احمد"
+        },
+        {
+          "city-en": "zonuz",
+          "city-fa": "زونوز"
+        },
+        {
+          "city-en": "tark",
+          "city-fa": "تارک"
+        },
+        {
+          "city-en": "khomarlu",
+          "city-fa": "خمارلو"
+        },
+        {
+          "city-en": "kharaju",
+          "city-fa": "خراجو"
+        },
+        {
+          "city-en": "siah-rud",
+          "city-fa": "سیاه رود"
+        },
+        {
+          "city-en": "nazarkahrizi",
+          "city-fa": "نظرکهریزی"
+        },
+        {
+          "city-en": "jowan-qaleh",
+          "city-fa": "جوان قلعه"
+        },
+        {
+          "city-en": "malek-kian",
+          "city-fa": "ملک کیان"
+        },
+        {
+          "city-en": "shahriar",
+          "city-fa": "شهریار"
+        }
+      ]
+    },
+    {
+      "province-en": "isfahan",
+      "province-fa": "اصفهان",
+      "cities": [
+        {
+          "city-en": "isfahan",
+          "city-fa": "اصفهان"
+        },
+        {
+          "city-en": "kashan",
+          "city-fa": "کاشان"
+        },
+        {
+          "city-en": "khomeyni-shahr",
+          "city-fa": "خمینی شهر"
+        },
+        {
+          "city-en": "najafabad",
+          "city-fa": "نجف آباد"
+        },
+        {
+          "city-en": "shahin-shahr",
+          "city-fa": "شاهین شهر"
+        },
+        {
+          "city-en": "shahreza",
+          "city-fa": "شهرضا"
+        },
+        {
+          "city-en": "fuladshahr",
+          "city-fa": "فولادشهر"
+        },
+        {
+          "city-en": "baharestan",
+          "city-fa": "بهارستان"
+        },
+        {
+          "city-en": "mobarakeh",
+          "city-fa": "مبارکه"
+        },
+        {
+          "city-en": "aran-va-bidgol",
+          "city-fa": "آران و بیدگل"
+        },
+        {
+          "city-en": "golpayegan",
+          "city-fa": "گلپایگان"
+        },
+        {
+          "city-en": "zarrin-shahr",
+          "city-fa": "زرین شهر"
+        },
+        {
+          "city-en": "dorcheh-piaz",
+          "city-fa": "درچه پیاز"
+        },
+        {
+          "city-en": "dowlatabad",
+          "city-fa": "دولت آباد"
+        },
+        {
+          "city-en": "falavarjan",
+          "city-fa": "فلاورجان"
+        },
+        {
+          "city-en": "qahderijan",
+          "city-fa": "قهدریجان"
+        },
+        {
+          "city-en": "khvorzuq",
+          "city-fa": "خورزوق"
+        },
+        {
+          "city-en": "nain",
+          "city-fa": "نایین"
+        },
+        {
+          "city-en": "semirom",
+          "city-fa": "سمیرم"
+        },
+        {
+          "city-en": "kelishad-va-sudarjan",
+          "city-fa": "کلیشاد و سودرجان"
+        },
+        {
+          "city-en": "goldasht",
+          "city-fa": "گلدشت"
+        },
+        {
+          "city-en": "gaz",
+          "city-fa": "گز"
+        },
+        {
+          "city-en": "abrisham",
+          "city-fa": "ابریشم"
+        },
+        {
+          "city-en": "khansar",
+          "city-fa": "خوانسار"
+        },
+        {
+          "city-en": "tiran",
+          "city-fa": "تیران"
+        },
+        {
+          "city-en": "daran",
+          "city-fa": "داران"
+        },
+        {
+          "city-en": "sedeh-lenjan",
+          "city-fa": "سده لنجان"
+        },
+        {
+          "city-en": "dizicheh",
+          "city-fa": "دیزیچه"
+        },
+        {
+          "city-en": "varnamkhast",
+          "city-fa": "ورنامخواست"
+        },
+        {
+          "city-en": "dehaqan",
+          "city-fa": "دهاقان"
+        },
+        {
+          "city-en": "dastgerd",
+          "city-fa": "دستگرد"
+        },
+        {
+          "city-en": "ardestan",
+          "city-fa": "اردستان"
+        },
+        {
+          "city-en": "chamgardan",
+          "city-fa": "چمگردان"
+        },
+        {
+          "city-en": "badrud",
+          "city-fa": "بادرود"
+        },
+        {
+          "city-en": "imanshahr",
+          "city-fa": "ایمان شهر"
+        },
+        {
+          "city-en": "natanz",
+          "city-fa": "نطنز"
+        },
+        {
+          "city-en": "chermahin",
+          "city-fa": "چرمهین"
+        },
+        {
+          "city-en": "fereydunshahr",
+          "city-fa": "فریدونشهر"
+        },
+        {
+          "city-en": "pir-bakran",
+          "city-fa": "پیر بکران"
+        },
+        {
+          "city-en": "kushk",
+          "city-fa": "کوشک"
+        },
+        {
+          "city-en": "varzaneh",
+          "city-fa": "ورزنه"
+        },
+        {
+          "city-en": "nushabad",
+          "city-fa": "نوش آباد"
+        },
+        {
+          "city-en": "baharan-shahr",
+          "city-fa": "بهاران شهر"
+        },
+        {
+          "city-en": "kahriz-sang",
+          "city-fa": "کهریز سنگ"
+        },
+        {
+          "city-en": "bagh-e-bahadoran",
+          "city-fa": "باغ بهادران"
+        },
+        {
+          "city-en": "zibashahr",
+          "city-fa": "زیباشهر"
+        },
+        {
+          "city-en": "chadegan",
+          "city-fa": "چادگان"
+        },
+        {
+          "city-en": "talkhuncheh",
+          "city-fa": "تلخونچه"
+        },
+        {
+          "city-en": "golshahr",
+          "city-fa": "گلشهر"
+        },
+        {
+          "city-en": "buin-va-miandasht",
+          "city-fa": "بوئین و میاندشت"
+        },
+        {
+          "city-en": "qahjaverestan",
+          "city-fa": "قهجاورستان"
+        },
+        {
+          "city-en": "zayandeh-rud",
+          "city-fa": "زاینده رود"
+        },
+        {
+          "city-en": "gorgab",
+          "city-fa": "گرگاب"
+        },
+        {
+          "city-en": "habibabad",
+          "city-fa": "حبیب آباد"
+        },
+        {
+          "city-en": "majlesi",
+          "city-fa": "مجلسی"
+        },
+        {
+          "city-en": "zavareh",
+          "city-fa": "زواره"
+        },
+        {
+          "city-en": "dehaq",
+          "city-fa": "دهاق"
+        },
+        {
+          "city-en": "alavicheh",
+          "city-fa": "علویچه"
+        },
+        {
+          "city-en": "zazeran",
+          "city-fa": "زازران"
+        },
+        {
+          "city-en": "manzariyeh",
+          "city-fa": "منظریه"
+        },
+        {
+          "city-en": "karkevand",
+          "city-fa": "کرکوند"
+        },
+        {
+          "city-en": "asgharabad",
+          "city-fa": "اصغر آباد"
+        },
+        {
+          "city-en": "khur",
+          "city-fa": "خور"
+        },
+        {
+          "city-en": "nasrabad",
+          "city-fa": "نصرآباد"
+        },
+        {
+          "city-en": "guged",
+          "city-fa": "گوگد"
+        },
+        {
+          "city-en": "harand",
+          "city-fa": "هرند"
+        },
+        {
+          "city-en": "jowzdan",
+          "city-fa": "جوزدان"
+        },
+        {
+          "city-en": "shadpurabad",
+          "city-fa": "شادپورآباد"
+        },
+        {
+          "city-en": "abuzeydabad",
+          "city-fa": "ابوزیدآباد"
+        },
+        {
+          "city-en": "sefidshahr",
+          "city-fa": "سفیدشهر"
+        },
+        {
+          "city-en": "meymeh",
+          "city-fa": "میمه"
+        },
+        {
+          "city-en": "barf-anbar",
+          "city-fa": "برف انبار"
+        },
+        {
+          "city-en": "meshkat",
+          "city-fa": "مشکات"
+        },
+        {
+          "city-en": "hana",
+          "city-fa": "حنا"
+        },
+        {
+          "city-en": "rozveh",
+          "city-fa": "روزوه"
+        },
+        {
+          "city-en": "komeshcheh",
+          "city-fa": "کومشچه"
+        },
+        {
+          "city-en": "vazvan",
+          "city-fa": "وزوان"
+        },
+        {
+          "city-en": "kuhpayeh",
+          "city-fa": "کوهپایه"
+        },
+        {
+          "city-en": "sin",
+          "city-fa": "سین"
+        },
+        {
+          "city-en": "golshan",
+          "city-fa": "گلشن"
+        },
+        {
+          "city-en": "damaneh",
+          "city-fa": "دامنه"
+        },
+        {
+          "city-en": "sagzi",
+          "city-fa": "سگزی"
+        },
+        {
+          "city-en": "hasanabad",
+          "city-fa": "حسن آباد"
+        },
+        {
+          "city-en": "nikabad",
+          "city-fa": "نیک آباد"
+        },
+        {
+          "city-en": "mohammadabad",
+          "city-fa": "محمد آباد"
+        },
+        {
+          "city-en": "mahabad",
+          "city-fa": "مهاباد"
+        },
+        {
+          "city-en": "asgaran",
+          "city-fa": "عسگران"
+        },
+        {
+          "city-en": "jandaq",
+          "city-fa": "جندق"
+        },
+        {
+          "city-en": "baghshad",
+          "city-fa": "باغشاد"
+        },
+        {
+          "city-en": "tudeshk",
+          "city-fa": "تودشک"
+        },
+        {
+          "city-en": "jowsheqan-va-kamu",
+          "city-fa": "جوشقان و کامو"
+        },
+        {
+          "city-en": "ziar",
+          "city-fa": "زیار"
+        },
+        {
+          "city-en": "qamsar",
+          "city-fa": "قمصر"
+        },
+        {
+          "city-en": "afus",
+          "city-fa": "افوس"
+        },
+        {
+          "city-en": "rezvanshahr",
+          "city-fa": "رضوانشهر"
+        },
+        {
+          "city-en": "ezhiyeh",
+          "city-fa": "اژیه"
+        },
+        {
+          "city-en": "khaledabad",
+          "city-fa": "خالدآباد"
+        },
+        {
+          "city-en": "farrokhi",
+          "city-fa": "فرخی"
+        },
+        {
+          "city-en": "kamu-va-chugan",
+          "city-fa": "کامو و چوگان"
+        },
+        {
+          "city-en": "barzok",
+          "city-fa": "بارزوک"
+        },
+        {
+          "city-en": "tarq",
+          "city-fa": "طرق"
+        },
+        {
+          "city-en": "vanak",
+          "city-fa": "ونک"
+        },
+        {
+          "city-en": "komeh",
+          "city-fa": "کومه"
+        },
+        {
+          "city-en": "neyasar",
+          "city-fa": "نیاسر"
+        },
+        {
+          "city-en": "bafran",
+          "city-fa": "بافران"
+        },
+        {
+          "city-en": "anarak",
+          "city-fa": "انارک"
+        },
+        {
+          "city-en": "lay-bid",
+          "city-fa": "لای بید"
+        }
+      ]
+    },
+    {
+      "province-en": "fars",
+      "province-fa": "فارس",
+      "cities": [
+        {
+          "city-en": "shiraz",
+          "city-fa": "شیراز"
+        },
+        {
+          "city-en": "marvdasht",
+          "city-fa": "مرودشت"
+        },
+        {
+          "city-en": "jahrom",
+          "city-fa": "جهرم"
+        },
+        {
+          "city-en": "fasa",
+          "city-fa": "فسا"
+        },
+        {
+          "city-en": "kazerun",
+          "city-fa": "کازرون"
+        },
+        {
+          "city-en": "sadra",
+          "city-fa": "صدرا"
+        },
+        {
+          "city-en": "darab",
+          "city-fa": "داراب"
+        },
+        {
+          "city-en": "firuzabad",
+          "city-fa": "فیروزآباد"
+        },
+        {
+          "city-en": "lar",
+          "city-fa": "لار"
+        },
+        {
+          "city-en": "abadeh",
+          "city-fa": "آباده"
+        },
+        {
+          "city-en": "nurabad",
+          "city-fa": "نورآباد"
+        },
+        {
+          "city-en": "neyriz",
+          "city-fa": "نی ریز"
+        },
+        {
+          "city-en": "eqlid",
+          "city-fa": "اقلید"
+        },
+        {
+          "city-en": "estahban",
+          "city-fa": "استهبان"
+        },
+        {
+          "city-en": "gerash",
+          "city-fa": "گراش"
+        },
+        {
+          "city-en": "zarqan",
+          "city-fa": "زرقان"
+        },
+        {
+          "city-en": "kavar",
+          "city-fa": "کوار"
+        },
+        {
+          "city-en": "lamerd",
+          "city-fa": "لامرد"
+        },
+        {
+          "city-en": "safashahr",
+          "city-fa": "صفاشهر"
+        },
+        {
+          "city-en": "qaemiyeh",
+          "city-fa": "قائمیه"
+        },
+        {
+          "city-en": "hajjiabad",
+          "city-fa": "حاجی آباد"
+        },
+        {
+          "city-en": "farashband",
+          "city-fa": "فراشبند"
+        },
+        {
+          "city-en": "qir",
+          "city-fa": "قیر"
+        },
+        {
+          "city-en": "evaz",
+          "city-fa": "اوز"
+        },
+        {
+          "city-en": "khonj",
+          "city-fa": "خنج"
+        },
+        {
+          "city-en": "kharameh",
+          "city-fa": "خرامه"
+        },
+        {
+          "city-en": "sarvestan",
+          "city-fa": "سروستان"
+        },
+        {
+          "city-en": "arsanjan",
+          "city-fa": "ارسنجان"
+        },
+        {
+          "city-en": "saadat-shahr",
+          "city-fa": "سعادت شهر"
+        },
+        {
+          "city-en": "qaderabad",
+          "city-fa": "قادرآباد"
+        },
+        {
+          "city-en": "ardakan",
+          "city-fa": "اردکان"
+        },
+        {
+          "city-en": "dobiran",
+          "city-fa": "دوبیران"
+        },
+        {
+          "city-en": "jannat-shahr",
+          "city-fa": "جنت شهر"
+        },
+        {
+          "city-en": "galleh-dar",
+          "city-fa": "گاله در"
+        },
+        {
+          "city-en": "soghad",
+          "city-fa": "صغاد"
+        },
+        {
+          "city-en": "meymand",
+          "city-fa": "میمند"
+        },
+        {
+          "city-en": "darian",
+          "city-fa": "داریان"
+        },
+        {
+          "city-en": "zahedshahr",
+          "city-fa": "زاهدشهر"
+        },
+        {
+          "city-en": "khesht",
+          "city-fa": "خشت"
+        },
+        {
+          "city-en": "surian",
+          "city-fa": "سوریان"
+        },
+        {
+          "city-en": "banaruiyeh",
+          "city-fa": "بنارویه"
+        },
+        {
+          "city-en": "masiri",
+          "city-fa": "مصیری"
+        },
+        {
+          "city-en": "lapui",
+          "city-fa": "لاپویی"
+        },
+        {
+          "city-en": "karzin",
+          "city-fa": "کارزین"
+        },
+        {
+          "city-en": "seyyedan",
+          "city-fa": "سیدان"
+        },
+        {
+          "city-en": "eshkanan",
+          "city-fa": "اشکانان"
+        },
+        {
+          "city-en": "shahr-e-pir",
+          "city-fa": "شهر پیر"
+        },
+        {
+          "city-en": "beyram",
+          "city-fa": "بیرام"
+        },
+        {
+          "city-en": "bahman",
+          "city-fa": "بهمن"
+        },
+        {
+          "city-en": "qotbabad",
+          "city-fa": "قطب آباد"
+        },
+        {
+          "city-en": "juyom",
+          "city-fa": "جویوم"
+        },
+        {
+          "city-en": "abadeh-tashk",
+          "city-fa": "آباده طشک"
+        },
+        {
+          "city-en": "khur",
+          "city-fa": "خور"
+        },
+        {
+          "city-en": "mohr",
+          "city-fa": "مهر"
+        },
+        {
+          "city-en": "beyza",
+          "city-fa": "بیضا"
+        },
+        {
+          "city-en": "latifi",
+          "city-fa": "لطیفی"
+        },
+        {
+          "city-en": "bab-anar",
+          "city-fa": "باب انار"
+        },
+        {
+          "city-en": "qarah-bolagh",
+          "city-fa": "قره بلاغ"
+        },
+        {
+          "city-en": "ij",
+          "city-fa": "ایج"
+        },
+        {
+          "city-en": "khumeh-zar",
+          "city-fa": "خمه زار"
+        },
+        {
+          "city-en": "konartakhteh",
+          "city-fa": "کنارتخته"
+        },
+        {
+          "city-en": "miyanshahr",
+          "city-fa": "میانشهر"
+        },
+        {
+          "city-en": "izadkhast",
+          "city-fa": "ایزدخواست"
+        },
+        {
+          "city-en": "emam-shahr",
+          "city-fa": "امام شهر"
+        },
+        {
+          "city-en": "runiz",
+          "city-fa": "رونیز"
+        },
+        {
+          "city-en": "mobarakabad",
+          "city-fa": "مبارک آباد"
+        },
+        {
+          "city-en": "sedeh",
+          "city-fa": "سده"
+        },
+        {
+          "city-en": "sheshdeh",
+          "city-fa": "ششده"
+        },
+        {
+          "city-en": "khavaran",
+          "city-fa": "خاوران"
+        },
+        {
+          "city-en": "meshkan",
+          "city-fa": "مشکان"
+        },
+        {
+          "city-en": "varavi",
+          "city-fa": "وراوی"
+        },
+        {
+          "city-en": "emad-deh",
+          "city-fa": "عماد ده"
+        },
+        {
+          "city-en": "fadami",
+          "city-fa": "فدامی"
+        },
+        {
+          "city-en": "alamarvdasht",
+          "city-fa": "علمارودشت"
+        },
+        {
+          "city-en": "khaneh-zenyan",
+          "city-fa": "خانه زنیان"
+        },
+        {
+          "city-en": "baladeh",
+          "city-fa": "بلده"
+        },
+        {
+          "city-en": "nujin",
+          "city-fa": "نوجین"
+        },
+        {
+          "city-en": "korehi",
+          "city-fa": "کورهی"
+        },
+        {
+          "city-en": "dezhkord",
+          "city-fa": "دژکرد"
+        },
+        {
+          "city-en": "surmaq",
+          "city-fa": "سورماق"
+        },
+        {
+          "city-en": "mazayjan",
+          "city-fa": "مزایجان"
+        },
+        {
+          "city-en": "dehram",
+          "city-fa": "دهرم"
+        },
+        {
+          "city-en": "kuhenjan",
+          "city-fa": "کوهنجان"
+        },
+        {
+          "city-en": "khuzi",
+          "city-fa": "خوزی"
+        },
+        {
+          "city-en": "kupon",
+          "city-fa": "کوپن"
+        },
+        {
+          "city-en": "now-bandegan",
+          "city-fa": "نوبندگان"
+        },
+        {
+          "city-en": "ahel",
+          "city-fa": "اهل"
+        },
+        {
+          "city-en": "hesami",
+          "city-fa": "حسامی"
+        },
+        {
+          "city-en": "khaniman",
+          "city-fa": "خانیمان"
+        },
+        {
+          "city-en": "do-borji",
+          "city-fa": "دوبرجی"
+        },
+        {
+          "city-en": "qatruyeh",
+          "city-fa": "قطرویه"
+        },
+        {
+          "city-en": "nowdan",
+          "city-fa": "نودان"
+        },
+        {
+          "city-en": "kamfiruz",
+          "city-fa": "کامفیروز"
+        },
+        {
+          "city-en": "hamashahr",
+          "city-fa": "هماشهر"
+        },
+        {
+          "city-en": "efzar",
+          "city-fa": "افزار"
+        },
+        {
+          "city-en": "asir",
+          "city-fa": "اسیر"
+        },
+        {
+          "city-en": "ramjerd",
+          "city-fa": "رامجرد"
+        },
+        {
+          "city-en": "hasanabad",
+          "city-fa": "حسن آباد"
+        },
+        {
+          "city-en": "soltan-shahr",
+          "city-fa": "سلطان شهر"
+        },
+        {
+          "city-en": "madar-e-soleyman",
+          "city-fa": "مادر سلیمان"
+        },
+        {
+          "city-en": "baba-monir",
+          "city-fa": "بابا منیر"
+        },
+        {
+          "city-en": "duzeh",
+          "city-fa": "دوزه"
+        },
+        {
+          "city-en": "arad",
+          "city-fa": "آراد"
+        },
+        {
+          "city-en": "fishvar",
+          "city-fa": "فیش ور"
+        }
+      ]
+    },
+    {
+      "province-en": "gilan",
+      "province-fa": "گیلان",
+      "cities": [
+        {
+          "city-en": "rasht",
+          "city-fa": "رشت"
+        },
+        {
+          "city-en": "bandar-e-anzali",
+          "city-fa": "بندر انزلی"
+        },
+        {
+          "city-en": "lahijan",
+          "city-fa": "لاهیجان"
+        },
+        {
+          "city-en": "langarud",
+          "city-fa": "لنگرود"
+        },
+        {
+          "city-en": "hashtpar",
+          "city-fa": "هشتپر"
+        },
+        {
+          "city-en": "astara",
+          "city-fa": "آستارا"
+        },
+        {
+          "city-en": "sowme'eh-sara",
+          "city-fa": "صومعه سارا"
+        },
+        {
+          "city-en": "astaneh-ye-ashrafiyeh",
+          "city-fa": "آستانه اشرفیه"
+        },
+        {
+          "city-en": "rudsar",
+          "city-fa": "رودسر"
+        },
+        {
+          "city-en": "fuman",
+          "city-fa": "فومن"
+        },
+        {
+          "city-en": "khomam",
+          "city-fa": "خمام"
+        },
+        {
+          "city-en": "siahkal",
+          "city-fa": "سیاهکل"
+        },
+        {
+          "city-en": "rezvanshahr",
+          "city-fa": "رضوانشهر"
+        },
+        {
+          "city-en": "manjil",
+          "city-fa": "منجیل"
+        },
+        {
+          "city-en": "amlash",
+          "city-fa": "املش"
+        },
+        {
+          "city-en": "kiashahr",
+          "city-fa": "کیاشهر"
+        },
+        {
+          "city-en": "rostamabad",
+          "city-fa": "رستم آباد"
+        },
+        {
+          "city-en": "lowshan",
+          "city-fa": "لوشان"
+        },
+        {
+          "city-en": "rudbar",
+          "city-fa": "رودبار"
+        },
+        {
+          "city-en": "kelachay",
+          "city-fa": "کلاچای"
+        },
+        {
+          "city-en": "masal",
+          "city-fa": "ماسال"
+        },
+        {
+          "city-en": "lasht-e-nesha",
+          "city-fa": "لشت نشا"
+        },
+        {
+          "city-en": "lavandevil",
+          "city-fa": "لوندويل"
+        },
+        {
+          "city-en": "kuchesfahan",
+          "city-fa": "کوچصفهان"
+        },
+        {
+          "city-en": "asalem",
+          "city-fa": "اسالم"
+        },
+        {
+          "city-en": "rahimabad",
+          "city-fa": "رحیم آباد"
+        },
+        {
+          "city-en": "sangar",
+          "city-fa": "سنگر"
+        },
+        {
+          "city-en": "chaf-and-chamkhaleh",
+          "city-fa": "چاف و چمخاله"
+        },
+        {
+          "city-en": "chaboksar",
+          "city-fa": "چابکسر"
+        },
+        {
+          "city-en": "shaft",
+          "city-fa": "شفت"
+        },
+        {
+          "city-en": "pareh-sar",
+          "city-fa": "پره سر"
+        },
+        {
+          "city-en": "luleman",
+          "city-fa": "لولمان"
+        },
+        {
+          "city-en": "khoshk-e-bijar",
+          "city-fa": "خشک بیجار"
+        },
+        {
+          "city-en": "marjaghal",
+          "city-fa": "مرجغال"
+        },
+        {
+          "city-en": "kumeleh",
+          "city-fa": "کومله"
+        },
+        {
+          "city-en": "shalman",
+          "city-fa": "شلمان"
+        },
+        {
+          "city-en": "bazar-jomeh",
+          "city-fa": "بازار جمعه"
+        },
+        {
+          "city-en": "chubar",
+          "city-fa": "چوبر"
+        },
+        {
+          "city-en": "gurab-zarmikh",
+          "city-fa": "گوراب زرمیخ"
+        },
+        {
+          "city-en": "vajargah",
+          "city-fa": "واجارگاه"
+        },
+        {
+          "city-en": "haviq",
+          "city-fa": "حویق"
+        },
+        {
+          "city-en": "rudboneh",
+          "city-fa": "رودبونه"
+        },
+        {
+          "city-en": "lisar",
+          "city-fa": "ليسار"
+        },
+        {
+          "city-en": "jirandeh",
+          "city-fa": "جیرنده"
+        },
+        {
+          "city-en": "rankuh",
+          "city-fa": "رانکوه"
+        },
+        {
+          "city-en": "ahmadsargurab",
+          "city-fa": "احمدسرگوراب"
+        },
+        {
+          "city-en": "maklavan",
+          "city-fa": "ماکلوان"
+        },
+        {
+          "city-en": "tutkabon",
+          "city-fa": "توتکابن"
+        },
+        {
+          "city-en": "barehsar",
+          "city-fa": "بره سر"
+        },
+        {
+          "city-en": "otaqvar",
+          "city-fa": "اوتاقور"
+        },
+        {
+          "city-en": "deylaman",
+          "city-fa": "دیلمان"
+        },
+        {
+          "city-en": "masuleh",
+          "city-fa": "ماسوله"
+        }
+      ]
+    },
+    {
+      "province-en": "golestan",
+      "province-fa": "گلستان",
+      "cities": [
+        {
+          "city-en": "gorgan",
+          "city-fa": "گرگان"
+        },
+        {
+          "city-en": "gonbad-e-kavus",
+          "city-fa": "گنبدکاووس"
+        },
+        {
+          "city-en": "aliabad-e-katul",
+          "city-fa": "علی آباد کتول"
+        },
+        {
+          "city-en": "bandar-torkaman",
+          "city-fa": "بندرترکمان"
+        },
+        {
+          "city-en": "azadshahr",
+          "city-fa": "آزادشهر"
+        },
+        {
+          "city-en": "kordkuy",
+          "city-fa": "کردکوی"
+        },
+        {
+          "city-en": "kalaleh",
+          "city-fa": "کلاله"
+        },
+        {
+          "city-en": "aqqala",
+          "city-fa": "آق قلا"
+        },
+        {
+          "city-en": "minudasht",
+          "city-fa": "مینودشت"
+        },
+        {
+          "city-en": "galikash",
+          "city-fa": "گالیکش"
+        },
+        {
+          "city-en": "bandar-e-gaz",
+          "city-fa": "بندرگز"
+        },
+        {
+          "city-en": "gomishan",
+          "city-fa": "گمیشان"
+        },
+        {
+          "city-en": "siminshahr",
+          "city-fa": "سیمین شهر"
+        },
+        {
+          "city-en": "fazelabad",
+          "city-fa": "فاضل آباد"
+        },
+        {
+          "city-en": "ramian",
+          "city-fa": "رامیان"
+        },
+        {
+          "city-en": "khan-bebin",
+          "city-fa": "خان ببین"
+        },
+        {
+          "city-en": "daland",
+          "city-fa": "دالاند"
+        },
+        {
+          "city-en": "neginshahr",
+          "city-fa": "نگین شهر"
+        },
+        {
+          "city-en": "now-kandeh",
+          "city-fa": "نوکنده"
+        },
+        {
+          "city-en": "sarkhon-kalateh",
+          "city-fa": "سرخون کلاته"
+        },
+        {
+          "city-en": "jelin-e-olya",
+          "city-fa": "جلین علیا"
+        },
+        {
+          "city-en": "anbar-olum",
+          "city-fa": "انبار علوم"
+        },
+        {
+          "city-en": "maraveh-tappeh",
+          "city-fa": "مراوه تپه"
+        },
+        {
+          "city-en": "faraghi",
+          "city-fa": "فراغی"
+        },
+        {
+          "city-en": "tatar-e-olya",
+          "city-fa": "تاتار علیا"
+        },
+        {
+          "city-en": "sangdevin",
+          "city-fa": "سنگدوین"
+        },
+        {
+          "city-en": "mazraeh",
+          "city-fa": "مزرعه"
+        },
+        {
+          "city-en": "now-deh-khanduz",
+          "city-fa": "حالا ده خاندوز"
+        },
+        {
+          "city-en": "incheh-borun",
+          "city-fa": "اینچه برون"
+        }
+      ]
+    },
+    {
+      "province-en": "hamadan",
+      "province-fa": "همدان",
+      "cities": [
+        {
+          "city-en": "hamadan",
+          "city-fa": "همدان"
+        },
+        {
+          "city-en": "malayer",
+          "city-fa": "ملایر"
+        },
+        {
+          "city-en": "asadabad",
+          "city-fa": "اسدآباد"
+        },
+        {
+          "city-en": "nahavand",
+          "city-fa": "نهاوند"
+        },
+        {
+          "city-en": "tuyserkan",
+          "city-fa": "تویسرکان"
+        },
+        {
+          "city-en": "bahar",
+          "city-fa": "بهار"
+        },
+        {
+          "city-en": "kabudarahang",
+          "city-fa": "کبودرآهنگ"
+        },
+        {
+          "city-en": "lalejin",
+          "city-fa": "لالجین"
+        },
+        {
+          "city-en": "famenin",
+          "city-fa": "فامنین"
+        },
+        {
+          "city-en": "razan",
+          "city-fa": "رزن"
+        },
+        {
+          "city-en": "maryanaj",
+          "city-fa": "مريانج"
+        },
+        {
+          "city-en": "azandarian",
+          "city-fa": "ازندریان"
+        },
+        {
+          "city-en": "qorveh-e-darjazin",
+          "city-fa": "قروه درجزین"
+        },
+        {
+          "city-en": "juraqan",
+          "city-fa": "جورقان"
+        },
+        {
+          "city-en": "giyan",
+          "city-fa": "گیان"
+        },
+        {
+          "city-en": "mohajeran",
+          "city-fa": "مهاجران"
+        },
+        {
+          "city-en": "salehabad",
+          "city-fa": "صالح آباد"
+        },
+        {
+          "city-en": "sarkan",
+          "city-fa": "سرکان"
+        },
+        {
+          "city-en": "firuzan",
+          "city-fa": "فیروزان"
+        },
+        {
+          "city-en": "samen",
+          "city-fa": "ثامن"
+        },
+        {
+          "city-en": "damaq",
+          "city-fa": "داماق"
+        },
+        {
+          "city-en": "barzul",
+          "city-fa": "برزول"
+        },
+        {
+          "city-en": "qahavand",
+          "city-fa": "قهاوند"
+        },
+        {
+          "city-en": "ajin",
+          "city-fa": "آجین"
+        },
+        {
+          "city-en": "shirin-su",
+          "city-fa": "شیرین سو"
+        },
+        {
+          "city-en": "jowkar",
+          "city-fa": "جوکار"
+        },
+        {
+          "city-en": "gol-tappeh",
+          "city-fa": "گل تپه"
+        },
+        {
+          "city-en": "farasfaj",
+          "city-fa": "فراسفج"
+        },
+        {
+          "city-en": "zangeneh",
+          "city-fa": "زنگنه"
+        }
+      ]
+    },
+    {
+      "province-en": "hormozgan",
+      "province-fa": "هرمزگان",
+      "cities": [
+        {
+          "city-en": "bandar-abbas",
+          "city-fa": "بندرعباس"
+        },
+        {
+          "city-en": "minab",
+          "city-fa": "میناب"
+        },
+        {
+          "city-en": "qeshm",
+          "city-fa": "قشم"
+        },
+        {
+          "city-en": "rudan",
+          "city-fa": "رودان"
+        },
+        {
+          "city-en": "bandar-lengeh",
+          "city-fa": "بندرلنگه"
+        },
+        {
+          "city-en": "kish",
+          "city-fa": "کیش"
+        },
+        {
+          "city-en": "hajjiabad",
+          "city-fa": "حاجی آباد"
+        },
+        {
+          "city-en": "kong",
+          "city-fa": "کنگ"
+        },
+        {
+          "city-en": "dargahan",
+          "city-fa": "درگهان"
+        },
+        {
+          "city-en": "bandar-khamir",
+          "city-fa": "بندر خمیر"
+        },
+        {
+          "city-en": "jask",
+          "city-fa": "جاسک"
+        },
+        {
+          "city-en": "parsian",
+          "city-fa": "پارسیان"
+        },
+        {
+          "city-en": "bastak",
+          "city-fa": "بستک"
+        },
+        {
+          "city-en": "bika",
+          "city-fa": "بیکا"
+        },
+        {
+          "city-en": "jenah",
+          "city-fa": "جناح"
+        },
+        {
+          "city-en": "hasht-bandi",
+          "city-fa": "هشت بندی"
+        },
+        {
+          "city-en": "ruydar",
+          "city-fa": "رویدار"
+        },
+        {
+          "city-en": "hormuz",
+          "city-fa": "هرمز"
+        },
+        {
+          "city-en": "suza",
+          "city-fa": "سوزا"
+        },
+        {
+          "city-en": "qaleh-qazi",
+          "city-fa": "قلعه قاضی"
+        },
+        {
+          "city-en": "sirik",
+          "city-fa": "سیریک"
+        },
+        {
+          "city-en": "tirur",
+          "city-fa": "تیرور"
+        },
+        {
+          "city-en": "dashti",
+          "city-fa": "دشتی"
+        },
+        {
+          "city-en": "tazian-e-pain",
+          "city-fa": "تازيان پايين"
+        },
+        {
+          "city-en": "abu-musa",
+          "city-fa": "ابوموسی"
+        },
+        {
+          "city-en": "bandar-charak",
+          "city-fa": "بندر چارک"
+        },
+        {
+          "city-en": "garuk",
+          "city-fa": "گاروک"
+        },
+        {
+          "city-en": "ziarat-e-ali",
+          "city-fa": "زیارت علی"
+        },
+        {
+          "city-en": "fin",
+          "city-fa": "فین"
+        },
+        {
+          "city-en": "kushk-e-nar",
+          "city-fa": "کوشک نار"
+        },
+        {
+          "city-en": "takht",
+          "city-fa": "تخت"
+        },
+        {
+          "city-en": "kuhestak",
+          "city-fa": "کوهستک"
+        },
+        {
+          "city-en": "lamazan",
+          "city-fa": "لمازان"
+        },
+        {
+          "city-en": "senderk",
+          "city-fa": "سندرک"
+        },
+        {
+          "city-en": "fareghan",
+          "city-fa": "فارغان"
+        },
+        {
+          "city-en": "sardasht",
+          "city-fa": "سردشت"
+        },
+        {
+          "city-en": "gowharan",
+          "city-fa": "گوهران"
+        },
+        {
+          "city-en": "sargaz",
+          "city-fa": "سرگز"
+        },
+        {
+          "city-en": "dezghan",
+          "city-fa": "دزقان"
+        },
+        {
+          "city-en": "kukherd",
+          "city-fa": "كوخرد"
+        }
+      ]
+    },
+    {
+      "province-en": "ilam",
+      "province-fa": "ایلام",
+      "cities": [
+        {
+          "city-en": "ilam",
+          "city-fa": "ایلام"
+        },
+        {
+          "city-en": "abdanan",
+          "city-fa": "آبدانان"
+        },
+        {
+          "city-en": "eyvan",
+          "city-fa": "ایوان"
+        },
+        {
+          "city-en": "dehloran",
+          "city-fa": "دهلران"
+        },
+        {
+          "city-en": "darreh-shahr",
+          "city-fa": "دره شهر"
+        },
+        {
+          "city-en": "arakvaz",
+          "city-fa": "اركواز"
+        },
+        {
+          "city-en": "mehran",
+          "city-fa": "مهران"
+        },
+        {
+          "city-en": "sarableh",
+          "city-fa": "سرابله"
+        },
+        {
+          "city-en": "asemanabad",
+          "city-fa": "آسمان آباد"
+        },
+        {
+          "city-en": "towhid",
+          "city-fa": "توحید"
+        },
+        {
+          "city-en": "chavar",
+          "city-fa": "چوار"
+        },
+        {
+          "city-en": "badreh",
+          "city-fa": "بدره"
+        },
+        {
+          "city-en": "shabab",
+          "city-fa": "شباب"
+        },
+        {
+          "city-en": "pahleh",
+          "city-fa": "پهله"
+        },
+        {
+          "city-en": "delgosha",
+          "city-fa": "دلگشا"
+        },
+        {
+          "city-en": "murmuri",
+          "city-fa": "مورموری"
+        },
+        {
+          "city-en": "zarneh",
+          "city-fa": "زرنه"
+        },
+        {
+          "city-en": "lumar",
+          "city-fa": "لومار"
+        },
+        {
+          "city-en": "musian",
+          "city-fa": "موسيان"
+        },
+        {
+          "city-en": "meymeh",
+          "city-fa": "میمه"
+        },
+        {
+          "city-en": "sarabbagh",
+          "city-fa": "سراباغ"
+        },
+        {
+          "city-en": "salehabad",
+          "city-fa": "صالح آباد"
+        },
+        {
+          "city-en": "mirza-hoseynabad",
+          "city-fa": "میرزا حسین آباد"
+        },
+        {
+          "city-en": "mehr",
+          "city-fa": "مهر"
+        },
+        {
+          "city-en": "balavah",
+          "city-fa": "بلاوه"
+        }
+      ]
+    },
+    {
+      "province-en": "kerman",
+      "province-fa": "کرمان",
+      "cities": [
+        {
+          "city-en": "kerman",
+          "city-fa": "کرمان"
+        },
+        {
+          "city-en": "sirjan",
+          "city-fa": "سیرجان"
+        },
+        {
+          "city-en": "rafsanjan",
+          "city-fa": "رفسنجان"
+        },
+        {
+          "city-en": "jiroft",
+          "city-fa": "جیرفت"
+        },
+        {
+          "city-en": "bam",
+          "city-fa": "بم"
+        },
+        {
+          "city-en": "zarand",
+          "city-fa": "زرند"
+        },
+        {
+          "city-en": "kahnuj",
+          "city-fa": "کهنوج"
+        },
+        {
+          "city-en": "shahr-e-babak",
+          "city-fa": "شهربابک"
+        },
+        {
+          "city-en": "baft",
+          "city-fa": "بافت"
+        },
+        {
+          "city-en": "bardsir",
+          "city-fa": "بردسیر"
+        },
+        {
+          "city-en": "baravat",
+          "city-fa": "بروات"
+        },
+        {
+          "city-en": "ravar",
+          "city-fa": "راور"
+        },
+        {
+          "city-en": "mohamadabad",
+          "city-fa": "محمد آباد"
+        },
+        {
+          "city-en": "najaf-shahr",
+          "city-fa": "نجف شهر"
+        },
+        {
+          "city-en": "mahan",
+          "city-fa": "ماهان"
+        },
+        {
+          "city-en": "anbarabad",
+          "city-fa": "عنبرآباد"
+        },
+        {
+          "city-en": "manujan",
+          "city-fa": "منوجان"
+        },
+        {
+          "city-en": "anar",
+          "city-fa": "انار"
+        },
+        {
+          "city-en": "rudbar",
+          "city-fa": "رودبار"
+        },
+        {
+          "city-en": "rabor",
+          "city-fa": "رابر"
+        },
+        {
+          "city-en": "qaleh-ganj",
+          "city-fa": "قلعه گنج"
+        },
+        {
+          "city-en": "kuhbanan",
+          "city-fa": "کوهبنان"
+        },
+        {
+          "city-en": "darb-e-behesht",
+          "city-fa": "درب بهشت"
+        },
+        {
+          "city-en": "baghin",
+          "city-fa": "باغین"
+        },
+        {
+          "city-en": "rayen",
+          "city-fa": "راین"
+        },
+        {
+          "city-en": "negar",
+          "city-fa": "نگار"
+        },
+        {
+          "city-en": "mes-e-sarcheshmeh",
+          "city-fa": "مس سرچشمه"
+        },
+        {
+          "city-en": "ekhtiarabad",
+          "city-fa": "اختیار آباد"
+        },
+        {
+          "city-en": "golbaf",
+          "city-fa": "گلباف"
+        },
+        {
+          "city-en": "zeydabad",
+          "city-fa": "زیدآباد"
+        },
+        {
+          "city-en": "zangiabad",
+          "city-fa": "زنگی آباد"
+        },
+        {
+          "city-en": "khursand",
+          "city-fa": "خورسند"
+        },
+        {
+          "city-en": "pariz",
+          "city-fa": "پاریز"
+        },
+        {
+          "city-en": "dehaj",
+          "city-fa": "دهج"
+        },
+        {
+          "city-en": "koshkuiyeh",
+          "city-fa": "کوشکویه"
+        },
+        {
+          "city-en": "golzar",
+          "city-fa": "گلزار"
+        },
+        {
+          "city-en": "mohammadabad-e-gonbaki",
+          "city-fa": "محمد آباد گنبکی"
+        },
+        {
+          "city-en": "fahraj",
+          "city-fa": "فهرج"
+        },
+        {
+          "city-en": "arzuiyeh",
+          "city-fa": "آرزویه"
+        },
+        {
+          "city-en": "zeh-e-kalut",
+          "city-fa": "زه کلوت"
+        },
+        {
+          "city-en": "jebalbarez",
+          "city-fa": "جبالبارز"
+        },
+        {
+          "city-en": "chatrud",
+          "city-fa": "چترود"
+        },
+        {
+          "city-en": "yazdan-shahr",
+          "city-fa": "یزدان شهر"
+        },
+        {
+          "city-en": "nowdezh",
+          "city-fa": "نودژ"
+        },
+        {
+          "city-en": "faryab",
+          "city-fa": "فاریاب"
+        },
+        {
+          "city-en": "reyhan-shahr",
+          "city-fa": "ریحان شهر"
+        },
+        {
+          "city-en": "kian-shahr",
+          "city-fa": "کیان شهر"
+        },
+        {
+          "city-en": "bezenjan",
+          "city-fa": "بزنجان"
+        },
+        {
+          "city-en": "lalehzar",
+          "city-fa": "لاله زار"
+        },
+        {
+          "city-en": "aminshahr",
+          "city-fa": "امین شهر"
+        },
+        {
+          "city-en": "dow-sari",
+          "city-fa": "دوساری"
+        },
+        {
+          "city-en": "boluk",
+          "city-fa": "بولوک"
+        },
+        {
+          "city-en": "bahreman",
+          "city-fa": "بهرمان"
+        },
+        {
+          "city-en": "narmashir",
+          "city-fa": "نرماشیر"
+        },
+        {
+          "city-en": "shahdad",
+          "city-fa": "شهداد"
+        },
+        {
+          "city-en": "khatunabad",
+          "city-fa": "خاتون آباد"
+        },
+        {
+          "city-en": "jupar",
+          "city-fa": "جوپار"
+        },
+        {
+          "city-en": "balvard",
+          "city-fa": "بلورد"
+        },
+        {
+          "city-en": "jowzam",
+          "city-fa": "جوزم"
+        },
+        {
+          "city-en": "kazemabad",
+          "city-fa": "کاظم آباد"
+        },
+        {
+          "city-en": "khanuk",
+          "city-fa": "خانوک"
+        },
+        {
+          "city-en": "mohiabad",
+          "city-fa": "محی آباد"
+        },
+        {
+          "city-en": "anduhjerd",
+          "city-fa": "اندوهجرد"
+        },
+        {
+          "city-en": "khvaju-shahr",
+          "city-fa": "خواجو شهر"
+        },
+        {
+          "city-en": "safayyeh",
+          "city-fa": "صفاییه"
+        },
+        {
+          "city-en": "hamashahr",
+          "city-fa": "هماشهر"
+        },
+        {
+          "city-en": "dashtkar",
+          "city-fa": "دشتکار"
+        },
+        {
+          "city-en": "mardehek",
+          "city-fa": "مردهک"
+        },
+        {
+          "city-en": "nezamshahr",
+          "city-fa": "نظامشهر"
+        },
+        {
+          "city-en": "hanza",
+          "city-fa": "هنزا"
+        },
+        {
+          "city-en": "hojedk",
+          "city-fa": "هجدک"
+        }
+      ]
+    },
+    {
+      "province-en": "kermanshah",
+      "province-fa": "کرمانشاه",
+      "cities": [
+        {
+          "city-en": "kermanshah",
+          "city-fa": "کرمانشاه"
+        },
+        {
+          "city-en": "eslamabad-e-gharb",
+          "city-fa": "اسلام آباد غرب"
+        },
+        {
+          "city-en": "kangavar",
+          "city-fa": "کنگاور"
+        },
+        {
+          "city-en": "harsin",
+          "city-fa": "هرسین"
+        },
+        {
+          "city-en": "javanrud",
+          "city-fa": "جوانرود"
+        },
+        {
+          "city-en": "sarpol-e-zahab",
+          "city-fa": "سرپل ذهاب"
+        },
+        {
+          "city-en": "sonqor",
+          "city-fa": "سنقر"
+        },
+        {
+          "city-en": "sahneh",
+          "city-fa": "صحنه"
+        },
+        {
+          "city-en": "gilan-e-gharb",
+          "city-fa": "گیلانغرب"
+        },
+        {
+          "city-en": "paveh",
+          "city-fa": "پاوه"
+        },
+        {
+          "city-en": "ravansar",
+          "city-fa": "روانسر"
+        },
+        {
+          "city-en": "qasr-e-shirin",
+          "city-fa": "قصرشیرین"
+        },
+        {
+          "city-en": "tazehabad",
+          "city-fa": "تازه آباد"
+        },
+        {
+          "city-en": "kerend-gharb",
+          "city-fa": "کرند غرب"
+        },
+        {
+          "city-en": "gahvareh",
+          "city-fa": "گهواره"
+        },
+        {
+          "city-en": "kuzaran",
+          "city-fa": "کوزاران"
+        },
+        {
+          "city-en": "banevreh",
+          "city-fa": "بانوره"
+        },
+        {
+          "city-en": "gowdin",
+          "city-fa": "گودین"
+        },
+        {
+          "city-en": "nowdeshah",
+          "city-fa": "نودشاه"
+        },
+        {
+          "city-en": "shahrak-e-rijab",
+          "city-fa": "شهرک ریجاب"
+        },
+        {
+          "city-en": "shahu",
+          "city-fa": "شاهو"
+        },
+        {
+          "city-en": "sarmast",
+          "city-fa": "سرمست"
+        },
+        {
+          "city-en": "bisotun",
+          "city-fa": "بیستون"
+        },
+        {
+          "city-en": "bayangan",
+          "city-fa": "باینگان"
+        },
+        {
+          "city-en": "nowsud",
+          "city-fa": "نوسود"
+        },
+        {
+          "city-en": "ezgeleh",
+          "city-fa": "ازگله"
+        },
+        {
+          "city-en": "homeyl",
+          "city-fa": "هومیل"
+        },
+        {
+          "city-en": "satar",
+          "city-fa": "ستار"
+        },
+        {
+          "city-en": "robat",
+          "city-fa": "رباط"
+        },
+        {
+          "city-en": "miyan-rahan",
+          "city-fa": "میان راهان"
+        },
+        {
+          "city-en": "هلشی",
+          "city-fa": "حلاشی"
+        },
+        {
+          "city-en": "sumar",
+          "city-fa": "سومار"
+        }
+      ]
+    },
+    {
+      "province-en": "khuzestan",
+      "province-fa": "خوزستان",
+      "cities": [
+        {
+          "city-en": "ahvaz",
+          "city-fa": "اهواز"
+        },
+        {
+          "city-en": "dezful",
+          "city-fa": "دزفول"
+        },
+        {
+          "city-en": "abadan",
+          "city-fa": "آبادان"
+        },
+        {
+          "city-en": "bandar-e-mahshahr",
+          "city-fa": "بندر ماهشهر"
+        },
+        {
+          "city-en": "andimeshk",
+          "city-fa": "اندیمشک"
+        },
+        {
+          "city-en": "khorramshahr",
+          "city-fa": "خرمشهر"
+        },
+        {
+          "city-en": "behbahan",
+          "city-fa": "بهبهان"
+        },
+        {
+          "city-en": "izeh",
+          "city-fa": "ایذه"
+        },
+        {
+          "city-en": "shushtar",
+          "city-fa": "شوشتر"
+        },
+        {
+          "city-en": "masjed-soleyman",
+          "city-fa": "مسجد سلیمان"
+        },
+        {
+          "city-en": "omidiyeh",
+          "city-fa": "امیدیه"
+        },
+        {
+          "city-en": "bandar-e-emam-khomeyni",
+          "city-fa": "بندر امام خمینی"
+        },
+        {
+          "city-en": "kut-e-abdollah",
+          "city-fa": "کوت عبدالله"
+        },
+        {
+          "city-en": "shush",
+          "city-fa": "شوش"
+        },
+        {
+          "city-en": "ramhormoz",
+          "city-fa": "رامهرمز"
+        },
+        {
+          "city-en": "shadegan",
+          "city-fa": "شادگان"
+        },
+        {
+          "city-en": "susangerd",
+          "city-fa": "سوسنگرد"
+        },
+        {
+          "city-en": "hendijan",
+          "city-fa": "هندیجان"
+        },
+        {
+          "city-en": "ramshir",
+          "city-fa": "رامشیر"
+        },
+        {
+          "city-en": "sheyban",
+          "city-fa": "شیبان"
+        },
+        {
+          "city-en": "hamidiyeh",
+          "city-fa": "حمیدیه"
+        },
+        {
+          "city-en": "gotvand",
+          "city-fa": "گتوند"
+        },
+        {
+          "city-en": "bagh-e-malek",
+          "city-fa": "باغ ملک"
+        },
+        {
+          "city-en": "chamran",
+          "city-fa": "چمران"
+        },
+        {
+          "city-en": "lali",
+          "city-fa": "لالی"
+        },
+        {
+          "city-en": "haftkel",
+          "city-fa": "هفتکل"
+        },
+        {
+          "city-en": "hoveyzeh",
+          "city-fa": "هویزه"
+        },
+        {
+          "city-en": "veys",
+          "city-fa": "ویس"
+        },
+        {
+          "city-en": "mollasani",
+          "city-fa": "ملاثانی"
+        },
+        {
+          "city-en": "aghajari",
+          "city-fa": "آغاجاری"
+        },
+        {
+          "city-en": "sharaft",
+          "city-fa": "شرافت"
+        },
+        {
+          "city-en": "dezab",
+          "city-fa": "دزاب"
+        },
+        {
+          "city-en": "arvandkenar",
+          "city-fa": "اروندکنار"
+        },
+        {
+          "city-en": "shamsabad",
+       
