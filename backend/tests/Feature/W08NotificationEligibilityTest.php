@@ -27,6 +27,20 @@ final class W08NotificationEligibilityTest extends TestCase
         $this->assertDatabaseHas('notification_deliveries', ['outbox_event_id' => $event->id, 'status' => 'delivered', 'failure_code' => null]);
     }
 
+    public function test_terminal_failure_is_not_resent_when_outbox_is_redispatched(): void
+    {
+        $event = $this->event();
+        $this->delivery($event, 'failed');
+        DB::table('notification_deliveries')->where('outbox_event_id', $event->id)->update(['failure_code' => 'REJECTED']);
+        $sender = $this->createMock(NotificationSender::class);
+        $sender->expects($this->never())->method('send');
+
+        (new ProcessOutboxEvent($event->id))->handle($sender);
+
+        $this->assertNotNull($event->refresh()->processed_at);
+        $this->assertDatabaseHas('notification_deliveries', ['outbox_event_id' => $event->id, 'status' => 'failed', 'failure_code' => 'REJECTED']);
+    }
+
     public function test_exhausted_job_cannot_downgrade_a_delivered_receipt(): void
     {
         $event = $this->event();
