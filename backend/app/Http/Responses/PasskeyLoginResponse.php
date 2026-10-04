@@ -11,7 +11,8 @@ final class PasskeyLoginResponse implements PasskeyLoginResponseContract
 {
     public function toResponse($request): Response
     {
-        $locale = Auth::user()?->locale;
+        $selectedLocale = $request->hasSession() ? $request->session()->get('ui_locale') : null;
+        $locale = in_array($selectedLocale, ['fa', 'ar', 'en'], true) ? $selectedLocale : Auth::user()?->locale;
         $locale = in_array($locale, ['fa', 'ar', 'en'], true) ? $locale : 'fa';
         $target = route('panel', ['locale' => $locale]);
 
