@@ -1,0 +1,123 @@
+diff --git a/src/components/brand-mark.tsx b/src/components/brand-mark.tsx
+index 6d912eb..6203cfc 100644
+--- a/src/components/brand-mark.tsx
++++ b/src/components/brand-mark.tsx
+@@ -1,10 +1,14 @@
+ export function BrandMark({ className = "h-11 w-11" }: { className?: string }) {
+   return (
+-    <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
+-      <rect width="64" height="64" rx="16" fill="var(--color-teal)" />
+-      <path d="M32 12c-7 8-12 14-12 21a12 12 0 0 0 24 0c0-7-5-13-12-21z" fill="var(--color-foam)" />
+-      <path d="M32 28v16" stroke="var(--color-teal)" strokeWidth="3" strokeLinecap="round" />
+-    </svg>
++    <img
++      src="/brand/royadarman-symbol.svg"
++      className={className}
++      width={512}
++      height={512}
++      alt=""
++      aria-hidden="true"
++      decoding="async"
++    />
+   );
+ }
+ 
+diff --git a/src/routes/__root.tsx b/src/routes/__root.tsx
+index 3480692..97e4d37 100644
+--- a/src/routes/__root.tsx
++++ b/src/routes/__root.tsx
+@@ -10,10 +10,10 @@ export const Route = createRootRoute({
+       { name: "viewport", content: "width=device-width, initial-scale=1" },
+       { title: "CRM رویا درمان" },
+       { name: "description", content: "پیش‌نمایش CRM رویا درمان: داشبورد، بیماران، تقویم، پرونده، مالی، پیام و وظایف. امضای محصول اسمارت طب است." },
+-      { name: "theme-color", content: "#0d7657" },
++      { name: "theme-color", content: "#0E52B7" },
+     ],
+     links: [
+-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
++      { rel: "icon", type: "image/svg+xml", href: "/brand/royadarman-symbol.svg" },
+       { rel: "stylesheet", href: appCss },
+       { rel: "preconnect", href: "https://fonts.googleapis.com" },
+       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+@@ -26,7 +26,7 @@ export const Route = createRootRoute({
+     ],
+   }),
+   component: () => (
+-    <html lang="fa" dir="rtl" suppressHydrationWarning>
++    <html lang="fa" dir="rtl" data-brand="royadarman" suppressHydrationWarning>
+       <head>
+         <HeadContent />
+       </head>
+diff --git a/src/styles.css b/src/styles.css
+index 4b1bc2e..733f71b 100644
+--- a/src/styles.css
++++ b/src/styles.css
+@@ -1,39 +1,42 @@
+ @import "tailwindcss";
++@import "./styles/royadarman-tokens.css";
+ 
+ @theme {
+   --font-sans: "Vazirmatn", "Inter", Tahoma, ui-sans-serif, system-ui, sans-serif;
+-  --color-ink: #173b30;
+-  --color-muted: #62756b;
+-  --color-paper: #eef7f2;
+-  --color-card: #ffffff;
+-  --color-line: #dfe8e2;
+-  --color-pine: #0d5141;
+-  --color-pine-2: #e7f4ee;
+-  --color-teal: #0d7657;
+-  --color-foam: #e7f5ee;
+-  --color-brass: #a86a00;
+-  --color-danger: #bc2626;
+-  --color-ok: #087149;
+-  --color-onpine: #f4faf7;
+-  --color-info: #365cb5;
++  --color-ink: var(--rd-ui-text);
++  --color-muted: var(--rd-ui-muted);
++  --color-paper: var(--rd-ui-canvas);
++  --color-card: var(--rd-ui-surface);
++  --color-line: var(--rd-ui-border);
++  --color-pine: var(--rd-brand-deep);
++  --color-pine-2: var(--rd-surface-muted);
++  --color-teal: var(--rd-ui-primary);
++  --color-foam: var(--rd-surface-muted);
++  --color-brass: var(--rd-warning);
++  --color-danger: var(--rd-danger);
++  --color-ok: var(--rd-success);
++  --color-onpine: var(--rd-ui-on-primary);
++  --color-info: var(--rd-ui-primary);
+   --radius-lg: 1.05rem;
+ }
+ 
+-.dark {
+-  --color-ink: #e7f3ef;
+-  --color-muted: #9bb0aa;
+-  --color-paper: #101816;
+-  --color-card: #182421;
+-  --color-line: #2c4540;
+-  --color-pine: #d7efe4;
+-  --color-pine-2: #1a3330;
+-  --color-teal: #3dbe8f;
+-  --color-foam: #1a3330;
++/* The supplied build toggles .dark on html; keep its existing mechanism. */
++[data-brand="royadarman"].dark {
++  --rd-ui-primary: var(--rd-brand-highlight);
++  --rd-ui-on-primary: var(--rd-dark-canvas);
++  --rd-ui-canvas: var(--rd-dark-canvas);
++  --rd-ui-surface: var(--rd-dark-surface);
++  --rd-ui-text: var(--rd-dark-text);
++  --rd-ui-muted: var(--rd-dark-text-muted);
++  --rd-ui-border: #37536F;
++  --rd-ui-focus: var(--rd-brand-highlight);
++  --color-pine: var(--rd-dark-text);
++  --color-pine-2: var(--rd-dark-surface);
++  --color-foam: var(--rd-dark-surface);
++  /* Status colours remain distinct from the application brand. */
+   --color-brass: #e0b56a;
+   --color-danger: #ffb4b4;
+   --color-ok: #8ddeb0;
+-  --color-onpine: #10241c;
+-  --color-info: #b9ccff;
+ }
+ 
+ @layer base {

@@ -1,0 +1,45 @@
+/* Royadarman brand tokens. Namespaced; not a Smart Teb rebrand. */
+:root {
+  --rd-brand-deep: #103D92;
+  --rd-brand-primary: #0E52B7;
+  --rd-brand-accent: #2699F0;
+  --rd-brand-highlight: #6BB4E8;
+  --rd-canvas: #F3F8FE;
+  --rd-surface: #FFFFFF;
+  --rd-surface-muted: #EAF3FD;
+  --rd-border: #C8DCF2;
+  --rd-text: #15304B;
+  --rd-text-muted: #49647F;
+  --rd-on-primary: #FFFFFF;
+  --rd-success: #18794E;
+  --rd-warning: #B54708;
+  --rd-danger: #B42318;
+  --rd-focus: #0E52B7;
+  --rd-dark-canvas: #0C1628;
+  --rd-dark-surface: #14243A;
+  --rd-dark-text: #E8F2FC;
+  --rd-dark-text-muted: #B4C9DE;
+  --rd-brand-gradient: linear-gradient(135deg, #103D92 0%, #0E52B7 48%, #2699F0 100%);
+}
+/* Opt in on the Royadarman application root. Keep typography and layout unchanged. */
+[data-brand="royadarman"] {
+  --rd-ui-primary: var(--rd-brand-primary);
+  --rd-ui-on-primary: var(--rd-on-primary);
+  --rd-ui-canvas: var(--rd-canvas);
+  --rd-ui-surface: var(--rd-surface);
+  --rd-ui-text: var(--rd-text);
+  --rd-ui-muted: var(--rd-text-muted);
+  --rd-ui-border: var(--rd-border);
+  --rd-ui-focus: var(--rd-focus);
+}
+[data-brand="royadarman"][data-theme="dark"],
+[data-brand="royadarman"] [data-theme="dark"] {
+  --rd-ui-primary: var(--rd-brand-highlight);
+  --rd-ui-on-primary: var(--rd-dark-canvas);
+  --rd-ui-canvas: var(--rd-dark-canvas);
+  --rd-ui-surface: var(--rd-dark-surface);
+  --rd-ui-text: var(--rd-dark-text);
+  --rd-ui-muted: var(--rd-dark-text-muted);
+  --rd-ui-border: #37536F;
+  --rd-ui-focus: var(--rd-brand-highlight);
+}
