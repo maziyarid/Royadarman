@@ -11,6 +11,7 @@ use App\Models\PatientCase;
 use App\Models\PolicyVersion;
 use App\Models\ReviewRevision;
 use App\Models\User;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -256,6 +257,186 @@ final class W05ClinicalReleaseJourneyTest extends TestCase
         $this->getJson($this->documentUrl($case, $document))->assertNotFound();
         $this->getJson($this->documentUrl($case, $document).'/content')->assertNotFound();
         $this->assertDatabaseCount('document_access_events', 0);
+    }
+
+    public function test_interrupted_upload_creates_no_record_and_a_complete_retry_succeeds(): void
+    {
+        [$patient, $case] = $this->submittedRequest();
+        $this->acceptDocumentConsent($patient, $case);
+        $complete = UploadedFile::fake()->createWithContent('SYNTHETIC-W05-retry.png', base64_decode(self::IMAGE, true));
+        $interrupted = new UploadedFile($complete->getPathname(), 'SYNTHETIC-W05-interrupted.png', 'image/png', UPLOAD_ERR_PARTIAL, true);
+
+        $this->actingAs($patient)->post('/api/v1/cases/'.$case->id.'/documents', [
+            'document' => $interrupted,
+        ], ['Accept' => 'application/json'])->assertUnprocessable();
+        $this->assertDatabaseCount('clinical_documents', 0);
+        $this->assertSame([], Storage::disk('opg-quarantine')->allFiles());
+        Queue::assertNotPushed(ScanClinicalDocument::class);
+
+        $this->post('/api/v1/cases/'.$case->id.'/documents', ['document' => $complete], ['Accept' => 'application/json'])
+            ->assertStatus(202)->assertJsonPath('data.status', 'quarantined');
+        $this->assertDatabaseCount('clinical_documents', 1);
+        Queue::assertPushed(ScanClinicalDocument::class, 1);
+    }
+
+    public function test_upload_storage_failure_is_not_acknowledged_and_a_restored_disk_allows_retry(): void
+    {
+        [$patient, $case] = $this->submittedRequest();
+        $this->acceptDocumentConsent($patient, $case);
+        $workingDisk = Storage::disk('opg-quarantine');
+        // Fault-inject only the storage boundary; the real HTTP handler and DB run.
+        $failedDisk = \Mockery::mock(FilesystemAdapter::class);
+        $failedDisk->shouldReceive('writeStream')->once()->andReturn(false);
+        $failedDisk->shouldReceive('delete')->zeroOrMoreTimes()->andReturn(true);
+        Storage::set('opg-quarantine', $failedDisk);
+        try {
+            $response = $this->actingAs($patient)->post('/api/v1/cases/'.$case->id.'/documents', [
+                'document' => UploadedFile::fake()->createWithContent('SYNTHETIC-W05-storage.png', base64_decode(self::IMAGE, true)),
+            ], ['Accept' => 'application/json']);
+        } finally {
+            Storage::set('opg-quarantine', $workingDisk);
+        }
+
+        $this->assertGreaterThanOrEqual(500, $response->status(), 'Failed-write outcome: '.json_encode([
+            'http_status' => $response->status(),
+            'document_rows' => DB::table('clinical_documents')->count(),
+            'success_audits' => DB::table('audit_events')->where('action', 'document.quarantined')->count(),
+            'stored_files' => count($workingDisk->allFiles()),
+        ]));
+        $this->assertLessThan(600, $response->status());
+        $this->assertDatabaseCount('clinical_documents', 0);
+        $this->assertSame(0, DB::table('audit_events')->where('action', 'document.quarantined')->count());
+        $this->assertSame([], $workingDisk->allFiles());
+        Queue::assertNotPushed(ScanClinicalDocument::class);
+
+        $this->post('/api/v1/cases/'.$case->id.'/documents', [
+            'document' => UploadedFile::fake()->createWithContent('SYNTHETIC-W05-storage.png', base64_decode(self::IMAGE, true)),
+        ], ['Accept' => 'application/json'])->assertStatus(202);
+        $this->assertDatabaseCount('clinical_documents', 1);
+        Queue::assertPushed(ScanClinicalDocument::class, 1);
+    }
+
+    public function test_completed_scan_replay_is_a_noop_without_rescanning_or_duplicate_audit(): void
+    {
+        [$patient, $case] = $this->submittedRequest();
+        $document = $this->upload($patient, $case);
+        $this->approve($document);
+        $attempts = DB::table('scan_attempts')->where('document_id', $document->id)->count();
+        $audits = DB::table('audit_events')->where('resource_id', $document->id)->count();
+        $scanner = new class implements DocumentScanner
+        {
+            public function scan(string $absolutePath): ScanResult
+            {
+                throw new RuntimeException('A completed scan must not run again.');
+            }
+        };
+        (new ScanClinicalDocument($document->id))->handle($scanner);
+        $this->assertSame(DocumentStatus::Approved, $document->fresh()->status);
+        $this->assertSame($attempts, DB::table('scan_attempts')->where('document_id', $document->id)->count());
+        $this->assertSame($audits, DB::table('audit_events')->where('resource_id', $document->id)->count());
+        Storage::disk('private-opg')->assertExists($document->storage_key);
+    }
+
+    #[DataProvider('completedScanStates')]
+    public function test_late_scan_failure_does_not_replace_a_completed_verdict(string $state): void
+    {
+        [$patient, $case] = $this->submittedRequest();
+        $document = $this->upload($patient, $case);
+        if ($state === 'approved') {
+            $this->approve($document);
+        } elseif ($state === 'rejected') {
+            $scanner = new class implements DocumentScanner
+            {
+                public function scan(string $absolutePath): ScanResult
+                {
+                    return new ScanResult(false, 'synthetic-w05-scanner', 'SYNTHETIC-INFECTED');
+                }
+            };
+            (new ScanClinicalDocument($document->id))->handle($scanner);
+        } else {
+            // Persisted retention/deletion fixture, not a claim about a deletion UI.
+            $document->update(['status' => DocumentStatus::Deleted, 'deleted_at' => now()]);
+        }
+        $document->refresh();
+        $this->assertSame($state, $document->status->value);
+        $before = $document->getRawOriginal();
+        $audits = DB::table('audit_events')->where('resource_id', $document->id)->count();
+        (new ScanClinicalDocument($document->id))->failed(new RuntimeException('SYNTHETIC-LATE-QUEUE-FAILURE'));
+
+        $this->assertSame($before, $document->fresh()->getRawOriginal(), 'A late failure callback must not demote a terminal result.');
+        $this->assertSame($audits, DB::table('audit_events')->where('resource_id', $document->id)->count());
+    }
+
+    public static function completedScanStates(): array
+    {
+        return ['approved' => ['approved'], 'rejected' => ['rejected'], 'deleted' => ['deleted']];
+    }
+
+    public function test_repeated_scan_failure_callback_does_not_duplicate_the_failure_audit(): void
+    {
+        [$patient, $case] = $this->submittedRequest();
+        $document = $this->upload($patient, $case);
+        $job = new ScanClinicalDocument($document->id);
+        $failure = new RuntimeException('SYNTHETIC-W05-QUEUE-TIMEOUT');
+        $job->failed($failure);
+        $this->assertSame(DocumentStatus::ScanFailed, $document->fresh()->status);
+        $this->assertSame(1, DB::table('audit_events')->where('resource_id', $document->id)->where('action', 'document.scanned')->where('result', 'failed')->count());
+        $job->failed($failure);
+        $this->assertSame(1, DB::table('audit_events')->where('resource_id', $document->id)->where('action', 'document.scanned')->where('result', 'failed')->count());
+        Storage::disk('opg-quarantine')->assertExists($document->storage_key);
+    }
+
+    public function test_deleted_source_is_not_processed_by_a_delayed_scan_job(): void
+    {
+        [$patient, $case] = $this->submittedRequest();
+        $document = $this->upload($patient, $case);
+        // A deletion tombstone must win even before a separate status update.
+        $document->update(['deleted_at' => now()]);
+        $scanner = new class implements DocumentScanner
+        {
+            public int $calls = 0;
+
+            public function scan(string $absolutePath): ScanResult
+            {
+                $this->calls++;
+
+                return new ScanResult(true, 'synthetic-w05-scanner', hash_file('sha256', $absolutePath));
+            }
+        };
+        (new ScanClinicalDocument($document->id))->handle($scanner);
+        $this->assertSame(0, $scanner->calls, 'A deletion tombstone must stop processing before the scanner is invoked.');
+        $this->assertSame(DocumentStatus::Quarantined, $document->fresh()->status);
+        $this->assertDatabaseCount('scan_attempts', 0);
+        $this->assertSame([], Storage::disk('private-opg')->allFiles());
+    }
+
+    public function test_deletion_during_scan_wins_over_late_clean_promotion(): void
+    {
+        [$patient, $case] = $this->submittedRequest();
+        $document = $this->upload($patient, $case);
+        $scanner = new class($document->id) implements DocumentScanner
+        {
+            public function __construct(private readonly string $documentId) {}
+
+            public function scan(string $absolutePath): ScanResult
+            {
+                // Deterministic DB interleaving at the actual external-scan boundary.
+                // This is not simultaneous-connection MariaDB race evidence.
+                ClinicalDocument::query()->whereKey($this->documentId)->update([
+                    'status' => DocumentStatus::Deleted, 'deleted_at' => now(),
+                ]);
+
+                return new ScanResult(true, 'synthetic-w05-scanner', hash_file('sha256', $absolutePath));
+            }
+        };
+        (new ScanClinicalDocument($document->id))->handle($scanner);
+        // Existing content guards still deny access: do not misreport public exposure.
+        $this->actingAs($patient)->getJson($this->documentUrl($case, $document).'/content')->assertNotFound();
+        $this->assertSame(DocumentStatus::Deleted, $document->fresh()->status, 'A clean scan of an obsolete source must not resurrect a deleted record.');
+        $this->assertNotNull($document->fresh()->deleted_at);
+        $this->assertSame([], Storage::disk('private-opg')->allFiles());
+        $this->assertSame(0, DB::table('audit_events')->where('resource_id', $document->id)->where('action', 'document.scanned')->where('result', 'success')->count());
+        $this->actingAs($patient)->getJson($this->documentUrl($case, $document).'/content')->assertNotFound();
     }
 
     /** @return array{User, PatientCase, User, User} */
