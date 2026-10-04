@@ -1,232 +1,112 @@
 # W04 security handoff — 4 October 2026
 
-## Status and ownership
+## Current revision: G03 repair published, release gates open
 
-Role W04; RPH-59, security acceptance under RPH-57 and continuity issue #15.
-Base reviewed: `9a16918997dfa064364fda47c57b18b4f5e40618` (main/PR59).
-W01 G01 grant: issue #61 comment `5977948680`. This slice writes ONLY the new
-`backend/tests/Feature/W04AuthenticationAcceptanceTest.php` and this handoff.
-Both paths were absent at the pinned base. The earlier proposed test filename
-`W04RecoveryCodeConsumptionTest.php` is superseded by the granted name.
+Role W04; RPH-59, security acceptance under RPH-57, continuity issue #15 and delivery issue #61. This revision supersedes the old TESTS-ONLY / NOT APPLIED status; the historical report and original proposed diff remain in this document at commit `10431a10bb85a771ce229721ea9db2c9a5bf3158`.
 
-This is a **TESTS-ONLY / NOT_RUN application-regression handoff**. Production auth
-source is unchanged. The proposed service patch below is NOT applied, not an
-ownership grant, and not independently approved. W01 alone integrates/deploys.
-No production data, environment, providers, schema, or MFA activation was changed.
+Base: `9a16918997dfa064364fda47c57b18b4f5e40618`.
+Branch: `security/w04-auth-verification-20261004`; PR63.
+Repair commit: `9da7afcc60d5f60e35e160e99d1d9fb0d74b7b57`.
 
-Startup ACK: #61 comment `5977903459`. Finding: #15 comment `5977968219`.
-Actual worker: foreground ChatGPT with GitHub/Agiflow and a local PHP container.
-No detached runner, lease or background heartbeat is claimed.
+Authority: W01 G01, issue #61 comment `5977948680`, granted the two new test/handoff files. W01 G03, comment `5978095937`, explicitly granted only the recovery-code fresh-state/atomic-consumption repair in `backend/app/Domain/Identity/Services/StaffMfaService.php`. No new paths or broader authentication policy are taken by this revision.
+
+Exactly three paths differ from the base:
+- `backend/app/Domain/Identity/Services/StaffMfaService.php`
+- `backend/tests/Feature/W04AuthenticationAcceptanceTest.php`
+- `docs/coordination/2026-10-04-w04-security-handoff.md`
+
+States: IMPLEMENTED + PUBLISHED; matching service-content digest independently TESTED_ISOLATED and source-reviewed by W01; final published-candidate integration/concurrency/release review remains pending. NOT_INTEGRATED / NOT_DEPLOYED / NOT_ACCEPTED. PR remains draft. W04 does not self-approve; W01 alone integrates/deploys. No production data, environment, providers, schema or MFA activation changed. No detached worker or additional automation was started.
 
 ## F-W04-20261004-01 — stale recovery inventory
 
-Proposed severity: **HIGH**, subject to independent route/MariaDB confirmation.
-Source-level counterexample reproduced; no production exploitation established.
+Severity: HIGH for the independently reproduced application defect; production exploitation is not established. Finding record: #15 comment `5977968219`.
 
-Path/action: `backend/app/Domain/Identity/Services/StaffMfaService.php`,
-`verifyAndConsume()`. Git blob: `59c38912dffaab6bce940a1bb238f7ba2d7b4204`.
-Exact copied source SHA256:
-`aea49e34ed507e975877160e966fa7caea2e0a2288a93aaaa9df1b2e8a592e54`.
-The local `git hash-object` matched the GitHub blob before execution.
+The original `StaffMfaService::verifyAndConsume()` verifies the caller's already-hydrated encrypted-array inventory and writes the whole remaining array without rereading/locking the shared User row. Password login hydrates a User before this call. OTP verification locks its challenge, not that shared inventory. Two snapshots A/B can reuse the same code, restore a different already-consumed code, or accept codes cleared/replaced after hydration. Password login still requires the primary password: this is not passwordless remote takeover.
 
-The service verifies the already-hydrated caller's encrypted-array inventory and
-writes back the whole remaining array without rereading/locking the shared user
-row. The password controller loads a User before this call. OTP verification
-locks its challenge, not the shared user recovery inventory. The password route
-still requires the primary password; this is not passwordless remote takeover.
+The repair retains the primary-factor and TOTP paths. For recovery-code verification it rereads the current User under `lockForUpdate()` inside a transaction, rejects missing/inactive rows or absent current inventory, and removes a matching hash only from that locked current inventory. The stale caller model is not saved. Configured-MFA and recovery-exhaustion policies are not changed. No User/UserRole/controller/routes/SessionAssurance/dependency or migration change.
 
-Minimal synthetic reproduction: load User snapshots A and B before consumption.
-A consumes X; B then consumes X, or B consumes Y from the original X/Y list.
+### Exact content identity
 
-| Invariant | Original exact-source harness | Proposed-source harness |
+| Content | Git blob | SHA256 |
 | --- | --- | --- |
-| First valid use succeeds | PASS | PASS |
-| Same code cannot succeed through a stale snapshot | FAIL: true twice | PASS |
-| Different valid codes both remain consumed | FAIL: spent X reappears | PASS |
-| Restored spent code stays unusable | FAIL: X works again | PASS |
-| Cleared persisted codes invalidate stale snapshots | FAIL: stale code accepted | PASS |
-| Unknown code denied and inventory preserved | PASS | PASS |
+| Original service | `59c38912dffaab6bce940a1bb238f7ba2d7b4204` | `aea49e34ed507e975877160e966fa7caea2e0a2288a93aaaa9df1b2e8a592e54` |
+| Published repaired service | `fc19080617df523e77c60e87cf641994fe0e0ac2` | `35ce968964bbacc0ce7c2f220a51c10b1df98b6492d90add464ef9eeab6762b0` |
+| Existing W04 application tests | `25e5143a0d2299d720d9ec25040854c333e943b0` | `bfd1b489dd3e1808e00aed305f72029e8d300e93c47e92218e9d355b620c512d` |
 
-Impact: one-use and recovery-code revocation semantics can be defeated by stale
-requests; a competing write can resurrect an already-spent factor. Confidence is
-high for the demonstrated PHP stale-object behavior, not yet for measured live
-exploitability or production-family lock behavior.
+The repaired service matches the exact W04 proposal independently executed by W01. No test expectations were weakened. The tests remain unchanged. Digest equivalence permits reuse of that focused evidence; it is not a claim that CI ran on the new publication commit or that a final combined candidate passed.
 
-## Evidence actually executed
+## Execution evidence and attribution
 
-Local PHP CLI **8.4.23**, not the reported current Roya PHP 8.3.35.
-No Laravel vendor, Composer, database driver or HTTP application runtime was
-available. The owner-correct SentinelX command was platform-blocked, not retried
-or bypassed. Public clone failed DNS; no complete local checkout was obtained.
+### Historical W04 source harness — not database proof
 
-The standalone harness executes the exact service source with EXPLICIT
-model/facade doubles that simulate independent hydration and last-write-wins
-persistence. The transaction/lock doubles do not implement real database locks.
-These results are NOT Laravel HTTP, MariaDB race, CSRF, browser or device proof.
+PHP8.4.23, exact source with explicitly labelled User/facade/transaction doubles:
+- 08:06:58 UTC / 11:36:58 Tehran: original service, 9 assertions, 4 failed security expectations, exit1.
+- 08:10:39 UTC / 11:40:39 Tehran: proposed service, 9 assertions, 0 failures, exit0.
 
-```text
-2026-10-04T08:06:58Z / 11:36:58 Asia/Tehran
-php reproduce_stale_recovery.php source/StaffMfaService.php
-exit 1; 9 assertions; 4 failed security expectations
+The harness simulates independent hydration and last-write-wins persistence; its transaction/lock doubles do not implement real locks. These are not Laravel HTTP, MariaDB concurrency, browser, CSRF or device tests. The original source, harness JSON and full harness remain in the earlier owner conversation evidence bundle, not executable files added to this branch.
 
-2026-10-04T08:10:39Z / 11:40:39 Asia/Tehran
-php reproduce_stale_recovery.php proposed/backend/app/Domain/Identity/Services/StaffMfaService.php
-exit 0; 9 assertions; 0 failures
-```
+### W01 independent application reproduction and repair verification
 
-Harness JSON, original hash-verified source and the complete harness are retained
-in the downloadable W04 evidence bundle. They are not extra executable files in
-this branch. Application tests below remain NOT_RUN. PHP syntax checking alone
-is not a framework or behavioral test, and no Pint/full-suite pass is claimed.
+Sources: issue #61 G03 comment `5978095937`; PR63 review `5405052451`. W01 used its isolated review copy based on the PR62 candidate, not W04's branch or production. PHP8.3.35 / PHPUnit12.5.34; actual Laravel routes and Eloquent; synthetic SQLite; no production .env/data; outbound network functions blocked.
 
-## Application regressions supplied — NOT_RUN
+| W01 command scope | Result |
+| --- | --- |
+| Exact W04AuthenticationAcceptanceTest on original service | 12 tests / 57 assertions / 8 failures, exit1 |
+| Same tests on the exact proposed repaired-service digest | 12 tests / 96 assertions, exit0 |
+| StaffMfaLoginPathsCharacterizationTest, StaffMfaPolicyCharacterizationTest, RecentAuthenticationSessionTest, OtpAttemptCounterTest, ProfileSecurityUiTest, AdministratorRecentAuthenticationTest | 70 tests / 296 assertions, exit0 |
+| Targeted StaffMfaService Pint check | 1 file, exit0 |
 
-`W04AuthenticationAcceptanceTest.php` contains 12 synthetic tests. They exercise
-real Eloquent persistence and existing password/OTP routes when independently
-executed. There is no mocked auth handler or recovery verifier. A one-shot
-`retrieved` event deterministically places a competing code consumption after
-outer User hydration, with dispatcher restoration in `finally`.
+The failing cases reproduced same-code replay, different-code resurrection, cleared/replaced/inactive state and actual password/OTP handlers accepting an interleaved spent factor (200 rather than422). Legitimate factor and wrong-primary-password cases were retained. W01's receipts remain in its private `.w01-evidence`, including `pr63-auth-red-junit.xml`. These results belong to W01's run; they are not new W04 execution or MariaDB contention evidence.
 
-Coverage: same-code replay; different-code resurrection; replaced/cleared
-inventory; stale active-account state; wrong recovery code; successful password
-recovery and later replay; password route interleavings; wrong primary password;
-configured-staff MFA denial plus legitimate patient password login; OTP
-challenge/verification denial after interleaved consumption, persisted attempt
-count, and successful retry using the remaining valid recovery factor.
+### This resumed W04 session
 
-The event seam is NOT a second database connection or a real lock-contention
-proof. OTP delivery uses an in-process capture, and stray HTTP is prevented.
-The normal framework test CSRF behavior is not browser CSRF acceptance.
+Recovered the newer PR63 checkpoint from live GitHub/Agiflow instead of restarting solved work. Consumed G03; reconstructed the exact proposal locally, checked the original blob/hash, matched the candidate hash against W01's tested digest, and passed PHP8.4.23 syntax checking (exit0). Published the single authorised service repair and read it back at the exact repair commit; GitHub returned blob `fc19080617df523e77c60e87cf641994fe0e0ac2`.
 
-## Proposed service repair — NOT APPLIED
+No Laravel/HTTP/MariaDB/browser suite was executed by this resumed W04 session. Earlier owner-correct remote execution was platform-blocked and was not retried, split or bypassed. Local full-source retrieval failed DNS and no Laravel/vendor runtime was available. GitHub source publication under the later G03 grant does not claim that the blocked VPS command executed.
 
-Requested exact source grant: only
-`backend/app/Domain/Identity/Services/StaffMfaService.php`, import and recovery
-branch of `verifyAndConsume()`. Preserve TOTP behavior and configured-MFA policy;
-no routes, controllers, User/UserRole, dependencies, schema or global UI changes.
-Reread recovery inventory under a user-row lock in a transaction; reject missing
-or inactive current rows; consume only current codes. The caller's stale model
-is not saved by this recovery branch. Review nested OTP transaction/lock order.
+## Test coverage and limits
 
-Proposed file SHA256:
-`35ce968964bbacc0ce7c2f220a51c10b1df98b6492d90add464ef9eeab6762b0`.
-Laravel 13 documentation: `laravel/docs`, branch `13.x`, `queries.md` pessimistic
-locking and `eloquent-mutators.md` encrypted casting; retrieved through Context7.
-Encrypted arrays cannot be safely patched with plaintext SQL JSON operations.
+The 12 existing regressions exercise real Eloquent persistence and existing password/OTP routes. A one-shot `retrieved` event deliberately interleaves a competing consumption after outer User hydration; dispatcher restoration is in `finally`. No test-only auth handler or mocked recovery verifier is used. OTP delivery is captured in-process; stray HTTP is prevented.
 
-```diff
---- a/backend/app/Domain/Identity/Services/StaffMfaService.php
-+++ b/backend/app/Domain/Identity/Services/StaffMfaService.php
-@@ -4,6 +4,7 @@
- 
- use App\Models\User;
- use App\Support\DigitNormalizer;
-+use Illuminate\Support\Facades\DB;
- use Illuminate\Support\Facades\Hash;
- use Illuminate\Support\Str;
- 
-@@ -23,21 +24,31 @@
-             return true;
-         }
- 
--        if (! $recoveryCode || ! is_array($user->mfa_recovery_codes)) {
-+        if (! $recoveryCode) {
-             return false;
-         }
- 
--        foreach ($user->mfa_recovery_codes as $index => $hash) {
--            if (is_string($hash) && Hash::check($recoveryCode, $hash)) {
--                $codes = $user->mfa_recovery_codes;
--                unset($codes[$index]);
--                $user->update(['mfa_recovery_codes' => array_values($codes)]);
-+        return DB::transaction(function () use ($user, $recoveryCode): bool {
-+            // Requests can hold independently hydrated User instances. Serialize
-+            // recovery consumption on the shared user row, not the OTP challenge,
-+            // and never write an inventory copied from a stale caller snapshot.
-+            $current = User::query()->lockForUpdate()->find($user->getKey());
-+            if (! $current || ! $current->is_active || ! is_array($current->mfa_recovery_codes)) {
-+                return false;
-+            }
- 
--                return true;
-+            foreach ($current->mfa_recovery_codes as $index => $hash) {
-+                if (is_string($hash) && Hash::check($recoveryCode, $hash)) {
-+                    $codes = $current->mfa_recovery_codes;
-+                    unset($codes[$index]);
-+                    $current->update(['mfa_recovery_codes' => array_values($codes)]);
-+
-+                    return true;
-+                }
-             }
--        }
- 
--        return false;
-+            return false;
-+        });
-     }
- 
-     public function verifySecret(string $secret, string $code): bool
-```
+Coverage includes first valid use, same/different-code stale snapshots, cleared/replaced inventory, inactive current account, wrong recovery code, legitimate password recovery followed by replay, wrong primary password, configured-staff MFA denial, legitimate patient password login, OTP interleaving rejection, persisted attempt count and retry with the remaining valid recovery factor.
 
-## Independent execution and integration gates
+The deterministic event seam is not a second connection, actual lock contention, browser CSRF or physical-device proof. W01 application GREEN does not close these gates.
 
-W01 or another independent reviewer must first verify base/source hashes and
-own the isolated worktree/database. Obtain W01's single heavy-job turn before
-MariaDB/full-suite work. Do not copy a production `.env`, reuse production
-credentials/database, widen permissions or bypass a blocked command.
+## Remaining independent release gates
 
-On the tests-only candidate, run the new class and record intended baseline
-failures. After an explicit source grant and application of the reviewed patch,
-run it again. Record actual SHA, PHP/DB versions, commands, exit and counts.
-Use production-family MariaDB for the real persistence/concurrency gate.
+W01 owns the next runtime/integration action; no new blanket execution grant is implied. Preserve the one-heavy-job rule and exact isolated ownership.
+
+1. Pin the final PR63 head and combine with other reviewed changes in a separate candidate. Verify that the service and test digests above remain exact; rerun changed dependency/integration scope rather than repeating unchanged proof merely for counts.
+2. Run bounded TWO-process/TWO-connection production-family MariaDB tests with committed synthetic fixtures: hydrate both users before a barrier, same code yields one success, different valid codes stay consumed with none restored, and reset/rotation/revocation interleavings invalidate stale inventory. Exercise the real password/OTP paths and examine nested OTP transaction/lock ordering. Record process exits/final state and lock/deadlock handling. No unbounded load test or production database.
+3. Complete applicable CSRF/session-regeneration/credential-setup/returning-password browser checks. A successful login-page GET is not that proof.
+4. W01 or another independent reviewer reviews the final published candidate; W04 must not approve its own fix. Only W01 merges/deploys under fresh live hashes, private exact backups and the shared deployment lock. No source rollback may restore the database or resurrect consumed codes. No migration is proposed.
+
+Known commands for an already provisioned isolated synthetic checkout:
 
 ```sh
-# ONLY from an independently provisioned, synthetic Laravel backend checkout.
-# Pin the installed project dependencies and isolated test environment first.
 php artisan test --compact tests/Feature/W04AuthenticationAcceptanceTest.php
 php artisan test --compact tests/Feature/StaffMfaLoginPathsCharacterizationTest.php tests/Feature/StaffMfaPolicyCharacterizationTest.php tests/Feature/RecentAuthenticationSessionTest.php tests/Feature/OtpAttemptCounterTest.php tests/Feature/ProfileSecurityUiTest.php tests/Feature/AdministratorRecentAuthenticationTest.php
 ```
 
-Separately reproduce with TWO independent MariaDB connections/processes and
-committed synthetic fixtures: hydrate both users before releasing a bounded
-barrier, use the same code (exactly one success) and different codes (both
-consumed, none restored), then a reset/rotation interleaving. Exercise the actual
-password and OTP routes too. Preserve fake transports and current MFA policy.
-Record process exits and final persisted state; no unbounded stress/load loop.
+The original expected-failure evidence should be retained, not confused with an unresolved failure on the repaired digest. Obtain the legitimate runtime turn before any full-suite/MariaDB job; do not copy a production .env or credentials, widen permissions, or retry a platform-blocked action without a genuine authorised boundary change.
 
-Before release: independent review of W04's patch, focused and combined suite,
-CSRF/session/regeneration/returning-credential browser journeys, source/candidate
-reconciliation and W01-only serial deployment under the existing release gates.
-No schema migration is proposed. Source rollback must not restore a database or
-resurrect consumed codes; there are no fixture writes to production.
+## Other W04 acceptance remains visible
 
-## Current disposition and remaining acceptance
+- Historical PX.1 shared-timestamp issue remains resolved by current SessionAssurance and existing tests; no September patch replay.
+- Reported live OTP internal error remains NOT_VERIFIED as a live incident here. Source handling and synthetic route tests are not a diagnosis of that reported production error.
+- First credential setup and returning-password browser journey remain unaccepted.
+- Staff MFA enrolment/reset, recovery-only exhaustion, last-owner concurrency and stale TOTP/reset races are separate policy/revocation work, not silently fixed or activated by this patch.
+- PR28 capability/policy remediation belongs to W02; no broad clinical access or import of old PR28/46 stacks.
+- Tenant/IDOR/exports, quarantine/clinical release, payments, notification eligibility/deduplication and PWA private-cache acceptance remain tied to their respective pinned candidates; no blanket security certification.
 
-- Historical PX.1 shared-timestamp issue: source disposition RESOLVED by current
-  SessionAssurance per-session timestamp and existing RecentAuthenticationSession
-  regressions. No reason to reapply September patches; not newly runtime-tested.
-- Reported live OTP internal error: NOT_VERIFIED in this run. Current source has
-  delivery-unavailable handling and committed failed-attempt logic; that is not
-  proof of a successful live OTP journey or a diagnosis of the reported error.
-- Successful first credential setup / returning password browser flow: still
-  NOT_VERIFIED here. New route tests supplement, not replace, browser acceptance.
-- Staff MFA enrolment/reset, exhaustion of recovery-only configuration, last-owner
-  safety and stale TOTP/reset races: separate policy/revocation review remains.
-  This proposed patch does not silently enable mandatory MFA or remove it.
-- PR28 capability-policy findings: review comments read; W02 owns current-head
-  reproduction/remediation. No transfer/merge of PR28/46 and no new clinical grant.
-- Cross-lane tenant/IDOR/export/clinical/payment/outbox/PWA acceptance: pending
-  pinned implementation candidates. No blanket security certification follows
-  from this bounded recovery test slice.
+## Independent cross-lane review completed this session
 
-## Exact next action / sync
+PR62, head `9d646acdbed56f3bdf4696800d40fb0a6b260552`: W04 source/diff security review recorded as COMMENT review `5406067458`, scoped PASS/no blocking finding. The active-coordinator/demo guard precedes input parsing; the new selected-query string guards prevent array conversion without changing case/assignee/referral filters, timezone windows or valid selectors. All15 new test cases were read. W01 review `5405041165` independently provides matching candidate39tests/30,262assertions/Pint2files exit0. These are reused W01 results, not fresh W04 tests. This review does not certify appointment capacity, holiday-source accuracy or browser acceptance, and performs no merge/deployment.
 
-W01: consume the two-path tests-only handoff, independently reproduce its failing
-route/persistence cases, then grant/review the single service hunk if confirmed.
-W04 must not self-approve. Existing RPH-59 and RPH-57 receive the pinned PR and
-state distinction; no duplicate tasks or hourly automation are created.
+## Durable records and next action
 
-States: regressions AUTHORED + SYNTAX_CHECKED / application tests NOT_RUN;
-proposed repair SOURCE_HARNESS_TESTED only / REVIEW_PENDING / NOT_INTEGRATED /
-NOT_DEPLOYED / NOT_ACCEPTED. Repository publication is evidenced by its actual
-commit/PR checkpoint, not by this pre-publication document.
+Startup ACK #61 `5977903459`; finding #15 `5977968219`; G01 `5977948680`; G03 `5978095937`; W01 PR63 review `5405052451`; W04 PR62 review `5406067458`. Preserve the initial tests-only commit and all failed-hypothesis receipts in history.
+
+The prior archive `W04-security-evidence-20261004.zip`, SHA256 `e62ccd31f755946bc27800e699fbf5aee4ea90f94f990d4f344483021ffd9dd4`, was a conversation attachment; its Agiflow attachment failed UNREGISTERED_FILE_REFERENCE and was not silently uploaded. Current source/tests/handoff are directly readable in PR63. Text checkpoints are mirrored to the existing RPH-59/RPH-57; write success is recorded separately, with no status/acceptance promotion.
+
+Exact next action: W01 verifies the final published candidate and performs the bounded independent MariaDB/combined release gate. W04 retains security review of other ready lane candidates. No claim of uninterrupted background execution, a completed production fix, or owner acceptance.
