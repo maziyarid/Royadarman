@@ -22,10 +22,32 @@ function safePublicResponse(response, asset) {
     && !/(?:^|,)\s*(?:\*|cookie|authorization)\s*(?:,|$)/i.test(vary);
 }
 
+// Bound only public-shell loads and the wait for navigation response headers.
+// API requests and all mutations retain their caller's timeout/retry policy.
+const RESPONSE_DEADLINE_MS = 15000;
+
+async function fetchWithDeadline(request, options = {}) {
+  const controller = new AbortController();
+  const cancel = () => controller.abort();
+  if (request.signal?.aborted) cancel();
+  else request.signal?.addEventListener('abort', cancel, {once: true});
+  const timer = setTimeout(cancel, RESPONSE_DEADLINE_MS);
+  try {
+    // Keep the once-only parent link after headers: the returned body may
+    // still stream, and cancelling the caller must also stop that stream.
+    return await fetch(request, {...options, signal: controller.signal});
+  } catch (error) {
+    request.signal?.removeEventListener('abort', cancel);
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function fetchPublic(asset) {
   // Omit credentials even on same-origin static requests. A query string alone
   // is not an integrity guarantee; fetch's SRI rejects changed server bytes.
-  const response = await fetch(new Request(new URL(asset.url, self.location.origin), {
+  const response = await fetchWithDeadline(new Request(new URL(asset.url, self.location.origin), {
     credentials: 'omit', cache: 'reload', redirect: 'error', integrity: asset.integrity,
   }));
   if (!safePublicResponse(response, asset)) throw new TypeError('Public shell response rejected');
@@ -82,7 +104,7 @@ self.addEventListener('fetch', event => {
   if (request.mode === 'navigate') {
     // Authentication/domain state is always obtained from the server. The
     // offline fallback is neutral presentation, never a cached signed-in page.
-    event.respondWith(fetch(request, {cache: 'no-store'}).catch(offlineResponse));
+    event.respondWith(fetchWithDeadline(request, {cache: 'no-store'}).catch(offlineResponse));
     return;
   }
 

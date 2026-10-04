@@ -20,17 +20,29 @@ const settle = async () => { await new Promise(setImmediate); await new Promise(
 
 function harness() {
   const handlers = new Map(); const stores = new Map();
-  const state = {account:'SYNTHETIC_A', offline:false, failPinned:false, privatePinned:false, redirectPinned:false, wrongMime:false, varyCookie:false};
-  const calls = {fetch:[], skipWaiting:0, claim:0};
+  const timers = new Map(); let timerId = 0;
+  const clock = {
+    setTimeout(fn, milliseconds) { const id = ++timerId; timers.set(id, {fn, milliseconds}); return id; },
+    clearTimeout(id) { timers.delete(id); },
+    async expire() { for (const [id, timer] of [...timers]) { timers.delete(id); timer.fn(); } await settle(); },
+  };
+  const state = {account:'SYNTHETIC_A', offline:false, failPinned:false, privatePinned:false, redirectPinned:false, wrongMime:false, varyCookie:false, hang:false, httpStatus:200};
+  const calls = {fetch:[], skipWaiting:0, claim:0, aborts:0};
   const fakeFetch = async (request, options={}) => {
     const url=urlOf(request); const path=new URL(url).pathname;
     const option = key => options[key] ?? request?.[key];
-    calls.fetch.push({url, cache:option('cache'), credentials:option('credentials'), redirect:option('redirect'), integrity:option('integrity')});
+    calls.fetch.push({url, cache:option('cache'), credentials:option('credentials'), redirect:option('redirect'), integrity:option('integrity'), signal:option('signal')});
+    if(state.hang) return new Promise((resolve, reject) => {
+      const signal = option('signal');
+      const rejectAbort = () => { calls.aborts++; reject(new DOMException('Synthetic request aborted', 'AbortError')); };
+      if (signal?.aborted) rejectAbort();
+      else signal?.addEventListener('abort', rejectAbort, {once:true});
+    });
     if(state.offline || state.failPinned) throw new TypeError('Synthetic network/integrity rejection');
     const sensitive=path.includes('sensitive-fixture');
     const text = sensitive ? state.account : path==='/offline.html' ? offline : 'SYNTHETIC_PUBLIC_ASSET';
     const type = state.wrongMime ? 'application/json' : path.endsWith('.css') ? 'text/css' : path.endsWith('.svg') ? 'image/svg+xml' : path.endsWith('.html') ? 'text/html' : 'text/plain';
-    const r=new Response(text,{status:200,headers:{'Content-Type':type,'Cache-Control':(sensitive||state.privatePinned)?'private, no-store':'public, max-age=86400'}});
+    const r=new Response(text,{status:state.httpStatus,headers:{'Content-Type':type,'Cache-Control':(sensitive||state.privatePinned)?'private, no-store':'public, max-age=86400'}});
     if(state.varyCookie)r.headers.set('Vary','Accept-Encoding, Cookie');
     Object.defineProperties(r,{url:{value:url},type:{value:'basic'},redirected:{value:state.redirectPinned}});
     return r;
@@ -59,7 +71,8 @@ function harness() {
   const self={location:{origin:ORIGIN},addEventListener:(n,f)=>handlers.set(n,f),
     skipWaiting:()=>{calls.skipWaiting++;return Promise.resolve();},
     clients:{claim:()=>{calls.claim++;return Promise.resolve();}}};
-  const ctx=vm.createContext({self,caches,fetch:fakeFetch,URL,Request,Response,console});
+  const ctx=vm.createContext({self,caches,fetch:fakeFetch,URL,Request,Response,console,AbortController,DOMException,
+    setTimeout:clock.setTimeout,clearTimeout:clock.clearTimeout});
   vm.runInContext(source,ctx,{filename:'actual-pwa-source.js',timeout:2000});
   const metadata=vm.runInContext(`({ cache: typeof CACHE === 'undefined' ? null : CACHE,
     assets: typeof PUBLIC_ASSETS === 'undefined' ? [] : PUBLIC_ASSETS })`,ctx);
@@ -67,14 +80,14 @@ function harness() {
     const work=[]; handlers.get(name)?.({waitUntil:p=>work.push(p)});
     await Promise.all(work); await settle();
   };
-  const request=async(path,{method='GET',mode='cors'}={})=>{
+  const request=async(path,{method='GET',mode='cors',signal}={})=>{
     let intercepted=false,promise; const work=[];
-    const request={url:new URL(path,ORIGIN).href,method,mode};
+    const request={url:new URL(path,ORIGIN).href,method,mode,signal};
     handlers.get('fetch')?.({request,waitUntil:p=>work.push(p),respondWith:p=>{assert.equal(intercepted,false);intercepted=true;promise=Promise.resolve(p);}});
     const response=intercepted?await promise:undefined; await Promise.all(work); await settle();
     return {intercepted,response};
   };
-  return {handlers,stores,state,calls,caches,metadata,lifecycle,request};
+  return {handlers,stores,state,calls,caches,metadata,lifecycle,request,timers,clock};
 }
 async function installed(){const h=harness();await h.lifecycle('install');await h.lifecycle('activate');return h;}
 
@@ -173,4 +186,70 @@ test('repeated runtime reads use only the pinned cache without network writes',a
   const h=await installed();assert.equal(h.metadata.assets.length,3);
   const before=h.calls.fetch.length;for(const asset of h.metadata.assets){await h.request(asset.url);await h.request(asset.url);}
   assert.equal(h.calls.fetch.length,before);assert.equal((await(await h.caches.open(h.metadata.cache)).keys()).length,3);
+});
+
+
+// Virtual deadlines exercise a hanging Fetch promise without sleeping or
+// contacting a server. They do not claim browser throttling/device timing proof.
+test('stalled navigation has a bounded neutral recovery and cancels its network request',async()=>{
+  const h=await installed();h.state.hang=true;let result;
+  void h.request('/en/panel/sensitive-fixture',{mode:'navigate'}).then(r=>{result=r;});
+  await settle();assert.equal(result,undefined);
+  await h.clock.expire();await settle();
+  assert.ok(result,'a stalled navigation must settle at the request deadline');
+  assert.equal(await result.response.text(),offline);
+  assert.equal(h.calls.aborts,1);assert.equal(h.timers.size,0);
+  assert.equal(Boolean(await h.caches.match('/en/panel/sensitive-fixture')),false);
+});
+test('stalled installation fails closed and preserves the previously active cache',async()=>{
+  const h=harness();await(await h.caches.open('royadarman-static-v2')).put('/prior',new Response('SYNTHETIC_OLD'));
+  h.state.hang=true;let outcome='pending';
+  void h.lifecycle('install').then(()=>{outcome='resolved';},()=>{outcome='rejected';});
+  await settle();await h.clock.expire();
+  assert.equal(outcome,'rejected','installation must not remain pending on a stalled public fetch');
+  assert.equal(h.stores.has('royadarman-static-v2'),true);
+  assert.equal(h.stores.has(h.metadata.cache),false);
+  assert.equal(h.calls.aborts,3);assert.equal(h.timers.size,0);
+});
+test('completed install and navigation leave no pending deadline timers',async()=>{
+  const h=await installed();assert.equal(h.timers.size,0);
+  await h.request('/fa/panel/sensitive-fixture',{mode:'navigate'});
+  assert.equal(h.timers.size,0);await h.clock.expire();assert.equal(h.calls.aborts,0);
+});
+test('caller cancellation stops a stalled navigation without a second request',async()=>{
+  const h=await installed();h.state.hang=true;const controller=new AbortController();let result;
+  void h.request('/en/panel/sensitive-fixture',{mode:'navigate',signal:controller.signal}).then(r=>{result=r;});
+  await settle();controller.abort();await settle();await settle();
+  assert.ok(result,'navigation cancellation must propagate to its Fetch operation');
+  assert.equal(h.calls.aborts,1);assert.equal(h.timers.size,0);
+  assert.equal(h.calls.fetch.filter(r=>r.url===urlOf('/en/panel/sensitive-fixture')).length,1);
+});
+test('deadline is a bounded 15-second foreground-response budget',async()=>{
+  const h=await installed();h.state.hang=true;
+  void h.request('/en/panel/sensitive-fixture',{mode:'navigate'});
+  await settle();assert.equal(h.timers.size,1);
+  assert.deepEqual([...h.timers.values()].map(t=>t.milliseconds),[15000]);
+  await h.clock.expire();
+});
+for(const status of [401,403,429,500]){
+  test(`HTTP ${status} navigation remains a real server response, not an offline success`,async()=>{
+    const h=await installed();h.state.httpStatus=status;
+    const result=await h.request('/en/panel/sensitive-fixture',{mode:'navigate'});
+    assert.equal(result.response.status,status);assert.equal(h.timers.size,0);
+    assert.equal(Boolean(await h.caches.match('/en/panel/sensitive-fixture')),false);
+  });
+}
+test('private API requests remain caller-owned and receive no worker deadline or retry',async()=>{
+  const h=await installed();h.state.hang=true;let settled=false;
+  void h.request('/api/v1/sensitive-fixture').then(()=>{settled=true;},()=>{settled=true;});
+  await settle();assert.equal(h.timers.size,0);await h.clock.expire();assert.equal(settled,false);
+  assert.equal(h.calls.fetch.filter(r=>r.url===urlOf('/api/v1/sensitive-fixture')).length,1);
+});
+
+test('caller cancellation after navigation headers still reaches the response body signal',async()=>{
+  const h=await installed();const controller=new AbortController();
+  await h.request('/en/panel/sensitive-fixture',{mode:'navigate',signal:controller.signal});
+  const signal=h.calls.fetch.at(-1).signal;assert.ok(signal);assert.equal(signal.aborted,false);
+  controller.abort();assert.equal(signal.aborted,true,'header completion must not sever caller cancellation');
+  assert.equal(h.timers.size,0);
 });
