@@ -4,6 +4,7 @@ namespace App\Domain\Identity\Services;
 
 use App\Models\User;
 use App\Support\DigitNormalizer;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -23,21 +24,31 @@ final class StaffMfaService
             return true;
         }
 
-        if (! $recoveryCode || ! is_array($user->mfa_recovery_codes)) {
+        if (! $recoveryCode) {
             return false;
         }
 
-        foreach ($user->mfa_recovery_codes as $index => $hash) {
-            if (is_string($hash) && Hash::check($recoveryCode, $hash)) {
-                $codes = $user->mfa_recovery_codes;
-                unset($codes[$index]);
-                $user->update(['mfa_recovery_codes' => array_values($codes)]);
-
-                return true;
+        return DB::transaction(function () use ($user, $recoveryCode): bool {
+            // Requests can hold independently hydrated User instances. Serialize
+            // recovery consumption on the shared user row, not the OTP challenge,
+            // and never write an inventory copied from a stale caller snapshot.
+            $current = User::query()->lockForUpdate()->find($user->getKey());
+            if (! $current || ! $current->is_active || ! is_array($current->mfa_recovery_codes)) {
+                return false;
             }
-        }
 
-        return false;
+            foreach ($current->mfa_recovery_codes as $index => $hash) {
+                if (is_string($hash) && Hash::check($recoveryCode, $hash)) {
+                    $codes = $current->mfa_recovery_codes;
+                    unset($codes[$index]);
+                    $current->update(['mfa_recovery_codes' => array_values($codes)]);
+
+                    return true;
+                }
+            }
+
+            return false;
+        });
     }
 
     public function verifySecret(string $secret, string $code): bool
