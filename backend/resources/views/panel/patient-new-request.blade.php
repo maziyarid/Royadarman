@@ -6,7 +6,9 @@
 @endsection
 @push('scripts')
     <link rel="stylesheet" href="/assets/patient-request.css?v=20261003">
-    <script src="/assets/patient-request.js?v=20261003" defer></script>
+    <link rel="stylesheet" href="/assets/patient-portal-20261004.css">
+    <script src="/assets/patient-location-20261004.js" defer></script>
+    <script src="/assets/patient-request.js?v=20261004-iran" defer></script>
 @endpush
 @section('content')
 @php
@@ -80,7 +82,8 @@
             </div>
             <div class="request-step" data-step="3" hidden>
                 <h2 class="request-step-title">{{ __('request.steps.location') }}</h2>
-                <p class="hint">{{ __('request.location_help') }}</p>
+                @include('patient-portal.location-fields', ['locationProfile' => $patientProfile ?? null])
+                <div data-tehran-fields hidden>
                 @if($neighborhoods)
                     <p class="hint">{{ __('request.neighborhood_hint') }}</p>
                     <div class="coverage-chips request-neighborhoods" role="group">
@@ -99,6 +102,7 @@
                     </select>
                 </div>
                 <p class="hint" data-home-area-note hidden>{{ __('request.home_area_required') }}</p>
+                </div>
             </div>
             <div class="request-step" data-step="4" hidden>
                 <h2 class="request-step-title">{{ __('request.steps.preferences') }}</h2>
@@ -126,7 +130,7 @@
                 <div class="grid">
                     <div class="field">
                         <label for="name">{{ __('request.name') }}</label>
-                        <input id="name" type="text" maxlength="80" autocomplete="name">
+                        <input id="name" type="text" maxlength="80" autocomplete="name" value="{{ auth()->user()?->name }}">
                     </div>
                     <div class="field full">
                         <label for="reason">{{ __('request.reason') }}</label>
@@ -158,7 +162,7 @@
                 <dl class="request-summary" data-summary>
                     <div><dt>{{ __('request.service_type') }}</dt><dd data-sum="service">—</dd></div>
                     <div><dt>{{ __('request.urgency') }}</dt><dd data-sum="priority">—</dd></div>
-                    <div><dt>{{ __('request.tehran_area') }}</dt><dd data-sum="area">—</dd></div>
+                    <div><dt>{{ __('patient_portal.location_title') }}</dt><dd data-sum="area">—</dd></div>
                     <div><dt>{{ __('request.contact_time') }}</dt><dd data-sum="time">—</dd></div>
                     <div><dt>{{ __('request.budget') }}</dt><dd data-sum="budget">—</dd></div>
                     <div><dt>{{ __('request.name') }}</dt><dd data-sum="name">—</dd></div>
