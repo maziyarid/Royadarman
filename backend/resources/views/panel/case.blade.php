@@ -20,6 +20,7 @@
 @endif
 @endpush
 @section('content')
+@include('patient-portal.case-location')
 <div data-panel-case data-locale="{{ $locale }}" data-case-id="{{ $case->id }}" data-case-version="{{ (int) $case->version }}" data-source-language="{{ $case->source_language }}" data-error="{{ __('panel_case.error') }}" data-accept="{{ __('panel_case.accept_policy') }}" data-cancel="{{ __('panel_case.decline') }}">
 <div id="notice" class="notice is-hidden" role="status"></div>
 <section class="card pad">
@@ -211,10 +212,11 @@
             </form>
             <form id="referral-form">
                 <h3>{{ __('panel_case.propose_referral') }}</h3>
+                <p class="hint">{{ __('patient_portal.nearby_help') }}</p>
                 <div class="field">
                     <select name="clinic_id" required>
                         @foreach($clinics as $clinic)
-                            <option value="{{ $clinic->id }}">{{ $clinic->name }} · {{ $clinic->city }}</option>
+                            <option value="{{ $clinic->id }}">{{ $clinic->name }} · {{ $clinic->city }} · @if($clinic->distance_km !== null){{ number_format($clinic->distance_km, 1) }} {{ __('patient_portal.distance_km') }}@elseif($clinic->same_city){{ __('patient_portal.same_city') }}@else{{ __('patient_portal.no_distance') }}@endif · {{ __('patient_portal.'.($clinic->service_verified ? 'service_verified' : 'service_check')) }}</option>
                         @endforeach
                     </select>
                 </div>
