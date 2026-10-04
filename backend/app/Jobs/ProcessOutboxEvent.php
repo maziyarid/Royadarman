@@ -43,7 +43,7 @@ final class ProcessOutboxEvent implements ShouldQueue
         }
 
         $delivery = DB::table('notification_deliveries')->where('outbox_event_id', $event->id)->where('channel', 'sms')->first();
-        if ($delivery?->status === 'sent') {
+        if (in_array($delivery?->status, ['sent', 'delivered'], true)) {
             $event->update(['processed_at' => now()]);
 
             return;
@@ -72,11 +72,16 @@ final class ProcessOutboxEvent implements ShouldQueue
                 : null,
             default => null,
         };
-        if (! $case?->patient?->phone) {
+        if (! $case?->patient?->is_active || ! $case->patient->phone) {
             throw new RuntimeException('Notification recipient is unavailable.');
         }
 
-        $parameters = array_filter($event->payload, fn ($value, $key) => $key !== 'template_key' && is_scalar($value), ARRAY_FILTER_USE_BOTH);
+        // Internal outbox metadata must never become provider template parameters.
+        $allowedParameters = match ($event->event_type) {
+            'case.submitted' => ['reference'],
+            default => [],
+        };
+        $parameters = array_filter(array_intersect_key($event->payload, array_flip($allowedParameters)), fn ($value) => is_scalar($value));
         $reference = $sender->send($case->patient->phone, (string) ($event->payload['template_key'] ?? $event->event_type), $event->recipient_locale ?? $case->patient->locale, $parameters, $event->id);
 
         // After the provider call returns, lock/re-read the delivery row and
@@ -120,7 +125,10 @@ final class ProcessOutboxEvent implements ShouldQueue
 
     public function failed(Throwable $exception): void
     {
-        DB::table('notification_deliveries')->where('outbox_event_id', $this->outboxEventId)->where('channel', 'sms')->update(['status' => 'failed', 'failure_code' => class_basename($exception), 'updated_at' => now()]);
+        // A queue failure is not evidence that a provider-confirmed receipt failed.
+        DB::table('notification_deliveries')->where('outbox_event_id', $this->outboxEventId)->where('channel', 'sms')
+            ->whereNotIn('status', ['sent', 'delivered', 'failed'])
+            ->update(['status' => 'failed', 'failure_code' => class_basename($exception), 'updated_at' => now()]);
         OutboxEvent::query()->whereKey($this->outboxEventId)->update(['attempts' => DB::raw('attempts + 1')]);
     }
 }
