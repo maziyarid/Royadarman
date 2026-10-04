@@ -34,7 +34,14 @@ final class CaseController extends Controller
             'priority' => ['nullable', 'in:normal,urgent'],
         ]);
 
-        if ($data['service_type'] === ServiceType::HomeDentistry->value && empty($data['tehran_area'])) {
+        $locations = app(\App\Domain\Patients\IranLocations::class);
+        $location = $locations->validate($request->all());
+        if ($location !== [] && ! $locations->isTehranCity($location) && filled($data['tehran_area'] ?? null)) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['tehran_area' => __('patient_portal.tehran_only')]);
+        }
+        $data = [...$data, ...$location];
+        if ($data['service_type'] === ServiceType::HomeDentistry->value && empty($data['tehran_area'])
+            && ($location === [] || $locations->isTehranCity($location))) {
             return response()->json([
                 'error' => [
                     'code' => 'error.validation',
@@ -45,7 +52,7 @@ final class CaseController extends Controller
             ], 422);
         }
 
-        $result = $idempotency->execute($request->user(), 'case.draft', (string) $request->header('Idempotency-Key'), $data, function () use ($request, $data): array {
+        $result = $idempotency->execute($request->user(), 'case.draft', (string) $request->header('Idempotency-Key'), $data, function () use ($request, $data, $location, $locations): array {
             $user = $request->user();
             $case = PatientCase::query()->create([
                 'public_reference' => 'RD-'.strtoupper(Str::random(8)),
@@ -66,6 +73,9 @@ final class CaseController extends Controller
                 'version' => 1,
             ]);
 
+            if ($location !== []) {
+                \App\Models\CaseLocation::query()->create(['case_id' => $case->id, ...$locations->snapshot($location)]);
+            }
             return ['status' => 201, 'body' => ['data' => $this->resource($case)]];
         });
 
