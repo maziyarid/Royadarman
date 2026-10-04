@@ -5,24 +5,32 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#2947A3">
-  <title>اتصال اینترنت قطع است · رویادارمان</title>
-  <style>
-    :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#18233c;background:#f6f4ee}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px}
-    main{width:min(560px,100%);background:#fff;border:1px solid #dfe4ee;border-radius:20px;padding:28px;box-shadow:0 18px 50px rgba(22,43,112,.08)}
-    .brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}.brand img{width:44px;height:44px}.brand strong{font-size:1.1rem;color:#162b70}
-    h1{font-size:1.35rem;margin:0 0 10px;color:#162b70}p{line-height:1.9;color:#586279;margin:0 0 18px}
-    button{min-height:44px;border:0;border-radius:12px;background:#2947a3;color:#fff;padding:0 18px;font:inherit;font-weight:750;cursor:pointer}
-    small{display:block;margin-top:18px;color:#7a8294;line-height:1.7}
-  </style>
+  <title>اتصال اینترنت در دسترس نیست · رویادارمان</title>
+  <link rel="stylesheet" href="/assets/workspace.css?v=12a65d5cde491c447941b1d2542126c9130d353670ac2fd8c104f54d1ce32de7" integrity="sha256-EqZdXN5JHER5QbHSVCEmyRMNNTZwrC/YwQT1TRzjLec=" crossorigin="anonymous">
 </head>
-<body>
-<main>
-  <div class="brand"><img src="/assets/brand-mark.svg" alt=""><strong>رویادارمان</strong></div>
-  <h1>اتصال اینترنت در دسترس نیست</h1>
-  <p>برای حفاظت از اطلاعات، صفحات پنل و داده‌های پرونده روی دستگاه ذخیره نمی‌شوند. پس از برقراری اتصال دوباره صفحه را باز کنید.</p>
-  <button type="button" onclick="location.reload()">تلاش دوباره</button>
-  <small>این صفحه فقط پیام وضعیت اتصال است و هیچ اطلاعات بیمار یا پرونده‌ای را نمایش نمی‌دهد.</small>
+<body class="auth-body">
+<main class="auth-card card pad">
+  <header class="app-brand">
+    <img src="/assets/brand-mark.svg?v=491dcbb2cac8e72d4d3380449733c91db36664ca9c776addc83fabff57dded8b" width="38" height="38" alt="">
+    <strong>رویادارمان</strong>
+  </header>
+  <section lang="fa" dir="rtl" aria-labelledby="offline-fa">
+    <h1 id="offline-fa">اتصال اینترنت در دسترس نیست</h1>
+    <p>این صفحه اطلاعات بیمار یا پرونده را نمایش نمی‌دهد و تأیید نوبت، ارسال فایل یا پرداخت نیست. پس از برقراری اتصال، دوباره وارد سامانه شوید تا وضعیت فعلی بررسی شود.</p>
+    <a class="btn primary" href="/fa/login">پس از اتصال، ورود دوباره</a>
+  </section>
+  <hr class="divider">
+  <section lang="ar" dir="rtl" aria-labelledby="offline-ar">
+    <h2 id="offline-ar">الاتصال بالإنترنت غير متاح</h2>
+    <p>لا تعرض هذه الصفحة بيانات المرضى أو الملفات، ولا تؤكد حجزًا أو رفع ملف أو دفعًا. بعد عودة الاتصال، افتح صفحة تسجيل الدخول للتحقق من الحالة الحالية.</p>
+    <a class="btn" href="/ar/login">فتح تسجيل الدخول بعد عودة الاتصال</a>
+  </section>
+  <hr class="divider">
+  <section lang="en" dir="ltr" aria-labelledby="offline-en">
+    <h2 id="offline-en">Internet connection unavailable</h2>
+    <p>This page shows no patient or case data. It does not confirm a booking, upload or payment. Reconnect and open sign-in to check the current status.</p>
+    <a class="btn" href="/en/login">Open sign-in after reconnecting</a>
+  </section>
 </main>
 </body>
 </html>
